@@ -12,7 +12,10 @@ extension Bundle {
     
     class var mainSdk: Bundle {
         let bundle = Bundle.init(for: PaymentForm.self)
-        let bundleUrl = bundle.url(forResource: "CloudpaymentsSDK", withExtension: "bundle")
+        var bundleUrl = bundle.url(forResource: "CloudpaymentsSDK", withExtension: "bundle")
+        if bundleUrl == nil {
+            bundleUrl = bundle.url(forResource: "CloudPayments_CloudpaymentsSDK", withExtension: "bundle")
+        }
         return Bundle.init(url: bundleUrl!)!
     }
     

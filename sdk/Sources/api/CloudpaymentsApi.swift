@@ -1,4 +1,5 @@
 
+import Foundation
 import CloudpaymentsNetworking
 
 public struct TPayButtonConfiguration {
