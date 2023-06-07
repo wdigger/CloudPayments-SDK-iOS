@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PublicKeyData: Codable {
+public struct PublicKeyData: Codable {
     let Pem: String?
     let Version: Int?
     

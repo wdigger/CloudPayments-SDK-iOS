@@ -44,6 +44,10 @@ public class ThreeDsProcessor: NSObject, WKNavigationDelegate {
                         }
                         
                         let webView = WKWebView.init()
+                        webView.configuration.preferences.javaScriptEnabled = true
+                        if #available(iOS 14.0, *) {
+                            webView.configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+                        }
                         webView.navigationDelegate = self
                         if let mimeType = httpResponse.mimeType,
                            let url = httpResponse.url {
