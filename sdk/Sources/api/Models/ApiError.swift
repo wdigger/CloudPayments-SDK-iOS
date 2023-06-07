@@ -79,13 +79,13 @@ public class ApiError {
         return error
     }
     
-    static func getErrorDescription(code: String) -> String {
+    public static func getErrorDescription(code: String) -> String {
         
         let description: String = errors[code] ?? "Операция не может быть обработана"
         return description
     }
     
-    static func getErrorDescriptionExtra(code: String) -> String {
+    public static func getErrorDescriptionExtra(code: String) -> String {
         
         let description: String = errors[code + "_extra"] ?? "Свяжитесь с вашим банком или воспользуйтесь другой картой"
         return description

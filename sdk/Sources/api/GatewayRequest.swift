@@ -5,6 +5,7 @@
 //  Created by Cloudpayments on 16.06.2023.
 //
 
+import Foundation
 import CloudpaymentsNetworking
 
 struct PayButtonStatus {
