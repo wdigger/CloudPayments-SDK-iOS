@@ -44,7 +44,10 @@ public class PaymentForm: BaseViewController {
 
         if PKPaymentAuthorizationViewController.canMakePayments() || !configuration.disableYandexPay {
             let controller = PaymentOptionsForm.present(with: configuration, from: from, completion: completion) as! PaymentOptionsForm
-            controller.onCardOptionSelected = {
+            controller.onCardOptionSelected = { isSaveCard in
+                
+                 configuration.paymentData.saveCard = isSaveCard
+                
                 self.showCardForm(with: configuration, from: from, completion: nil)
             }
             return controller

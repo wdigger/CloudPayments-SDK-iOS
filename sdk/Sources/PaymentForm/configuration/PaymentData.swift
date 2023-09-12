@@ -69,6 +69,7 @@ public class PaymentData {
     private (set) var cultureName: String?
     private (set) var jsonData: String?
     
+    var saveCard: Bool?
     var cryptogram: String?
     
     public init() {

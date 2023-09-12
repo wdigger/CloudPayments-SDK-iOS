@@ -50,7 +50,8 @@ class GatewayRequest {
                 "TtlMinutes" : model.ttlMinutes,
                 "SuccessRedirectUrl" : model.successRedirectURL,
                 "FailRedirectUrl" : model.failRedirectURL,
-                "Webview" : true
+                "Webview" : true,
+                "Scenario": "7"
             ] as [String : Any?]
             
             if let saveCard = model.saveCard {
@@ -78,7 +79,7 @@ class GatewayRequest {
 
 extension GatewayRequest {
     
-    public static func isOnTinkoffPayAction(baseURL: String, terminalPublicId: String?, completion: @escaping (Bool, Int?) -> Void) {
+    public static func isOnGatewayAction(baseURL: String, terminalPublicId: String?, isOnBank: CaseOfBank, completion: @escaping (Bool, Int?) -> Void) {
         
         TinkoffPayRequestData<GatewayConfiguration>(baseURL: baseURL, terminalPublicId: terminalPublicId).execute { value in
            let array = value.model.externalPaymentMethods
@@ -87,7 +88,7 @@ extension GatewayRequest {
             for element in array {
                 guard let rawValue = element.type, let value = CaseOfBank(rawValue: rawValue) else { continue }
                 
-                if CaseOfBank.tinkoff == value {
+                if isOnBank == value {
                     return completion(element.enabled, id)
                 }
             }
@@ -100,7 +101,7 @@ extension GatewayRequest {
         }
     }
     
-    public static func isTinkoffQrLink(baseURL: String, model: TinkoffPayData, completion: @escaping (TinkoffResultModel?) -> Void) {
+    public static func isTinkoffQrLink(baseURL: String, model: TinkoffPayData, completion: @escaping (QrPayResponse?) -> Void) {
         TinkoffPayRequestData<TinkoffResultPayData>(baseURL: baseURL, model: model).execute { value in
 //            GatewayRequest.resultDataPrint(type: ResultTinkoffPayData.self, value)
             return completion(value.model)
@@ -112,26 +113,26 @@ extension GatewayRequest {
     }
     
     public static func getStatusTransactionId(baseURL: String, publicId: String, transactionId: Int) {
-        let model = TinkoffPayRequestData<TinkoffRepsonseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
+        let model = TinkoffPayRequestData<RepsonseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
         
         model.execute { value in
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "TinkoffStatusPayObserver"), object: value)
+            NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key, object: value)
 
         } onError: { string in
 //            GatewayRequest.resultDataPrint(type: TinkoffRepsonseTransactionModel.self, string.localizedDescription)
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "TinkoffStatusPayObserver"), object: string)
+            NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key, object: string)
             return
         }
     }
     
-    public static func resultDataPrint<T:Decodable>(type: T.Type, _ value: Any? ) {
-        print("\n\n")
-        print(#line)
-        print("-----------------------", type.self, "-----------------------")
-        print("\n", value, "\n")
-        print("-----------------------", "end", "-----------------------")
-        print("\n\n")
-    }
+//    public static func resultDataPrint<T:Decodable>(type: T.Type, _ value: Any? ) {
+//        print("\n\n")
+//        print(#line)
+//        print("-----------------------", type.self, "-----------------------")
+//        print("\n", value, "\n")
+//        print("-----------------------", "end", "-----------------------")
+//        print("\n\n")
+//    }
 }
 
 enum StatusPay: String {

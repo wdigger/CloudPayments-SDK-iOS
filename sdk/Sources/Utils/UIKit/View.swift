@@ -7,7 +7,7 @@
 
 import UIKit
 
-class View: UIView {
+public class View: UIView {
     @IBInspectable var activeColor: UIColor = UIColor.mainBlue
     
     @IBInspectable var borderWidth : CGFloat = 0.0 {
@@ -47,7 +47,9 @@ class View: UIView {
     }
     
     
-    
+    open class func animated(animations: @escaping () -> Void, completion: ((Bool) -> Void)? = nil) {
+        animate(withDuration: 0.35, delay: 0, animations: animations, completion: completion)
+    }
 }
 
 enum BorderEdge {

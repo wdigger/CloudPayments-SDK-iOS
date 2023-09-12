@@ -21,6 +21,13 @@ class DemoViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
+
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
+        view.addGestureRecognizer(tap)
+    }
+
+    @objc private func tapAction() {
+        view.endEditing(true)
     }
     
     // MARK: - Private methods
@@ -118,10 +125,11 @@ class DemoViewController: BaseViewController {
             scanner: nil,
             requireEmail: true,
             useDualMessagePayment: footer.demoActionSwitch.isOn,
-            disableApplePay: false,
+            disableApplePay: true,
             disableYandexPay: false,
             apiUrl: apiUrl,
-            changedEmail: nil
+            changedEmail: nil,
+            customListBanks: false
         )
 
         PaymentForm.present(with: configuration, from: self)

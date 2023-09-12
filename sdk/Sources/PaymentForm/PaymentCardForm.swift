@@ -411,6 +411,12 @@ public class PaymentCardForm: PaymentForm {
 
 //MARK: - Delegates for TextField
 extension PaymentCardForm {
+    
+    private var isHiddenCvv: Bool {
+        guard let text = cardNumberTextField.text else { return false }
+        return Card.isHumoCard(cardNumber: text) || Card.isUzcardCard(cardNumber: text)
+    }
+    
     /// Did Begin Editings
     /// - Parameter textField:
     @objc private func didBeginEditing(_ textField: UITextField) {
@@ -452,6 +458,7 @@ extension PaymentCardForm {
     /// Did Change
     /// - Parameter textField:
     @objc private func didChange(_ textField: UITextField) {
+        cvvView.isHidden = isHiddenCvv
         
         switch textField {
             

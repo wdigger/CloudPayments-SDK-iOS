@@ -10,7 +10,7 @@ import Foundation
 enum CaseOfBank: Int {
     case sberbank = 1
     case qiwi = 2
-    case yandex = 5
+    case sbp = 5
     case tinkoff = 6
 }
 

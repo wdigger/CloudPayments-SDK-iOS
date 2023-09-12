@@ -122,7 +122,7 @@ final class FooterForPresentCard: UIView {
     func setup(_ status: SaveCardState) {
         savingButton.superview?.isHidden = !(status == .isOnCheckbox)
         forcedInformationButton.superview?.isHidden = !(status == .isOnHint)
-        if status == .isOnCheckbox { isSelectedSave = true }
+        if status == .isOnCheckbox { isSelectedSave = false }
     }
 }
 

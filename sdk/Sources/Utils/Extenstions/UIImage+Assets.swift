@@ -41,6 +41,10 @@ extension UIImage {
     public class var icn_attention: UIImage {
         return self.named("icn_attention")
     }
+    
+    public class var icn_sbp_logo: UIImage {
+        return self.named("icon_sbp_logo")
+    }
 }
 
 extension UIImageView {

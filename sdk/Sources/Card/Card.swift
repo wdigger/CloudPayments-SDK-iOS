@@ -142,20 +142,14 @@ public struct Card {
         return false
     }
     
-    private static func isUzcardCard(cardNumber: String?) -> Bool {
+    public static func isUzcardCard(cardNumber: String?) -> Bool {
         //Uzcard 8600
-        if (cardNumber?.prefix(4) == "8600") {
-            return true
-        }
-        return false
+        return cardNumber?.prefix(4) == "8600"
     }
 
-    private static func isHumoCard(cardNumber: String?) -> Bool {
+    public static func isHumoCard(cardNumber: String?) -> Bool {
         //Humo 9860
-        if (cardNumber?.prefix(4) == "9860") {
-            return true
-        }
-        return false
+        return cardNumber?.prefix(4) == "9860"
     }
     
     public static func cardType(from cardNumber: String) -> CardType {

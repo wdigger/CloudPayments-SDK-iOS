@@ -49,7 +49,7 @@ struct TinkoffPayData: Codable {
 
 // MARK: - TinkoffResultPayData
 struct TinkoffResultPayData: Codable {
-    let model: TinkoffResultModel?
+    let model: QrPayResponse?
     let success: Bool
     let message: String?
 
@@ -60,32 +60,61 @@ struct TinkoffResultPayData: Codable {
     }
 }
 
-// MARK: - TinkoffResultModel
-struct TinkoffResultModel: Codable {
-    let qrURL: String?
-    let qrImage: String?
-    let transactionId: Int?
-    let merchantOrderId: String?
-    let amount: Int?
+struct QrResponseModel: Codable {
+    let model: QrPayResponse
+    let success: Bool
     let message: String?
-    let isTest: Bool?
-
+    
     enum CodingKeys: String, CodingKey {
-        case qrURL = "QrUrl"
-        case qrImage = "QrImage"
-        case transactionId = "TransactionId"
-        case merchantOrderId = "MerchantOrderId"
-        case amount = "Amount"
+        case model = "Model"
+        case success = "Success"
         case message = "Message"
-        case isTest = "IsTest"
     }
 }
 
-// MARK: - TinkoffRepsonseTransactionModel
-struct TinkoffRepsonseTransactionModel: Codable {
+
+// MARK: - QrPayResponse
+struct QrPayResponse: Codable {
+    let qrURL: String?
+//    let qrImage: String?
+    let transactionId: Int?
+//    let merchantOrderId: String?
+    let providerQrId: String?
+    let amount: Int?
+    let message: String?
+    let isTest: Bool?
+    var banks: SbpQRModel?
+
+    enum CodingKeys: String, CodingKey {
+        case qrURL = "QrUrl"
+//        case qrImage = "QrImage"
+        case transactionId = "TransactionId"
+//        case merchantOrderId = "MerchantOrderId"
+        case providerQrId = "ProviderQrId"
+        case amount = "Amount"
+        case message = "Message"
+        case isTest = "IsTest"
+        case banks = "Banks"
+    }
+    
+    init(qrURL: String?, transactionId: Int?, amount: Int?, message: String?, isTest: Bool?, banks: SbpQRModel? = nil, providerQrId: String? = nil) {
+        self.qrURL = qrURL
+//        self.qrImage = qrImage
+        self.transactionId = transactionId
+//        self.merchantOrderId = merchantOrderId
+        self.amount = amount
+        self.message = message
+        self.isTest = isTest
+        self.banks = banks
+        self.providerQrId = providerQrId
+    }
+}
+
+// MARK: - RepsonseTransactionModel
+struct RepsonseTransactionModel: Codable {
     let success: Bool?
     let message: String?
-    let model: TinkoffRepsonseStatusModel?
+    let model: RepsonseStatusModel?
     
     enum CodingKeys: String, CodingKey {
         case success = "Success"
@@ -94,8 +123,8 @@ struct TinkoffRepsonseTransactionModel: Codable {
     }
 }
 
-// MARK: - TinkoffRepsonseStatusModel
-struct TinkoffRepsonseStatusModel: Codable {
+// MARK: - RepsonseStatusModel
+struct RepsonseStatusModel: Codable {
     let transactionId: Int?
     let status: StatusPay.RawValue?
     let statusCode: Int?
@@ -110,3 +139,4 @@ struct TinkoffRepsonseStatusModel: Codable {
         //case escrowAccumulationId = "EscrowAccumulationId"
     }
 }
+

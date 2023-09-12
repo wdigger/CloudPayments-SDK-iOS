@@ -80,10 +80,10 @@ public class PaymentProcessForm: PaymentForm {
     private var email: String?
     private var transactionId: Int?
     private var tinkoffState: Bool = false
-    private var isOnSaveCard: Bool? = nil
+    private var isSaveCard: Bool? = nil
     
     @discardableResult
-    public class func present(with configuration: PaymentConfiguration, cryptogram: String?, email: String?, state: State = .inProgress, from: UIViewController, isOnTinkoffPay: Bool = false, isOnSaveCard: Bool? = nil, completion: (() -> ())? = nil) -> PaymentForm? {
+    public class func present(with configuration: PaymentConfiguration, cryptogram: String?, email: String?, state: State = .inProgress, from: UIViewController, isOnTinkoffPay: Bool = false, isSaveCard: Bool? = nil, completion: (() -> ())? = nil) -> PaymentForm? {
         let storyboard = UIStoryboard.init(name: "PaymentForm", bundle: Bundle.mainSdk)
 
         let controller = storyboard.instantiateViewController(withIdentifier: "PaymentProcessForm") as! PaymentProcessForm        
@@ -92,7 +92,7 @@ public class PaymentProcessForm: PaymentForm {
         controller.email = email
         controller.state = state
         controller.tinkoffState = isOnTinkoffPay
-        controller.isOnSaveCard = isOnSaveCard
+        controller.isSaveCard = isSaveCard
         
         controller.show(inViewController: from, completion: completion)
         
@@ -303,7 +303,7 @@ extension PaymentProcessForm {
                                    ttlMinutes: 30,
                                    successRedirectURL: "https://cp.ru",
                                    failRedirectURL: "https://cp.ru",
-                                   saveCard: isOnSaveCard)
+                                   saveCard: isSaveCard)
         
         let baseURL = self.configuration.apiUrl
         
@@ -344,12 +344,13 @@ extension PaymentProcessForm {
     @objc private func observerPayStatus(_ notification: NSNotification) {
         guard let vc = self.presentingViewController else { return }
         
-        guard let result = notification.object as? TinkoffRepsonseTransactionModel,
+        guard let result = notification.object as? RepsonseTransactionModel,
               let rawValue = result.model?.status,
               let status = StatusPay(rawValue: rawValue)
         else {
             if let error = notification.object as? Error {
-                let code = error._code
+                let code = error._code < 0 ? -error._code : error._code
+                if code > 1000 {checkstatusTransactionId(); return }
                 let string = String(code)
                 let descriptionError = ApiError.getFullErrorDescription(code: string)
                 presentError(descriptionError, vc: vc)
@@ -365,11 +366,12 @@ extension PaymentProcessForm {
         checkstatusTransactionId()
             
         case .authorized,.completed, .cancelled:
+            let transaction = Transaction(transactionId: transactionId)
             transactionId = nil
             guard let vc = self.presentingViewController else { return }
 
             dismiss(animated: true) {
-                PaymentProcessForm.present(with: self.configuration, cryptogram: nil, email: nil, state: .succeeded(Transaction()), from: vc)
+                PaymentProcessForm.present(with: self.configuration, cryptogram: nil, email: nil, state: .succeeded(transaction), from: vc)
             }
             
         case .declined:
@@ -390,10 +392,12 @@ extension PaymentProcessForm {
     
     private func checkstatusTransactionId() {
         guard let id = transactionId else { return }
+        NotificationCenter.default.removeObserver(self, name: ObserverKeys.tinkoffPayStatus.key, object: nil)
         let url = configuration.apiUrl
         let publicId = configuration.publicId
         //TinkoffStatusPayObserver
-        NotificationCenter.default.addObserver(self, selector: #selector(observerPayStatus(_:)), name: NSNotification.Name(rawValue: "TinkoffStatusPayObserver"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(observerPayStatus(_:)),
+                                               name: ObserverKeys.tinkoffPayStatus.key, object: nil)
         GatewayRequest.getStatusTransactionId(baseURL: url, publicId: publicId, transactionId: id)
     }
 }

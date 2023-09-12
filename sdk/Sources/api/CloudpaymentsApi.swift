@@ -142,7 +142,7 @@ public class CloudpaymentsApi {
                                 email: String?,
                                 paymentData: PaymentData) -> [String: Any] {
         
-        let parameters: [String: Any] = [
+        var parameters: [String: Any] = [
             "Amount" : paymentData.amount, // Сумма платежа (Обязательный)
             "Currency" : paymentData.currency, // Валюта (Обязательный)
             "IpAddress" : paymentData.ipAddress ?? "",
@@ -157,6 +157,10 @@ public class CloudpaymentsApi {
             "scenario" : 7
         ]
         
+        if let saveCard = paymentData.saveCard {
+            parameters["SaveCard"] = saveCard
+        }
+
         return parameters
     }
 
