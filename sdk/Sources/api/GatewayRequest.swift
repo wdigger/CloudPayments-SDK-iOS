@@ -51,7 +51,8 @@ class GatewayRequest {
                 "SuccessRedirectUrl" : model.successRedirectURL,
                 "FailRedirectUrl" : model.failRedirectURL,
                 "Webview" : true,
-                "Scenario": "7"
+                "Scenario": "7",
+                "JsonData": model.jsonData
             ] as [String : Any?]
             
             if let saveCard = model.saveCard {

@@ -60,7 +60,7 @@ public class PaymentProcessForm: PaymentForm {
             }
         }
     }
-    // MARK: - Private properties 
+    // MARK: - Private properties
     @IBOutlet private weak var progressIcon: UIImageView!
     @IBOutlet private weak var messageLabel: UILabel!
     @IBOutlet private weak var actionButton: Button!
@@ -74,7 +74,7 @@ public class PaymentProcessForm: PaymentForm {
     @IBOutlet private weak var tinkoffDescription: UILabel!
     
     @IBOutlet private weak var selectPaymentButton: Button!
-
+    
     private var state: State = .inProgress
     private var cryptogram: String?
     private var email: String?
@@ -85,8 +85,8 @@ public class PaymentProcessForm: PaymentForm {
     @discardableResult
     public class func present(with configuration: PaymentConfiguration, cryptogram: String?, email: String?, state: State = .inProgress, from: UIViewController, isOnTinkoffPay: Bool = false, isSaveCard: Bool? = nil, completion: (() -> ())? = nil) -> PaymentForm? {
         let storyboard = UIStoryboard.init(name: "PaymentForm", bundle: Bundle.mainSdk)
-
-        let controller = storyboard.instantiateViewController(withIdentifier: "PaymentProcessForm") as! PaymentProcessForm        
+        
+        let controller = storyboard.instantiateViewController(withIdentifier: "PaymentProcessForm") as! PaymentProcessForm
         controller.configuration = configuration
         controller.cryptogram = cryptogram
         controller.email = email
@@ -182,7 +182,7 @@ public class PaymentProcessForm: PaymentForm {
         self.state = state
         self.stopAnimation()
         
-
+        
         switch state {
             
         case .inProgress:
@@ -286,26 +286,33 @@ public class PaymentProcessForm: PaymentForm {
 extension PaymentProcessForm {
     func pushPayForTinkoff(state: PaymentProcessForm.State) {
         
+        let baseURL = configuration.apiUrl
         let publicId = configuration.publicId
-        let sheme: Scheme = configuration.useDualMessagePayment ? .auth : .charge
-        let invoiceID = configuration.paymentData.invoiceId
+        let amount = configuration.paymentData.amount
+        let accountId = configuration.paymentData.accountId
+        let invoiceId = configuration.paymentData.invoiceId
+        let description = configuration.paymentData.description
+        let currency = configuration.paymentData.currency
+        let email = configuration.paymentData.email
+        let sсheme: Scheme = configuration.useDualMessagePayment ? .auth : .charge
+        let jsonData = configuration.paymentData.jsonData
         
-        let model = TinkoffPayData(publicId: publicId, amount: self.configuration.paymentData.amount,
-                                   accountId: self.configuration.paymentData.accountId,
-                                   invoiceId: invoiceID,
+        let model = TinkoffPayData(publicId: publicId,
+                                   amount: amount ,
+                                   accountId: accountId,
+                                   invoiceId: invoiceId,
                                    browser: nil,
-                                   description: self.configuration.paymentData.description,
-                                   currency: self.configuration.paymentData.currency,
-                                   email: self.configuration.paymentData.email,
+                                   description: description,
+                                   currency: currency,
+                                   email: email,
                                    ipAddress: "123.123.123.123",
                                    os: nil,
-                                   scheme: sheme.rawValue,
+                                   scheme: sсheme.rawValue,
                                    ttlMinutes: 30,
                                    successRedirectURL: "https://cp.ru",
                                    failRedirectURL: "https://cp.ru",
-                                   saveCard: isSaveCard)
-        
-        let baseURL = self.configuration.apiUrl
+                                   saveCard: isSaveCard,
+                                   jsonData: jsonData)
         
         GatewayRequest.isTinkoffQrLink(baseURL: baseURL, model: model) { value in
             let message = value?.message
@@ -363,13 +370,13 @@ extension PaymentProcessForm {
         
         switch status {
         case .created, .pending:
-        checkstatusTransactionId()
+            checkstatusTransactionId()
             
         case .authorized,.completed, .cancelled:
             let transaction = Transaction(transactionId: transactionId)
             transactionId = nil
             guard let vc = self.presentingViewController else { return }
-
+            
             dismiss(animated: true) {
                 PaymentProcessForm.present(with: self.configuration, cryptogram: nil, email: nil, state: .succeeded(transaction), from: vc)
             }

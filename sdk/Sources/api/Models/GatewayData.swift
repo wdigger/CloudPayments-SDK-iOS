@@ -27,6 +27,7 @@ struct TinkoffPayData: Codable {
     let successRedirectURL: String?
     let failRedirectURL: String?
     let saveCard: Bool?
+    let jsonData: String?
 
     enum CodingKeys: String, CodingKey {
         case publicId = "PublicId"
@@ -44,6 +45,7 @@ struct TinkoffPayData: Codable {
         case successRedirectURL = "SuccessRedirectUrl"
         case failRedirectURL = "FailRedirectUrl"
         case saveCard = "SaveCard"
+        case jsonData = "JsonData"
     }
 }
 
