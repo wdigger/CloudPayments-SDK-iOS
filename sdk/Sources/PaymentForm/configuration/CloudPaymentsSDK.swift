@@ -14,9 +14,6 @@ final public class CloudPaymentsSDK {
     private static var initialized: Bool = false
 
     public static var instance: CloudPaymentsSDK = {
-        guard initialized == true else {
-            fatalError("CloudPaymentsSDK should be initialized using initialize(yandexPayAppId:sandboxMode:) method before use")
-        }
         return CloudPaymentsSDK()
     }()
 
