@@ -11,11 +11,11 @@ struct PublicKeyData: Codable {
     let Pem: String?
     let Version: Int?
     
-    private static let key = "ApiURLKeyCrypto"
+    private static let key = "ApiURLKey"
     
     public var version: String { return String(Version ?? 0)}
     
-    private static var keyChain: String { return "PublicBaseKey64"}
+    private static var publicKey: String { return "PublicBaseKey64"}
     
     public static var apiURL: String! {
         get {
@@ -37,12 +37,11 @@ struct PublicKeyData: Codable {
     }
     
     public static var getValue: PublicKeyData? {
-        guard let data = UserDefaults.standard.data(forKey: PublicKeyData.keyChain) else {
+        guard let data = UserDefaults.standard.data(forKey: PublicKeyData.publicKey) else {
             Network.updatePublicCryptoKey()
             return nil
         }
         guard let value = try? JSONDecoder().decode(PublicKeyData.self, from: data) else {
-            print("ошибка в парсинге данных\n:", #function, "\nline:", #line)
             return nil
         }
         
@@ -51,7 +50,7 @@ struct PublicKeyData: Codable {
     
     public func save() {
         let data = try? JSONEncoder().encode(self)
-        UserDefaults.standard.set(data, forKey: PublicKeyData.keyChain)
+        UserDefaults.standard.set(data, forKey: PublicKeyData.publicKey)
         UserDefaults.standard.synchronize()
     }
     

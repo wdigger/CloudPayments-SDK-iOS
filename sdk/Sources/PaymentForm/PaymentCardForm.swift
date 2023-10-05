@@ -8,70 +8,6 @@
 
 import UIKit
 
-enum EyeStatus: String {
-    case open = "icn_eye_open"
-    case closed = "icn_eye_closed"
-    
-    func toString() -> String {
-        return self.rawValue
-    }
-    
-    var image: UIImage? {
-        switch self {
-        case .open:
-            return UIImage.named(rawValue)
-        case .closed:
-            return UIImage.named(rawValue)
-        }
-    }
-}
-
-enum ValidState {
-    case border
-    case error
-    case normal
-    case text
-    
-    var color: UIColor {
-        switch self {
-        case .border:
-            return .border
-        case .error:
-            return .errorBorder
-        case .normal:
-            return .mainBlue
-        case .text:
-            return .mainText
-        }
-    }
-}
-
-enum PlaceholderType: String {
-    case correctCard = "Номер карты"
-    case incorrectCard = "Некорректный номер карты"
-    case correctExpDate = "ММ / ГГ"
-    case incorrectExpDate = "Ошибка в дате"
-    case correctCvv = "СVV"
-    case incorrectCvv = "Ошибка в CVV"
-    
-    func toString() -> String {
-        return self.rawValue
-    }
-}
-
-enum InputFieldType {
-    case card
-    case expDate
-    case cvv
-}
-
-extension TextField {
-    var cardExpText: String? {
-        get {self.text?.replacingOccurrences(of: " ", with: "") }
-        set {self.text = newValue?.onlyNumbers().formattedString(mask: "XX / XX", ignoredSymbols: nil)}
-    }
-}
-
 public class PaymentCardForm: PaymentForm {
     // MARK: - Private properties
     @IBOutlet private weak var cardNumberTextField: TextField!
@@ -93,6 +29,7 @@ public class PaymentCardForm: PaymentForm {
     @IBOutlet private weak var cvvPlaceholder: UILabel!
     @IBOutlet private weak var stackInpitMainStackView: UIStackView!
     @IBOutlet private weak var eyeOpenButton: Button!
+    @IBOutlet private weak var paymentCardLabel: UILabel!
     
     lazy var defaultHeight: CGFloat = self.mainCardStackView.frame.height
     let dismissibleHigh: CGFloat = 400
@@ -203,6 +140,15 @@ public class PaymentCardForm: PaymentForm {
         configureTextFields()
         hideKeyboardWhenTappedAround()
         setButtonsAndContainersEnabled(isEnabled: false)
+        paymentCardLabel.textColor = .mainText
+        
+        cardNumberTextField.textColor = .mainText
+        cardExpDateTextField.textColor = .mainText
+        cardCvvTextField.textColor = .mainText
+        
+        cardLabel.textColor = .colorProgressText
+        expDatePlaceholder.textColor = .colorProgressText
+        cvvPlaceholder.textColor = .colorProgressText
     }
     
     func setupPanGesture() {

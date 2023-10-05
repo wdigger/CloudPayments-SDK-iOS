@@ -7,7 +7,22 @@
 
 import CloudpaymentsNetworking
 
+struct PayButtonStatus {
+    var isOnSbp: Bool
+    var isOnTinkoff: Bool
+    var isSaveCard: Int?
+    
+    init(isOnSbp: Bool = false, isOnTinkoff: Bool = false, isSaveCard: Int? = nil) {
+        self.isOnSbp = isOnSbp
+        self.isOnTinkoff = isOnTinkoff
+        self.isSaveCard = isSaveCard
+    }
+}
+
 class GatewayRequest {
+    static var payButtonStatus: PayButtonStatus?
+    static var connectNetworkNotification: Bool = false
+    
     private class TinkoffPayRequestData<Model: Codable>: BaseRequest, CloudpaymentsRequestType {
         
         var data: CloudpaymentsNetworking.CloudpaymentsRequest
@@ -80,36 +95,72 @@ class GatewayRequest {
 
 extension GatewayRequest {
     
-    public static func isOnGatewayAction(baseURL: String, terminalPublicId: String?, isOnBank: CaseOfBank, completion: @escaping (Bool, Int?) -> Void) {
+    public static func isOnGatewayAction(baseURL: String, terminalPublicId: String?, completion: @escaping (PayButtonStatus?) -> Void) {
+        var result = PayButtonStatus()
         
         TinkoffPayRequestData<GatewayConfiguration>(baseURL: baseURL, terminalPublicId: terminalPublicId).execute { value in
-           let array = value.model.externalPaymentMethods
-            let id = value.model.features?.isSaveCard
+            result.isSaveCard = value.model.features?.isSaveCard
             
-            for element in array {
+            for element in value.model.externalPaymentMethods {
                 guard let rawValue = element.type, let value = CaseOfBank(rawValue: rawValue) else { continue }
                 
-                if isOnBank == value {
-                    return completion(element.enabled, id)
+                switch value {
+                case .tinkoff: result.isOnTinkoff = element.enabled
+                case .sbp: result.isOnSbp = element.enabled
+                default: continue
                 }
             }
             
-            return completion(false, id)
+            self.payButtonStatus = result
             
-        } onError: { string in
-//            GatewayRequest.resultDataPrint(type: GatewayConfiguration.self, string.localizedDescription)
-            return completion(false, nil)
+            return completion(result)
+            
+        } onError: { error in
+            let code = error._code < 0 ? -error._code : error._code
+            self.payButtonStatus = code == 1009 ? nil : result
+            if code == 1009 {
+                connectNetworkNotification = true
+                self.connectNetworkNotification()
+                return completion(nil)
+            }
+            
+            return completion(result)
         }
     }
     
-    public static func isTinkoffQrLink(baseURL: String, model: TinkoffPayData, completion: @escaping (QrPayResponse?) -> Void) {
-        TinkoffPayRequestData<TinkoffResultPayData>(baseURL: baseURL, model: model).execute { value in
-//            GatewayRequest.resultDataPrint(type: ResultTinkoffPayData.self, value)
-            return completion(value.model)
+    class func connectNetworkNotification(_ count: Int = 0) {
+        if !connectNetworkNotification { return }
+        DispatchQueue.global().asyncAfter(wallDeadline: .now() + 3) {
+            // проверка соединения
+            let string = "https://www.google.com"
+            guard let url = URL(string: string) else { return }
+            let task = URLSession.shared.dataTask(with: .init(url: url)) {_,_,error in
+                guard let error = error, error._code == 1009 || error._code == -1009  else {
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: ObserverKeys.networkConnectStatus.key, object: true)
+                    }
+                    return
+                }
+                self.connectNetworkNotification(count + 1)
+            }
             
-        } onError: { string in
-//            GatewayRequest.resultDataPrint(type: TinkoffResultPayData.self, string.localizedDescription)
-            return completion(nil)
+            task.resume()
+        }
+    }
+    
+    public static func isTinkoffQrLink(baseURL: String, model: TinkoffPayData, completion: @escaping (QrPayResponse?, Bool) -> Void) {
+        TinkoffPayRequestData<TinkoffResultPayData>(baseURL: baseURL, model: model).execute { value in
+            return completion(value.model, true)
+            
+        } onError: { error in
+            let code = error._code < 0 ? -error._code : error._code
+            if code == 1009 {
+                connectNetworkNotification = true
+                connectNetworkNotification()
+                return completion(nil, false)
+            }
+            
+            return completion(nil, true)
         }
     }
     
@@ -120,27 +171,8 @@ extension GatewayRequest {
             NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key, object: value)
 
         } onError: { string in
-//            GatewayRequest.resultDataPrint(type: TinkoffRepsonseTransactionModel.self, string.localizedDescription)
             NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key, object: string)
             return
         }
     }
-    
-//    public static func resultDataPrint<T:Decodable>(type: T.Type, _ value: Any? ) {
-//        print("\n\n")
-//        print(#line)
-//        print("-----------------------", type.self, "-----------------------")
-//        print("\n", value, "\n")
-//        print("-----------------------", "end", "-----------------------")
-//        print("\n\n")
-//    }
-}
-
-enum StatusPay: String {
-    case created = "Created"
-    case pending = "Pending"
-    case authorized = "Authorized"
-    case completed = "Completed"
-    case cancelled = "Cancelled"
-    case declined = "Declined"
 }

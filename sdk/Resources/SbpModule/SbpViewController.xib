@@ -133,9 +133,9 @@
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </stackView>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PUG-Dd-CM8" userLabel="LineView">
+                                <view alpha="0.80000000000000004" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PUG-Dd-CM8" userLabel="LineView">
                                     <rect key="frame" x="36" y="97" width="337" height="1"/>
-                                    <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                    <color key="backgroundColor" red="0.85882353779999998" green="0.85882353779999998" blue="0.86274516580000005" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="1" id="mwC-ns-Ett"/>
                                     </constraints>
@@ -176,7 +176,7 @@
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
-                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="x2B-Xe-ibO" secondAttribute="bottom" priority="950" id="94I-zr-7wO"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="x2B-Xe-ibO" secondAttribute="bottom" priority="900" id="94I-zr-7wO"/>
                 <constraint firstItem="x2B-Xe-ibO" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="H7m-LY-zLV"/>
                 <constraint firstItem="x2B-Xe-ibO" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="bottom" id="KpY-jP-LoE"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="x2B-Xe-ibO" secondAttribute="trailing" id="p6K-n0-9lY"/>
@@ -188,9 +188,6 @@
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemGray5Color">
-            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

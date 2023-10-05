@@ -75,7 +75,7 @@ class SbpNoAppsViewController: BaseViewController {
                 presentesionView(false) {
                     guard let parent = self.presentingViewController else {return}
                     self.dismiss(animated: false)
-                    PaymentOptionsForm.present(with: self.configuration, from: parent, completion: nil)
+                    PaymentForm.present(with: self.configuration, from: parent)
                 }
             } else {
                 bottomConstraint.constant = -heightPresentView

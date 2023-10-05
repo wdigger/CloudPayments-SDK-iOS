@@ -11,8 +11,12 @@ import Foundation
 extension String {
     static let bundleName = "CloudpaymentsSdkResources"
     static let errorWord = "Ошибка"
+    static let noData = "Отсутствует соединение с сервером"
     static let errorCreatingCryptoPacket = "Ошибка при создании крипто-пакета"
     static let informationWord = "Информация"
+    static let noConnection = "Проверьте подключение к интернету"
+    static let infoOutdated = "Данные могли устареть"
+    static let noBankApps = "Приложение банка не найдено"
     
     static let RUBLE_SIGN = "\u{20BD}"
     static let EURO_SIGN = "\u{20AC}"

@@ -10,47 +10,50 @@ import UIKit
 import PassKit
 import YandexPaySDK
 
-enum EmailType: String {
-    case incorrectEmail = "Некорректный e-mail"
-    case receiptEmail = "E-mail для квитанции"
-    case defaultEmail = "E-mail"
-
-    func toString() -> String {
-        return self.rawValue
-    }
-}
-
 final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControllerDelegate, YandexPayButtonDelegate {
-    // MARK: - Private Properties
-    // main stackView
-    @IBOutlet private weak var mainStackView: UIStackView!
-    // containers
     @IBOutlet private weak var yandexPayContainer: View!
     @IBOutlet private weak var applePayContainer: View!
     @IBOutlet private weak var payWithCardButton: Button!
-    // mainViewInputReceiptButton and button
     @IBOutlet private weak var footer: FooterForPresentCard!
-    // emailView,emailInputView,attentionView and attentionImage
-    private var emailTextField: TextField {
-        get { return footer.emailTextField }
-        set { footer.emailTextField = newValue }
-    }
-    private var emailPlaceholder: UILabel! {
-        get { return footer.emailLabel }
-        set { footer.emailLabel = newValue}
-    }
-    // container constraints
-    @IBOutlet private weak var containerViewHeightConstraint:NSLayoutConstraint!
-    @IBOutlet private weak var bottomContainerViewConstraint: NSLayoutConstraint!
-    // main container views
     @IBOutlet private weak var mainAppleView: View!
     @IBOutlet private weak var mainYandexView: View!
     @IBOutlet private weak var mainTinkoffView: View!
     @IBOutlet private weak var tinkoffButton: Button!
     @IBOutlet private weak var sbpButton: Button!
+    @IBOutlet private weak var loaderTinkoffView: UIView!
+    @IBOutlet private weak var loaderSBPView: UIView!
+    @IBOutlet private weak var heightConstraint:NSLayoutConstraint!
+    @IBOutlet private weak var paymentLabel: UILabel!
     
-    private let alertInfoView = AlertInfoView()
-    private var constraint: NSLayoutConstraint!
+    private var emailTextField: TextField {
+        get { return footer.emailTextField } set { footer.emailTextField = newValue }
+    }
+    
+    private var emailPlaceholder: UILabel! {
+        get { return footer.emailLabel } set { footer.emailLabel = newValue}
+    }
+    
+    private var isAnimatedTinkoffProgress: Bool = false {
+        didSet {
+            if isAnimatedTinkoffProgress {
+                updateTinkoffProgressView()
+                isEnabledView(isEnabled: false, select: tinkoffButton)
+            } else {
+                isEnabledView(isEnabled: true, select: tinkoffButton)
+            }
+        }
+    }
+    
+    private var isAnimatedSbpProgress: Bool = false {
+        didSet {
+            if isAnimatedSbpProgress {
+                updateSbpProgressView()
+                isEnabledView(isEnabled: false, select: sbpButton)
+            } else {
+                isEnabledView(isEnabled: true, select: sbpButton)
+            }
+        }
+    }
     
     private var supportedPaymentNetworks: [PKPaymentNetwork] {
         get {
@@ -66,20 +69,21 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         }
     }
     
+    private var isOnKeyboard: Bool = false
+    private var isCloused = false
+    private let loaderView = LoaderView()
+    private let alertInfoView = AlertInfoView()
+    private var constraint: NSLayoutConstraint!
+    private var rotation: Double = 0
     private var applePaymentSucceeded: Bool?
     private var resultTransaction: Transaction?
     private var errorMessage: String?
-    private var isSaveCard: Int!
-    private var isOnTinkoffPay: Bool = false
-    private var isOnSbp: Bool = false
+
+    private lazy var progressTinkoffView: CircleProgressView = .init(frame: .init(x: 0, y: 0, width: 28, height: 28), width: 2)
+    private lazy var progressSBPView: CircleProgressView  = .init(frame: .init(x: 0, y: 0, width: 28, height: 28), width: 2)
+    private lazy var currentContainerHeight: CGFloat = containerView.bounds.height
+    private var heightPresentView: CGFloat { return containerView.bounds.height }
     
-    // MARK: - Public Properties
-    lazy var defaultHeight: CGFloat = mainStackView.frame.height 
-    let dismissibleHigh: CGFloat = 300
-    let maximumContainerHeight: CGFloat = UIScreen.main.bounds.height - 64
-    lazy var currentContainerHeight: CGFloat = mainStackView.frame.height
-    
-    // MARK: - Public methods
     var onCardOptionSelected: ((_  isSaveCard: Bool?) -> ())?
     
     @discardableResult
@@ -94,6 +98,13 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         return controller
     }
     
+    override func loadView() {
+        super.loadView()
+        view.addSubview(loaderView)
+        loaderView.fullConstraint()
+        loaderView.isHidden = true
+    }
+    
     // MARK: - Lifecycle app
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -105,8 +116,19 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         emailTextField.delegate = self
         setupEmailPlaceholder()
         setupPanGesture()
+        setupAlertView()
+       
+        setupProgressViewForButtons()
         isOnActionPay(configuration: configuration)
-
+        paymentLabel.textColor = .mainText
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        GatewayRequest.connectNetworkNotification = false
+    }
+    
+    private func setupAlertView() {
         view.addSubview(alertInfoView)
         alertInfoView.translatesAutoresizingMaskIntoConstraints = false
         alertInfoView.alpha = 0
@@ -119,127 +141,118 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         constraint = alertInfoView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         constraint.isActive = true
     }
+    
+    private func setupProgressViewForButtons() {
+        loaderTinkoffView.superview?.isHidden = true
+        loaderSBPView.superview?.isHidden = true
+
+        loaderTinkoffView.addSubview(progressTinkoffView)
+        loaderSBPView.addSubview(progressSBPView)
+        
+        progressTinkoffView.fullConstraint()
+        progressSBPView.fullConstraint()
+        
+        progressTinkoffView.baseColor = .clear
+        progressSBPView.baseColor = .clear
+        
+        progressTinkoffView.progressColor = .white
+        progressSBPView.progressColor = .white
+    }
 
     private func isOnActionPay(configuration: PaymentConfiguration) {
         let terminalPublicId = configuration.publicId
         let baseUrl = configuration.apiUrl
         
-        let group = DispatchGroup()
-        group.enter()
-        
-        GatewayRequest.isOnGatewayAction(baseURL: baseUrl, terminalPublicId: terminalPublicId, isOnBank: .tinkoff) { [weak self] isOn, isSaveCard in
-            if let num = isSaveCard, num != 0, self?.isSaveCard != 2 { self?.isSaveCard = num }
-            self?.isOnTinkoffPay = isOn
-            group.leave()
+        guard let status = GatewayRequest.payButtonStatus else {
+            loaderView.startAnimated(LoaderType.loaderText.toString())
+            
+            GatewayRequest.isOnGatewayAction(baseURL: baseUrl, terminalPublicId: terminalPublicId) { status in
+                guard let status = status else {
+                    self.showAlert(title: .noData, message: .noConnection) {
+                        self.presentesionView(false) {
+                            self.dismiss(animated: false)
+                        }
+                    }
+                    return
+                }
+                self.resultPayButtons(status)
+            }
+            return
         }
+        resultPayButtons(status, delay: false)
+    }
+    
+    
+    @objc private func updateButtons(_  observer: NSNotification) {
+        NotificationCenter.default.removeObserver(self, name: ObserverKeys.networkConnectStatus.key, object: nil)
+        guard let value = observer.object as? Bool, value else { // false = 1009
+            return
+        }
+       
+        GatewayRequest.connectNetworkNotification = false
+        self.currentContainerHeight = 0
         
-        group.notify(queue: .main) {
-                self.tinkoffButton.superview?.isHidden = !self.isOnTinkoffPay
-                self.tinkoffButton.isHidden = !self.isOnTinkoffPay
-                
-                self.setupCheckbox(self.isSaveCard)
+        UIView.animate(withDuration: 0.35, delay: 0, options: .curveEaseInOut) {
+            self.heightConstraint.isActive = false
+            self.heightConstraint.constant = 0
+            self.view.backgroundColor = .init(red: 1, green: 1, blue: 1, alpha: 0)
+            self.view.layoutIfNeeded()
+        } completion: { _ in
+            self.loaderView.isHidden = false
+            self.loaderView.alpha = 1
+            self.isOnActionPay(configuration: self.configuration)
+            
+        }
+    }
+    
+    private func resultPayButtons(_  status: PayButtonStatus, delay: Bool = true) {
+        
+        self.tinkoffButton.superview?.isHidden = !status.isOnTinkoff
+        self.tinkoffButton.isHidden = !status.isOnTinkoff
+        
+        self.sbpButton.superview?.isHidden = !status.isOnSbp
+        self.sbpButton.isHidden = !status.isOnSbp
+        
+        self.setupCheckbox(status.isSaveCard)
+        
+        let deadline: DispatchTime = delay ? (.now() + 3) : .now()
+        
+        DispatchQueue.main.asyncAfter(deadline: deadline) {
+            self.loaderView(isOn: false) {
+                self.presentesionView(true) { }
+            }
         }
     }
     
     @IBAction func dismissModalButtonTapped(_ sender: UIButton) {
-        self.dismiss(animated: true)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        animatePresentContainer()
-    }
-    
-    func setupPanGesture() {
-        // add pan gesture recognizer to the view controller's view (the whole screen)
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(self.handlePanGesture(gesture:)))
-        // change to false to immediately listen on gesture movement
-        panGesture.delaysTouchesBegan = false
-        panGesture.delaysTouchesEnded = false
-        view.addGestureRecognizer(panGesture)
-    }
-    
-    // MARK: Pan gesture handler
-    @objc func handlePanGesture(gesture: UIPanGestureRecognizer) {
-        let translation = gesture.translation(in: view)
-        // Drag to top will be minus value and vice versa
-        
-        // Get drag direction
-        _ = translation.y > 0
-
-        // New height is based on value of dragging plus current container height
-        let newHeight = currentContainerHeight - translation.y
-        
-        // Handle based on gesture state
-        switch gesture.state {
-        case .changed:
-            //This state will occur when user is dragging
-            if newHeight < maximumContainerHeight {
-                // Keep updating the height constraint
-                
-                // refresh layout
-                view.layoutIfNeeded()
-            }
-            
-//            if newHeight > defaultHeight && !isDraggingDown  {
-//            }
-        
-            if newHeight < defaultHeight {
-                // Condition 2: If new height is below default, animate back to default
-                animateContainerHeight(defaultHeight)
-                //containerViewHeightConstraint?.constant = newHeight
-            }
-        default:
-            break
-        }
-    }
-    
-    func animateContainerHeight(_ height: CGFloat) {
-        
-        UIView.animate(withDuration: 0.35) {
-            // Update container height
-            self.bottomContainerViewConstraint?.constant = height
-            // Call this to trigger refresh constraint
-            self.view.layoutIfNeeded()
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        presentesionView(false) {
             self.dismiss(animated: false)
-        }
-        // Save current height
-        currentContainerHeight = height
-    }
-    
-    // MARK: Present and dismiss animation
-    func animatePresentContainer() {
-        // update bottom constraint in animation block
-        UIView.animate(withDuration: 0.35) {
-            self.bottomContainerViewConstraint?.constant = 0
-            // call this to trigger refresh constraint
-            
-            self.view.layoutIfNeeded()
-        }
-    }
-    
-    func animateDismissView() {
-        // hide main view by updating bottom constraint in animation block
-        self.dismiss(animated: false)
-        UIView.animate(withDuration: 0.5) {
-            self.bottomContainerViewConstraint?.constant = self.defaultHeight
-            
-            // call this to trigger refresh constraint
-            self.view.layoutIfNeeded()
         }
     }
     
     // MARK: - Private methods
-    private func setButtonsAndContainersEnabled(isEnabled: Bool) {
+    private func setButtonsAndContainersEnabled(isEnabled: Bool, select: UIButton! = nil) {
         let views: [UIView?] = [payWithCardButton, applePayContainer, yandexPayContainer, tinkoffButton, sbpButton]
 
         views.forEach {
-            guard let view = $0 else { return }
-
+            guard let view = $0, select != view else { return }
+            
             view.isUserInteractionEnabled = isEnabled
             view.alpha = isEnabled ? 1.0 : 0.3
+        }
+    }
+    
+    private func isEnabledView(isEnabled: Bool, select: UIButton) {
+        setButtonsAndContainersEnabled(isEnabled: isEnabled, select: select)
+
+        footer.subviews.forEach {
+            $0.isUserInteractionEnabled = isEnabled
+            $0.alpha = isEnabled ? 1.0 : 0.3
+        }
+        
+        alertInfoView.subviews.forEach {
+            $0.isUserInteractionEnabled = isEnabled
+            $0.alpha = isEnabled ? 1.0 : 0.3
         }
     }
     
@@ -250,14 +263,40 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     }
     
     @objc private func tinkoffButtonAction(_ sender: UIButton) {
+        loaderTinkoffView.superview?.isHidden = false
+        isAnimatedTinkoffProgress = true
+        
         guard let parent = self.presentingViewController else { return }
-
+        isAnimatedTinkoffProgress = false
         self.dismiss(animated: true) { [weak self] in
-            self?.pushPayForTinkoff(state: .inProgressTinkoff, parent)
+            self?.pushTinkoffProgressState(state: .inProgressTinkoff, parent)
+        }
+    }
+    
+    private func updateTinkoffProgressView() {
+        if !isAnimatedTinkoffProgress { return }
+        rotation = rotation == 0 ? .pi : 0
+        updatingView(animated: self.loaderTinkoffView, rotate: rotation, completion: updateTinkoffProgressView)
+    }
+    
+    private func updateSbpProgressView() {
+        if !isAnimatedSbpProgress { return }
+        rotation = rotation == 0 ? .pi : 0
+        updatingView(animated: self.loaderSBPView, rotate: rotation, completion: updateSbpProgressView)
+    }
+    
+    private func updatingView(animated: UIView, rotate: Double, completion: @escaping () -> Void) {
+        let transform = CGAffineTransform(rotationAngle: rotate)
+        
+        UIView.animate(withDuration: 1, delay: 0, options: .curveLinear) {
+            animated.transform = transform
+            self.view.layoutIfNeeded()
+        } completion: { _ in
+            completion()
         }
     }
 
-    func pushPayForTinkoff(state: PaymentProcessForm.State, _ vc: UIViewController) {
+    func pushTinkoffProgressState(state: PaymentProcessForm.State, _ vc: UIViewController) {
         let isSaveCard = footer.isSelectedSave
         PaymentProcessForm.present(with: self.configuration, cryptogram: nil, email: nil, state: .inProgressTinkoff, from: vc, isOnTinkoffPay: true, isSaveCard: isSaveCard)
     }
@@ -322,27 +361,52 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     }
     
     @objc private func sbpButtonAction(_ sender: UIButton) {
+        loaderSBPView.superview?.isHidden = false
+        isAnimatedSbpProgress = true
+        
         guard let parent = self.presentingViewController else {return}
         
-        let sheme: Scheme = configuration.useDualMessagePayment ? .auth : .charge
+        let baseURL = configuration.apiUrl
+        let publicId = configuration.publicId
+        let amount = configuration.paymentData.amount
+        let accountId = configuration.paymentData.accountId
+        let invoiceId = configuration.paymentData.invoiceId
+        let description = configuration.paymentData.description
+        let currency = configuration.paymentData.currency
+        let email = configuration.paymentData.email
+        let sсheme: Scheme = configuration.useDualMessagePayment ? .auth : .charge
+        let jsonData = configuration.paymentData.jsonData
         
-        let model = GetSbpModel(device: "MobileApp",
-                                amount: configuration.paymentData.amount,
-                                currency: configuration.paymentData.currency,
-                                publicId: configuration.publicId,
-                                scheme: sheme.rawValue,
-                                invoiceId: configuration.paymentData.invoiceId,
-                                email: configuration.paymentData.email,
+        let model = GetSbpModel(publicId: publicId,
+                                amount: amount,
+                                currency: currency,
+                                accountId: accountId,
+                                invoiceId: invoiceId,
+                                description: description,
+                                email: email,
                                 ipAddress: "123.123.123.123",
+                                scheme: sсheme.rawValue,
                                 ttlMinutes: 30,
                                 successRedirectURL: "https://cp.ru",
                                 failRedirectURL: "https://cp.ru",
-                                saveCard: footer.isSelectedSave)
+                                saveCard: footer.isSelectedSave,
+                                jsonData: jsonData)
         
-        SbpRequest.getSbpParametrs(baseURL: configuration.apiUrl, model: model) { [weak self] value in
-            guard let self = self, let value = value else {return}
-            guard let newArray = self.isActiveBanks(value) else { return }
-            self.openSbpViewController(from: parent, newArray)
+        SbpRequest.getSbpParametrs(baseURL: baseURL, model: model) { [weak self] value, isOnNetwork  in
+            guard let _ = self,  let value = value else {
+                self?.showAlert(title: .noData, message: .noConnection, shouldDismiss: {
+                    self?.isAnimatedSbpProgress = false
+                    self?.loaderSBPView.superview?.isHidden = true
+                    GatewayRequest.connectNetworkNotification = false
+                    NotificationCenter.default.removeObserver(self as Any, name: ObserverKeys.networkConnectStatus.key, object: nil)
+                    return false
+                })
+                return
+            }
+            
+            guard let newArray = self?.isActiveBanks(value) else { return }
+            self?.isAnimatedSbpProgress = false
+            self?.openSbpViewController(from: parent, newArray)
         }
     }
     
@@ -354,10 +418,6 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
             
             return banks.dictionary.filter({ bank in
                 guard let url = bank.deeplink else { return false }
-                
-                if UIApplication.shared.canOpenURL(url) {
-                    print(url)
-                }
                 
                 return UIApplication.shared.canOpenURL(url)
             })
@@ -378,8 +438,10 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     
     private func openSbpViewController(from: UIViewController, _ payResponse: QrPayResponse) {
         DispatchQueue.main.async {
-            self.dismiss(animated: true) {
-                SbpViewController.present(with: self.configuration, from: from, payResponse: payResponse)
+            self.presentesionView(false) {
+                self.dismiss(animated: false) {
+                    SbpViewController.present(with: self.configuration, from: from, payResponse: payResponse)
+                }
             }
         }
     }
@@ -452,8 +514,10 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
             self.setButtonsAndContainersEnabled(isEnabled: true)
 
         }
-        self.emailTextField.isHidden.toggle()
+        
         self.footer.emailView.isHidden.toggle()
+        self.footer.emailTextField.isHidden.toggle()
+        self.view.layoutIfNeeded()
     }
 
     @objc private func saveButtonAction(_ sender: UIButton) {
@@ -523,18 +587,21 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     //MARK: - Keyboard
     @objc override func onKeyboardWillShow(_ notification: Notification) {
         super.onKeyboardWillShow(notification)
-        self.bottomContainerViewConstraint.constant = -self.keyboardFrame.height
-        
-        self.view.setNeedsLayout()
-        self.view.layoutIfNeeded()
+        isOnKeyboard = true
+        self.heightConstraint.constant = self.keyboardFrame.height
+        UIView.animate(withDuration: 0.35, delay: 0) {
+            self.view.layoutIfNeeded()
+        }
     }
 
     @objc override func onKeyboardWillHide(_ notification: Notification) {
         super.onKeyboardWillHide(notification)
-        self.bottomContainerViewConstraint.constant = 0
-
-        self.view.setNeedsLayout()
-        self.view.layoutIfNeeded()
+        isOnKeyboard = false
+        self.heightConstraint.constant = 0
+        self.currentContainerHeight = 0
+        UIView.animate(withDuration: 0.35, delay: 0) {
+            self.view.layoutIfNeeded()
+        }
     }
     
     private func isValid(email: String? = nil) -> Bool {
@@ -648,12 +715,12 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     }
     
     private func openCardForm() {
-        self.hide { [weak self] in
-            guard let self = self else {
-                return
+        let isSave = self.footer.isSelectedSave
+        
+        presentesionView(false) {
+            self.dismiss(animated: false) {
+                self.onCardOptionSelected?(isSave)
             }
-            let isSave = self.footer.isSelectedSave
-            self.onCardOptionSelected?(isSave)
         }
     }
     
@@ -878,19 +945,92 @@ extension PaymentOptionsForm: UITextFieldDelegate {
     }
 }
 
-extension UIApplication {
-    class func topViewController(controller: UIViewController? = UIApplication.shared.windows.first?.rootViewController) -> UIViewController? {
-        if let navigationController = controller as? UINavigationController {
-            return topViewController(controller: navigationController.visibleViewController)
+private extension PaymentOptionsForm {
+    func loaderView(isOn: Bool, completion: @escaping () -> Void) {
+        if isOn {
+            self.loaderView.isHidden = false
+            self.loaderView.startAnimated()
+        } else {
+            self.loaderView.endAnimated()
         }
-        if let tabController = controller as? UITabBarController {
-            if let selected = tabController.selectedViewController {
-                return topViewController(controller: selected)
+        
+        UIView.animate(withDuration: 0.2) {
+            self.loaderView.alpha = isOn ? 1 : 0
+            self.view.layoutIfNeeded()
+        } completion: { _ in
+            self.loaderView.isHidden = !isOn
+            completion()
+        }
+    }
+}
+
+@objc private extension PaymentOptionsForm {
+    // MARK: Pan gesture handler
+    func setupPanGesture() {
+        let panGesture = UIPanGestureRecognizer()
+        panGesture.delaysTouchesBegan = false
+        panGesture.delaysTouchesEnded = false
+        panGesture.addTarget(self, action: #selector(handlePanGesture(_:)))
+        containerView.addGestureRecognizer(panGesture)
+    }
+    
+    // MARK: Pan gesture handler
+    func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        let y = gesture.translation(in: view).y
+        let newHeight = currentContainerHeight - y
+
+        if isOnKeyboard {
+            view.endEditing(true)
+            return
+        }
+        
+        let procent = 30.0
+        let defaultHeight = ((heightPresentView * procent) / 100)
+        
+        switch gesture.state {
+        case .changed:
+            if 0 < newHeight {
+                currentContainerHeight = 0
+                heightConstraint.constant = 0
+                view.layoutIfNeeded()
+                return
             }
+            
+            self.heightConstraint.constant = newHeight
+            self.view.layoutIfNeeded()
+            
+        case .ended, .cancelled:
+            
+            if -newHeight > defaultHeight {
+                presentesionView(false) {
+                    self.dismiss(animated: false)
+                }
+            } else {
+                currentContainerHeight = 0
+                heightConstraint.constant = 0
+                UIView.animate(withDuration: 0.35, delay: 0, options: .curveEaseInOut) {
+                    self.view.layoutIfNeeded()
+                }
+            }
+            
+        default:
+            break
         }
-        if let presented = controller?.presentedViewController {
-            return topViewController(controller: presented)
+    }
+    
+    func presentesionView(_ isPresent: Bool, completion: @escaping () -> Void) {
+        if isCloused { return }
+        isCloused = !isPresent
+        let alpha = isPresent ? 0.4 : 0
+        self.currentContainerHeight = 0
+        
+        UIView.animate(withDuration: 0.35, delay: 0, options: .curveEaseInOut) {
+            self.heightConstraint.isActive = isPresent
+            self.heightConstraint.constant = 0
+            self.view.backgroundColor = .init(red: 1, green: 1, blue: 1, alpha: alpha)
+            self.view.layoutIfNeeded()
+        } completion: { _ in
+            completion()
         }
-        return controller
     }
 }

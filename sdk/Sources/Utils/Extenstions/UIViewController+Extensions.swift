@@ -20,16 +20,19 @@ extension UIViewController {
     }
     
     /* Shows default OK action if actions is nil */
-    func showAlert(title: String?, message: String?, actions: [UIAlertAction]? = nil) {
+    func showAlert(title: String?, message: String?, completion: (() -> Void)? = nil, shouldDismiss: (() -> Bool)? = nil) {
         let alert = UIAlertController(title: title ?? "", message: message, preferredStyle: .alert)
         
-        var alertActions = actions ?? []
-        
-        if alertActions.isEmpty {
-            alertActions.append(UIAlertAction(title: "OK", style: .default))
+        let okAction = UIAlertAction(title: "OK", style: .default) { _ in
+            if let shouldDismiss = shouldDismiss, shouldDismiss() {
+                self.dismiss(animated: true, completion: nil)
+            } else {
+                completion?()
+            }
         }
         
-        alertActions.forEach { alert.addAction($0) }
+        alert.addAction(okAction)
+        
         DispatchQueue.main.async {
             self.present(alert, animated: true)
         }

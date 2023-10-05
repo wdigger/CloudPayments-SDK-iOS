@@ -121,7 +121,7 @@ class SbpViewController: BaseViewController {
                 presentesionView(false) {
                     guard let parent = self.presentingViewController else {return}
                     self.dismiss(animated: false)
-                    PaymentOptionsForm.present(with: self.configuration, from: parent, completion: nil)
+                    PaymentForm.present(with: self.configuration, from: parent)
                 }
             } else {
                 closedConstraint.constant = -heightPresentView
@@ -139,7 +139,7 @@ class SbpViewController: BaseViewController {
     private func presentesionView(_ isPresent: Bool, completion: @escaping () -> Void) {
         if isCloused { return }
         isCloused = !isPresent
-        let alpha = isPresent ? 0.4 : 0
+        let alpha = isPresent ? 0.6 : 0
         self.currentContainerHeight = heightPresentView
         
         UIView.animate(withDuration: 0.35, delay: 0, options: .curveEaseInOut) {
@@ -186,17 +186,14 @@ extension SbpViewController {
         guard let url = URL(string: string) else { return }
         
         if UIApplication.shared.canOpenURL(url) {
-            checkstatusTransactionId()
-            // для безопасности фиксации нотификации 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                UIApplication.shared.open(url)
-            }
+            checkSbpTransactionId()
+            UIApplication.shared.open(url)
         } else {
-            showAlert(title: "Ошибка", message: "Приложение банка не найдено")
+            showAlert(title: .errorWord, message: .noBankApps)
         }
     }
     
-    private func checkstatusTransactionId() {
+    private func checkSbpTransactionId() {
         guard let id = payResponse.transactionId else { return }
         removePayObserver()
         
@@ -211,7 +208,7 @@ extension SbpViewController {
     private func checkNotificationError(_ notification: NSNotification) -> Bool {
         guard let error = notification.object as? Error else { return false }
         let code = error._code < 0 ? -error._code : error._code
-        if code >= 1000 {checkstatusTransactionId(); return true}
+        if code >= 1000 {checkSbpTransactionId(); return true}
         let string = String(code)
         let descriptionError = ApiError.getFullErrorDescription(code: string)
         presentError(descriptionError)
@@ -228,7 +225,7 @@ extension SbpViewController {
         guard let rawValue = result.model?.status, let status = StatusPay(rawValue: rawValue) else {
             
             if result.success ?? false {
-                checkstatusTransactionId()
+                checkSbpTransactionId()
             } else {
                 if checkNotificationError(notification) { return }
                 let descriptionError = ApiError.getFullErrorDescription(code: "0")
@@ -240,7 +237,7 @@ extension SbpViewController {
         
         switch status {
         case .created, .pending:
-        checkstatusTransactionId()
+        checkSbpTransactionId()
             
         case .authorized,.completed, .cancelled:
             removePayObserver()

@@ -74,12 +74,25 @@ final class FooterForPresentCard: UIView {
         super.init(frame: frame)
         addXib()
         setup()
+        setupColors()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         addXib()
         setup()
+        setupColors()
+    }
+    
+    private func setupColors() {
+        emailTextField.textColor = .mainText
+        emailLabel.textColor = .colorProgressText
+        paymentEmailLabel.textColor = .colorProgressText
+        
+        receiptButton.setTitleColor(.colorTextButton, for: .normal)
+        savingButton.setTitleColor(.colorTextButton, for: .normal)
+        forcedInformationButton.setTitleColor(.colorTextButton, for: .normal)
+        defaultInformationButton.setTitleColor(.colorTextButton, for: .normal)
     }
     
     private func setup() {

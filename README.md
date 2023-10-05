@@ -71,7 +71,7 @@ let paymentData = PaymentData()
     .setInvoiceId("123") // Номер счета или заказа
     .setEmail("test@cp.ru") // E-mail плательщика, на который будет отправлена квитанция об оплате
     .setPayer(payer) // Информация о плательщике
-    .setJsonData(jsonData) // Любые другие данные, которые будут связаны с транзакцией   
+    .setJsonData(jsonData) // Любые другие данные, которые будут связаны с транзакцией                    
 ```
 
 2. Создайте объект PaymentConfiguration, передайте в него объект PaymentData и ваш **Public_id** из [личного кабинета Cloudpayments](https://merchant.cloudpayments.ru/). Реализуйте протокол PaymentDelegate, чтобы узнать о завершении платежа
@@ -87,6 +87,7 @@ let configuration = PaymentConfiguration.init(
     useDualMessagePayment: true, // Использовать двухстадийную схему проведения платежа, (по умолчанию используется одностадийная схема)
     disableApplePay: false, // Выключить Apple Pay, (по умолчанию Apple Pay включен)
     disableYandexPay: false, // Выключить Yandex Pay, (по умолчанию Yandex Pay включен)
+    customListBanks: false // Включить фильтрацию банков по установленным на устройстве, (по умолчанию false)
 ```
 
 ### Использование TinkoffPay:
@@ -104,8 +105,79 @@ let configuration = PaymentConfiguration.init(
 
 Благодаря этому SDK сможет корректно определить наличие приложения Тинькофф на устройстве пользователя.
 
-### Использование Yandex Pay:
+### Использование СБП: 
 
+1. Включить СБП через вашего курирующего менеджера.
+
+2. По умолчанию в SDK реализовано отображение всего списка банков. Если вы хотите включить функционал фильтрации банков в зависимости от того, какие банки установлены у пользователя на устройстве, то вам необходимо выполнить:
+
+2.1. Параметр **customListBanks** в PaymentConfiguration передать `true` 
+
+2.2. Чтобы SDK могло определить наличие установленных банковских приложений на устройстве, добавьте в файл **Info.plist** вашего приложении в массив по ключу **LSApplicationQueriesSchemes** список банков из пункта **2.4**
+
+2.3. Согласно [документации](https://developer.apple.com/documentation/uikit/uiapplication/1622952-canopenurl#discussion), системный метод `canOpenURL(:)` возвращает корректный ответ только при внесении схемы в массив с ключом **LSApplicationQueriesSchemes** в **Info.plist**. Также там сказано, что в этот список вы можете внести не более 50 схем.
+
+2.4. Ниже Подготовленный список из 50 актуальных банков:
+
+```
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>bank100000000004</string>
+    <string>bank100000000111</string>
+    <string>bank110000000005</string>
+    <string>bank100000000008</string>
+    <string>bank100000000007</string>
+    <string>bank100000000015</string>
+    <string>bank100000000001</string>
+    <string>bank100000000013</string>
+    <string>bank100000000010</string>
+    <string>bank100000000012</string>
+    <string>bank100000000020</string>
+    <string>bank100000000025</string>
+    <string>bank100000000030</string>
+    <string>bank100000000003</string>
+    <string>bank100000000043</string>
+    <string>bank100000000028</string>
+    <string>bank100000000086</string>
+    <string>bank100000000011</string>
+    <string>bank100000000044</string>
+    <string>bank100000000049</string>
+    <string>bank100000000095</string>
+    <string>bank100000000900</string>
+    <string>bank100000000056</string>
+    <string>bank100000000053</string>
+    <string>bank100000000121</string>
+    <string>bank100000000082</string>
+    <string>bank100000000127</string>
+    <string>bank100000000017</string>
+    <string>bank100000000087</string>
+    <string>bank100000000052</string>
+    <string>bank100000000006</string>
+    <string>bank100000000098</string>
+    <string>bank100000000092</string>
+    <string>bank100000000229</string>
+    <string>bank100000000027</string>
+    <string>bank100000000080</string>
+    <string>bank100000000122</string>
+    <string>bank100000000124</string>
+    <string>bank100000000118</string>
+    <string>bank100000000159</string>
+    <string>bank100000000146</string>
+    <string>bank100000000069</string>
+    <string>bank100000000140</string>
+    <string>bank100000000047</string>
+    <string>bank100000000099</string>
+    <string>bank100000000135</string>
+    <string>bank100000000139</string>
+    <string>bank100000000166</string>
+    <string>bank100000000172</string>
+    <string>bank100000000187</string>
+</array>
+```
+
+Если вам необходимо изменить список из пункта **2.4** вы можете его отредактировать самостоятельно в вашем файле **Info.plist**
+
+### Использование Yandex Pay:
 Если вы планируете использовать Yandex Pay, вам необходимо:
 
 1. Зарегистрировать приложение на [Яндекс.OAuth](https://oauth.yandex.ru/) и получить YANDEX CLIENT ID
@@ -373,6 +445,20 @@ public protocol ThreeDsDelegate: class {
     func onAuthorizationFailed(with html: String)
 }
 ```
+
+### История обновлений:
+
+#### 1.4.0
+* Добавлен новый способ оплаты: оплата через СБП (см. документацию для получения более подробной информации: https://gitpub.cloudpayments.ru/integrations/sdk/cloudpayments-ios/-/blob/master/README.md)
+
+* Оптимизировано получение параметров шлюза и проверка доступности способов оплаты: теперь экран способов оплаты появляется сразу со всеми подключенными и доступными способами оплаты
+
+* Оптимизирован интерфейс окна Выбор способов оплаты, теперь он работает плавнее
+
+* Добавлена проверка интерент соединения во время запука SDK, теперь пользователь не пройдет дальше по сценарию оплаты если сервер не доступен
+
+* Внесено значительное количество небольших исправлений и улучшений
+
 
 ### Поддержка
 

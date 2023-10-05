@@ -25,7 +25,7 @@ extension UIColor {
         return color(named: "color_border")
     }
     
-    public class var inputCardView: UIColor! {
+    public class var colorTextButton: UIColor! {
         return color(named: "color_text_button")
     }
     
@@ -43,6 +43,14 @@ extension UIColor {
     
     public class var colorAlertView: UIColor {
         return color(named: "color_alert_view")
+    }
+    
+    public class var colorLoader: UIColor {
+        return color(named: "color_loader")
+    }
+    
+    public class var colorProgressText: UIColor {
+        return color(named: "color_progress_text")
     }
     
     private class func color(named colorName: String) -> UIColor! {

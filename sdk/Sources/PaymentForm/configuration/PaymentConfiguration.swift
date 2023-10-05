@@ -20,7 +20,6 @@ public class PaymentConfiguration {
     var changedEmail: String?
     let customListBanks: Bool
 
-    
     public init(publicId: String, paymentData: PaymentData, delegate: PaymentDelegate?, uiDelegate: PaymentUIDelegate?, scanner: PaymentCardScanner?,
                 requireEmail: Bool = false, useDualMessagePayment: Bool = false, disableApplePay: Bool = false,
                 disableYandexPay: Bool = false, apiUrl: String = "https://api.cloudpayments.ru/", changedEmail: String? = nil, customListBanks: Bool = false) {

@@ -18,16 +18,16 @@ enum CaseOfBank: Int {
 struct GatewayConfiguration: Codable {
     let model: GatewayPaymentModel
     let success: Bool
-//    let message: String?
+    let message: String?
     
     enum CodingKeys: String, CodingKey {
         case model = "Model"
         case success = "Success"
-//        case message = "Message"
+        case message = "Message"
     }
 }
 
-// MARK: - GatewayPayModel
+// MARK: - GatewayPaymentModel
 struct GatewayPaymentModel: Codable {
     let logoURL: String?
     let terminalURL: String?

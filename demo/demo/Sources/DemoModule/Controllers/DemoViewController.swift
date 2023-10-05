@@ -123,12 +123,11 @@ class DemoViewController: BaseViewController {
             delegate: self,
             uiDelegate: self,
             scanner: nil,
-            requireEmail: true,
+            requireEmail: false,
             useDualMessagePayment: footer.demoActionSwitch.isOn,
             disableApplePay: true,
-            disableYandexPay: false,
+            disableYandexPay: true,
             apiUrl: apiUrl,
-            changedEmail: nil,
             customListBanks: false
         )
 

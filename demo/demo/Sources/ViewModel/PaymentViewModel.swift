@@ -44,7 +44,7 @@ enum PaymentViewModelType: Codable {
         case .payerBirthday: return "Payer.Birthday (Optional):"
         case .payerAddress: return "Payer.Address (Optional):"
         case .payerStreet: return "Payer.Street (Optional):"
-        case .payerCity: return "Paver.City (Optional):"
+        case .payerCity: return "Payer.City (Optional):"
         case .payerCountry: return "Payer.Country (Optional):"
         case .payerPhone: return "Payer.Phone (Optional):"
         case .payerPostcode: return "Payer.Postcode (Optional):"
@@ -55,7 +55,7 @@ enum PaymentViewModelType: Codable {
     //text
     var `default`: String {
         switch self {
-        case .api: return "https://api-preprod.cloudpayments.ru/"
+        case .api: return "https://api.cloudpayments.ru/"
         case .publicId: return "test_api_00000000000000000000002"
         case .amount: return "100"
         case .currency: return "RUB"

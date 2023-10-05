@@ -60,7 +60,7 @@ public class PaymentProcessForm: PaymentForm {
             }
         }
     }
-    // MARK: - Private properties
+    // MARK: - Private properties 
     @IBOutlet private weak var progressIcon: UIImageView!
     @IBOutlet private weak var messageLabel: UILabel!
     @IBOutlet private weak var actionButton: Button!
@@ -74,7 +74,7 @@ public class PaymentProcessForm: PaymentForm {
     @IBOutlet private weak var tinkoffDescription: UILabel!
     
     @IBOutlet private weak var selectPaymentButton: Button!
-    
+
     private var state: State = .inProgress
     private var cryptogram: String?
     private var email: String?
@@ -85,8 +85,8 @@ public class PaymentProcessForm: PaymentForm {
     @discardableResult
     public class func present(with configuration: PaymentConfiguration, cryptogram: String?, email: String?, state: State = .inProgress, from: UIViewController, isOnTinkoffPay: Bool = false, isSaveCard: Bool? = nil, completion: (() -> ())? = nil) -> PaymentForm? {
         let storyboard = UIStoryboard.init(name: "PaymentForm", bundle: Bundle.mainSdk)
-        
-        let controller = storyboard.instantiateViewController(withIdentifier: "PaymentProcessForm") as! PaymentProcessForm
+
+        let controller = storyboard.instantiateViewController(withIdentifier: "PaymentProcessForm") as! PaymentProcessForm        
         controller.configuration = configuration
         controller.cryptogram = cryptogram
         controller.email = email
@@ -162,7 +162,9 @@ public class PaymentProcessForm: PaymentForm {
             }
         }
         
-        if tinkoffState { pushPayForTinkoff(state: .inProgressTinkoff) }
+        if tinkoffState { pushTinkoffPay(state: .inProgressTinkoff) }
+        messageLabel.textColor = .mainText
+        secondDescriptionLabel.textColor = .colorProgressText
     }
     
     
@@ -182,7 +184,7 @@ public class PaymentProcessForm: PaymentForm {
         self.state = state
         self.stopAnimation()
         
-        
+
         switch state {
             
         case .inProgress:
@@ -284,7 +286,7 @@ public class PaymentProcessForm: PaymentForm {
 }
 
 extension PaymentProcessForm {
-    func pushPayForTinkoff(state: PaymentProcessForm.State) {
+    func pushTinkoffPay(state: PaymentProcessForm.State) {
         
         let baseURL = configuration.apiUrl
         let publicId = configuration.publicId
@@ -314,23 +316,34 @@ extension PaymentProcessForm {
                                    saveCard: isSaveCard,
                                    jsonData: jsonData)
         
-        GatewayRequest.isTinkoffQrLink(baseURL: baseURL, model: model) { value in
+        GatewayRequest.isTinkoffQrLink(baseURL: baseURL, model: model) { [weak self] value, isOnNetwork in
             let message = value?.message
             
-            guard let string = value?.qrURL,  let id = value?.transactionId else {
+            guard let parent = self?.presentingViewController else { return }
+            
+            guard let string = value?.qrURL, let id = value?.transactionId else {
+                GatewayRequest.connectNetworkNotification = false
+                NotificationCenter.default.removeObserver(self as Any, name: ObserverKeys.networkConnectStatus.key, object: nil)
+                
+                self?.showAlert(title: .noData, message: .noConnection) {
+                    self?.dismiss(animated: false) {
+                        guard let self = self else { return }
+                        PaymentForm.present(with: self.configuration, from: parent)
+                    }
+                }
                 return
             }
             
-            self.transactionId = id
+            self?.transactionId = id
             
             var status: StatusPay {
-                guard let message = message, let value = StatusPay(rawValue: message) else { return .declined}
+                guard let message = message, let value = StatusPay(rawValue: message) else { return .declined }
                 return value
             }
             
             switch status {
             case .created, .pending:
-                self.checkstatusTransactionId()
+                self?.checkTinkoffPayTransactionId()
             default:
                 return
             }
@@ -357,22 +370,22 @@ extension PaymentProcessForm {
         else {
             if let error = notification.object as? Error {
                 let code = error._code < 0 ? -error._code : error._code
-                if code > 1000 {checkstatusTransactionId(); return }
+                if code > 1000 {checkTinkoffPayTransactionId(); return }
                 let string = String(code)
                 let descriptionError = ApiError.getFullErrorDescription(code: string)
                 presentError(descriptionError, vc: vc)
                 return
             }
             
-            checkstatusTransactionId()
+            checkTinkoffPayTransactionId()
             return
         }
         
         switch status {
         case .created, .pending:
-            checkstatusTransactionId()
+            checkTinkoffPayTransactionId()
             
-        case .authorized,.completed, .cancelled:
+        case .authorized, .completed, .cancelled:
             let transaction = Transaction(transactionId: transactionId)
             transactionId = nil
             guard let vc = self.presentingViewController else { return }
@@ -397,7 +410,7 @@ extension PaymentProcessForm {
         }
     }
     
-    private func checkstatusTransactionId() {
+    private func checkTinkoffPayTransactionId() {
         guard let id = transactionId else { return }
         NotificationCenter.default.removeObserver(self, name: ObserverKeys.tinkoffPayStatus.key, object: nil)
         let url = configuration.apiUrl

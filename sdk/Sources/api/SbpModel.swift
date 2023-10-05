@@ -31,28 +31,27 @@ struct SbpQRDataModel: Codable {
 
 // MARK: - GetSbpModel
 struct GetSbpModel: Codable {
-    let device: String
-    let amount: String
-    let currency: String
     let publicId: String?
-    let scheme: Scheme.RawValue
-//    let accountId: String?
+    let amount: String?
+    let currency: String
+    let accountId: String?
     let invoiceId: String?
-//    let description: String?
+    let description: String?
     let email, ipAddress: String?
+    let scheme: Scheme.RawValue
     let ttlMinutes: Int?
     let successRedirectURL: String?
     let failRedirectURL: String?
     let saveCard: Bool?
+    let jsonData: String?
 
     enum CodingKeys: String, CodingKey {
         case publicId = "PublicId"
-        case device = "Device"
         case amount = "Amount"
-        //        case accountId = "AccountId"
+        case accountId = "AccountId"
         case invoiceId = "InvoiceId"
         case currency = "Currency"
-        //        case description = "Description"
+        case description = "Description"
         case email = "Email"
         case scheme = "Scheme"
         case ipAddress = "IpAddress"
@@ -60,5 +59,6 @@ struct GetSbpModel: Codable {
         case successRedirectURL = "SuccessRedirectUrl"
         case failRedirectURL = "FailRedirectUrl"
         case saveCard = "SaveCard"
+        case jsonData = "JsonData"
     }
 }

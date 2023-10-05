@@ -78,9 +78,7 @@ struct QrResponseModel: Codable {
 // MARK: - QrPayResponse
 struct QrPayResponse: Codable {
     let qrURL: String?
-//    let qrImage: String?
     let transactionId: Int?
-//    let merchantOrderId: String?
     let providerQrId: String?
     let amount: Int?
     let message: String?
@@ -89,9 +87,7 @@ struct QrPayResponse: Codable {
 
     enum CodingKeys: String, CodingKey {
         case qrURL = "QrUrl"
-//        case qrImage = "QrImage"
         case transactionId = "TransactionId"
-//        case merchantOrderId = "MerchantOrderId"
         case providerQrId = "ProviderQrId"
         case amount = "Amount"
         case message = "Message"
@@ -101,9 +97,7 @@ struct QrPayResponse: Codable {
     
     init(qrURL: String?, transactionId: Int?, amount: Int?, message: String?, isTest: Bool?, banks: SbpQRModel? = nil, providerQrId: String? = nil) {
         self.qrURL = qrURL
-//        self.qrImage = qrImage
         self.transactionId = transactionId
-//        self.merchantOrderId = merchantOrderId
         self.amount = amount
         self.message = message
         self.isTest = isTest
@@ -131,14 +125,12 @@ struct RepsonseStatusModel: Codable {
     let status: StatusPay.RawValue?
     let statusCode: Int?
     let providerQrId: String?
-//  let escrowAccumulationId: String?
     
     enum CodingKeys: String, CodingKey {
         case transactionId = "TransactionId"
         case status = "Status"
         case statusCode = "StatusCode"
         case providerQrId = "ProviderQrId"
-        //case escrowAccumulationId = "EscrowAccumulationId"
     }
 }
 

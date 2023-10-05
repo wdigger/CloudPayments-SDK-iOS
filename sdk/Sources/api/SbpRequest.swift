@@ -24,12 +24,14 @@ class SbpRequest {
                 "Amount" : model.amount,
                 "InvoiceId": model.invoiceId,
                 "Currency" : model.currency,
+                "Device" : "MobileApp",
                 "Email" : model.email,
                 "IpAddress":model.ipAddress,
                 "TtlMinutes" : model.ttlMinutes,
                 "SuccessRedirectUrl" : model.successRedirectURL,
                 "FailRedirectUrl" : model.failRedirectURL,
-                "Scenario": "7"
+                "Scenario": "7",
+                "JsonData": model.jsonData
             ] as [String : Any?]
             
             if let saveCard = model.saveCard {
@@ -56,13 +58,19 @@ class SbpRequest {
 
 extension SbpRequest {
     
-    public class func getSbpParametrs(baseURL: String, model: GetSbpModel, completion: @escaping (QrPayResponse?) -> Void) {
+    public class func getSbpParametrs(baseURL: String, model: GetSbpModel, completion: @escaping (QrPayResponse?, Bool) -> Void) {
         
         PrivateSbpRequest<QrResponseModel>(baseURL: baseURL, model: model).execute { value in
-            completion(value.model)
-        } onError: { string in
-            print(string.localizedDescription)
-            completion(nil)
+            completion(value.model, true)
+        } onError: { error in
+            print(error.localizedDescription)
+            let code = error._code < 0 ? -error._code : error._code
+            if code == 1009 {
+                GatewayRequest.connectNetworkNotification = true
+                GatewayRequest.connectNetworkNotification()
+                return completion(nil, false)
+            }
+            completion(nil, true)
         }
     }
     
@@ -73,7 +81,6 @@ extension SbpRequest {
             NotificationCenter.default.post(name: ObserverKeys.qrPayStatus.key, object: value)
 
         } onError: { string in
-//            GatewayRequest.resultDataPrint(type: TinkoffRepsonseTransactionModel.self, string.localizedDescription)
             NotificationCenter.default.post(name: ObserverKeys.qrPayStatus.key, object: string)
             return
         }

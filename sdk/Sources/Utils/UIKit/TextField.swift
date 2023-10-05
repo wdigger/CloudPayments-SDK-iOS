@@ -232,4 +232,9 @@ class TextField: UITextField, UITextFieldDelegate {
     }
 }
 
-
+extension TextField {
+    var cardExpText: String? {
+        get {self.text?.replacingOccurrences(of: " ", with: "") }
+        set {self.text = newValue?.onlyNumbers().formattedString(mask: "XX / XX", ignoredSymbols: nil)}
+    }
+}
