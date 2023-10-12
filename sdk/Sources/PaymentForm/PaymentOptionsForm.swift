@@ -387,8 +387,6 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
                                 ipAddress: "123.123.123.123",
                                 scheme: sсheme.rawValue,
                                 ttlMinutes: 30,
-                                successRedirectURL: "https://cp.ru",
-                                failRedirectURL: "https://cp.ru",
                                 saveCard: footer.isSelectedSave,
                                 jsonData: jsonData)
         

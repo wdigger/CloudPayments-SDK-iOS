@@ -24,12 +24,11 @@ class SbpRequest {
                 "Amount" : model.amount,
                 "InvoiceId": model.invoiceId,
                 "Currency" : model.currency,
+                "AccountId": model.accountId,
                 "Device" : "MobileApp",
                 "Email" : model.email,
                 "IpAddress":model.ipAddress,
                 "TtlMinutes" : model.ttlMinutes,
-                "SuccessRedirectUrl" : model.successRedirectURL,
-                "FailRedirectUrl" : model.failRedirectURL,
                 "Scenario": "7",
                 "JsonData": model.jsonData
             ] as [String : Any?]

@@ -40,8 +40,6 @@ struct GetSbpModel: Codable {
     let email, ipAddress: String?
     let scheme: Scheme.RawValue
     let ttlMinutes: Int?
-    let successRedirectURL: String?
-    let failRedirectURL: String?
     let saveCard: Bool?
     let jsonData: String?
 
@@ -56,8 +54,6 @@ struct GetSbpModel: Codable {
         case scheme = "Scheme"
         case ipAddress = "IpAddress"
         case ttlMinutes = "TtlMinutes"
-        case successRedirectURL = "SuccessRedirectUrl"
-        case failRedirectURL = "FailRedirectUrl"
         case saveCard = "SaveCard"
         case jsonData = "JsonData"
     }
