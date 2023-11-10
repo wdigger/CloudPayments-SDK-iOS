@@ -17,12 +17,11 @@ public class PaymentConfiguration {
     let disableApplePay: Bool
     let disableYandexPay: Bool
     let apiUrl: String
-    var changedEmail: String?
     let customListBanks: Bool
 
     public init(publicId: String, paymentData: PaymentData, delegate: PaymentDelegate?, uiDelegate: PaymentUIDelegate?, scanner: PaymentCardScanner?,
                 requireEmail: Bool = false, useDualMessagePayment: Bool = false, disableApplePay: Bool = false,
-                disableYandexPay: Bool = false, apiUrl: String = "https://api.cloudpayments.ru/", changedEmail: String? = nil, customListBanks: Bool = false) {
+                disableYandexPay: Bool = false, apiUrl: String = "https://api.cloudpayments.ru/", customListBanks: Bool = false) {
         self.publicId = publicId
         self.paymentData = paymentData
         self.paymentDelegate = PaymentDelegateImpl.init(delegate: delegate)
@@ -33,7 +32,6 @@ public class PaymentConfiguration {
         self.disableApplePay = disableApplePay
         self.disableYandexPay = disableYandexPay
         self.apiUrl = apiUrl
-        self.changedEmail = nil
         self.customListBanks = customListBanks
     }
 }

@@ -113,7 +113,7 @@ let configuration = PaymentConfiguration.init(
 
 2.1. Параметр **customListBanks** в PaymentConfiguration передать `true` 
 
-2.2. Чтобы SDK могло определить наличие установленных банковских приложений на устройстве, добавьте в файл **Info.plist** вашего приложении в массив по ключу **LSApplicationQueriesSchemes** список банков из пункта **2.4**
+2.2. Чтобы SDK могло определить наличие установленных банковских приложений на устройстве, добавьте в файл **Info.plist** вашего приложения в массив по ключу **LSApplicationQueriesSchemes** список банков из пункта **2.4**
 
 2.3. Согласно [документации](https://developer.apple.com/documentation/uikit/uiapplication/1622952-canopenurl#discussion), системный метод `canOpenURL(:)` возвращает корректный ответ только при внесении схемы в массив с ключом **LSApplicationQueriesSchemes** в **Info.plist**. Также там сказано, что в этот список вы можете внести не более 50 схем.
 
@@ -250,14 +250,19 @@ extension CartViewController: CardIOPaymentViewControllerDelegate {
 
 ### Использование вашей платежной формы с использованием функций CloudPaymentsApi:
 
-1. Создайте криптограмму карточных данных
+* **Для использования нового формата криптограммы:**
+
+1. Получите **publicKey** и **keyVersion** с данного [API](https://api.cloudpayments.ru/payments/publickey)
+2. Полученные **publicKey** и **keyVersion** передайте в метод создания криптограммы.
+
+3. Cоздайте криптограмму карточных данных
 
 ```
-// Обязательно проверяйте входящие данные карты (номер, срок действия и cvc код) на корректность, иначе функция создания криптограммы вернет nil.
-let cardCryptogramPacket = Card.makeCardCryptogramPacket(with: cardNumber, expDate: expDate, cvv: cvv, merchantPublicID: "Ваш Public_id")
+// Обязательно проверяйте входящие данные карты (номер, срок действия и cvc код) на корректность, иначе метод создания криптограммы вернет nil.
+let cardCryptogramPacket = Card.makeCardCryptogramPacket(cardNumber: cardNumber, expDate: expDate, cvv: cvv, merchantPublicID: "Ваш Public_id", publicKey: "Полученный публичный ключ", keyVersion: "Полученная версия ключа")
 ```
 
-2. Выполните запрос на проведения платежа. Создайте объект CloudpaymentApi и вызовите функцию charge для одностадийного платежа или auth для двухстадийного. Укажите email, на который будет выслана квитанция об оплате.
+4. Выполните запрос на проведения платежа. Создайте объект CloudpaymentApi и вызовите метод charge для одностадийного платежа или auth для двухстадийного. Укажите email, на который будет выслана квитанция об оплате.
 
 ```
 let api = CloudpaymentsApi.init(publicId: Constants.merchantPulicId)
@@ -270,7 +275,7 @@ api.auth(cardCryptogramPacket: cardCryptogramPacket, cardHolderName: cardHolderN
 }
 ```
 
-3. Если необходимо, покажите 3DS форму для подтверждения платежа
+5. Если необходимо, покажите 3DS форму для подтверждения платежа
 
 ```
 let data = ThreeDsData.init(transactionId: transactionId, paReq: paReq, acsUrl: acsUrl)
@@ -278,7 +283,7 @@ let threeDsProcessor = ThreeDsProcessor()
 threeDsProcessor.make3DSPayment(with: data, delegate: self)
 ```
 
-4. Для получения формы 3DS и получения результатов прохождения 3DS аутентификации реализуйте протокол ThreeDsDelegate.
+6. Для получения формы 3DS и получения результатов прохождения 3DS аутентификации реализуйте протокол ThreeDsDelegate.
 
 ```
 extension CheckoutViewController: ThreeDsDelegate {

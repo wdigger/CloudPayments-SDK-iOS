@@ -9,6 +9,14 @@
 import UIKit
 
 extension UIColor {
+    class var custom: UICustomColor.Type { return UICustomColor.self }
+    
+    class UICustomColor {
+        class var white: UIColor {
+            return UIColor.white
+        }
+    }
+    
     public class var mainText: UIColor {
         return color(named: "color_text_main")
     }
@@ -38,7 +46,7 @@ extension UIColor {
     }
     
     public class var whiteColor: UIColor {
-        return color(named: "color_text_white")
+        return UIColor.white
     }
     
     public class var colorAlertView: UIColor {

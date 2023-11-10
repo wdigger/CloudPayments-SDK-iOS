@@ -126,7 +126,7 @@ class DemoViewController: BaseViewController {
             requireEmail: false,
             useDualMessagePayment: footer.demoActionSwitch.isOn,
             disableApplePay: true,
-            disableYandexPay: true,
+            disableYandexPay: false,
             apiUrl: apiUrl,
             customListBanks: false
         )

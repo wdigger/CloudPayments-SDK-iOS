@@ -111,7 +111,7 @@ public class PaymentCardForm: PaymentForm {
                     guard let self = self else {
                         return
                     }
-                    self.onPayClicked?(cryptogram, self.configuration.changedEmail)
+                    self.onPayClicked?(cryptogram, paymentData.email)
                 }
             }
         }

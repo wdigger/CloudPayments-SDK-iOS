@@ -10,7 +10,7 @@ import UIKit
 import PassKit
 import YandexPaySDK
 
-final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControllerDelegate, YandexPayButtonDelegate {
+final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControllerDelegate  {
     @IBOutlet private weak var yandexPayContainer: View!
     @IBOutlet private weak var applePayContainer: View!
     @IBOutlet private weak var payWithCardButton: Button!
@@ -93,7 +93,7 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         let controller = storyboard.instantiateViewController(withIdentifier: "PaymentOptionsForm") as! PaymentOptionsForm
     
         controller.configuration = configuration
-        controller.show(inViewController: from, completion: completion)
+        controller.open(inViewController: from, completion: completion)
         
         return controller
     }
@@ -165,12 +165,12 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         
         guard let status = GatewayRequest.payButtonStatus else {
             loaderView.startAnimated(LoaderType.loaderText.toString())
-            
-            GatewayRequest.isOnGatewayAction(baseURL: baseUrl, terminalPublicId: terminalPublicId) { status in
-                guard let status = status else {
-                    self.showAlert(title: .noData, message: .noConnection) {
-                        self.presentesionView(false) {
-                            self.dismiss(animated: false)
+
+            GatewayRequest.isOnGatewayAction(baseURL: baseUrl, terminalPublicId: terminalPublicId) { [weak self] status in
+                guard let self = self, let status = status else {
+                    self?.showAlert(title: .noData, message: .noConnection) {
+                        self?.presentesionView(false) {
+                            self?.dismiss(animated: false)
                         }
                     }
                     return
@@ -214,6 +214,8 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         self.sbpButton.isHidden = !status.isOnSbp
         
         self.setupCheckbox(status.isSaveCard)
+        view.layoutIfNeeded()
+        view.layoutMarginsDidChange()
         
         let deadline: DispatchTime = delay ? (.now() + 3) : .now()
         
@@ -304,10 +306,19 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     fileprivate func addConfiguration(_ sender: UIButton, _ backgroundColor: UIColor? = nil, _ textColor: UIColor? = nil) {
         if #available(iOS 15.0, *) {
             var configuration = UIButton.Configuration.plain()
+            
             if let color = backgroundColor { configuration.baseBackgroundColor = color }
-            if let color = textColor { configuration.baseForegroundColor = color }
             configuration.imagePadding = 10
+            
+            if let color = textColor {
+                configuration.baseForegroundColor = color
+            }
             sender.configuration = configuration
+            
+            if let color = textColor {
+                sender.setTitleColor(color, for: .normal)
+                sender.tintColor = color
+            }
         } else {
             if let color = backgroundColor { sender.backgroundColor = color }
             if let color = textColor { sender.setTitleColor(color, for: .normal) }
@@ -318,8 +329,7 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
 
     private func setupButton() {
         emailTextField.text = configuration.paymentData.email
-        configuration.changedEmail = configuration.paymentData.email
-        addConfiguration(tinkoffButton, .blackColor, .whiteColor)
+        addConfiguration(tinkoffButton, .blackColor, .custom.white)
 
         tinkoffButton.semanticContentAttribute = .forceRightToLeft
         tinkoffButton.addTarget(self, action: #selector(tinkoffButtonAction(_:)), for: .touchUpInside)
@@ -497,9 +507,9 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         sender.isSelected.toggle()
 
         if sender.isSelected {
-            self.configuration.changedEmail = self.emailTextField.text
+            self.configuration.paymentData.email = self.emailTextField.text
         } else {
-            self.configuration.changedEmail = nil
+            self.configuration.paymentData.email = nil
         }
 
         let isEmailValid = self.emailTextField.text?.emailIsValid() ?? false
@@ -616,66 +626,6 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         return emailIsValid
     }
     
-    private func initializeYandexPay() {
-              
-        mainYandexView.isHidden = false
-        yandexPayContainer.isHidden = false
-        
-        // Укажите тему для кнопки
-        let theme: YandexPayButtonTheme
-        if #available(iOS 13.0, *) {
-            // Параметр `dynamic` позволяет указать, нужно ли кнопке
-            // менять свою цветовую палитру вместе со сменой системной темы
-            theme = YandexPayButtonTheme(appearance: .dark, dynamic: true)
-        } else {
-            theme = YandexPayButtonTheme(appearance: .dark)
-        }
-        
-        // Инициализируйте конфигурацию
-        let configuration = YandexPayButtonConfiguration(theme: theme)
-        
-        // Создайте кнопку
-        let button = YandexPaySDKApi.instance.createButton(configuration: configuration, delegate: self)
-        
-        // Укажите скругления для кнопки (по умолчанию - 8px)
-        button.layer.cornerRadius = 8
-        
-        // Установите layout для кнопки
-        yandexPayContainer.addSubview(button)
-        button.bindFrameToSuperviewBounds()
-    }
-    
-    private func initializeApplePay() {
-        
-        mainAppleView.isHidden = false
-        applePayContainer.isHidden = false
-        
-        if let _  = configuration.paymentData.applePayMerchantId, PKPaymentAuthorizationViewController.canMakePayments() {
-            let button: PKPaymentButton!
-            if PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedPaymentNetworks) {
-                button = PKPaymentButton.init(paymentButtonType: .plain, paymentButtonStyle: .black)
-                button.addTarget(self, action: #selector(onApplePay(_:)), for: .touchUpInside)
-            } else {
-                button = PKPaymentButton.init(paymentButtonType: .setUp, paymentButtonStyle: .black)
-                button.addTarget(self, action: #selector(onSetupApplePay(_:)), for: .touchUpInside)
-            }
-            button.translatesAutoresizingMaskIntoConstraints = false
-            
-            if #available(iOS 12.0, *) {
-                button.cornerRadius = 8
-            } else {
-                button.layer.cornerRadius = 8
-                button.layer.masksToBounds = true
-            }
-            
-            applePayContainer.isHidden = false
-            applePayContainer.addSubview(button)
-            button.bindFrameToSuperviewBounds()
-        } else {
-            applePayContainer.isHidden = true
-        }
-    }
-    
     @objc private func onApplePay(_ sender: UIButton) {
         errorMessage = nil
         resultTransaction = nil
@@ -723,6 +673,37 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     }
     
     //MARK: - PKPaymentAuthorizationViewControllerDelegate -
+    
+    private func initializeApplePay() {
+        
+        mainAppleView.isHidden = false
+        applePayContainer.isHidden = false
+        
+        if let _  = configuration.paymentData.applePayMerchantId, PKPaymentAuthorizationViewController.canMakePayments() {
+            let button: PKPaymentButton!
+            if PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedPaymentNetworks) {
+                button = PKPaymentButton.init(paymentButtonType: .plain, paymentButtonStyle: .black)
+                button.addTarget(self, action: #selector(onApplePay(_:)), for: .touchUpInside)
+            } else {
+                button = PKPaymentButton.init(paymentButtonType: .setUp, paymentButtonStyle: .black)
+                button.addTarget(self, action: #selector(onSetupApplePay(_:)), for: .touchUpInside)
+            }
+            button.translatesAutoresizingMaskIntoConstraints = false
+            
+            if #available(iOS 12.0, *) {
+                button.cornerRadius = 8
+            } else {
+                button.layer.cornerRadius = 8
+                button.layer.masksToBounds = true
+            }
+            
+            applePayContainer.isHidden = false
+            applePayContainer.addSubview(button)
+            button.bindFrameToSuperviewBounds()
+        } else {
+            applePayContainer.isHidden = true
+        }
+    }
     
     func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController) {
         controller.dismiss(animated: true) { [weak self] in
@@ -801,9 +782,46 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
             completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
         }
     }
+}
+
+//MARK: - YandexPayButtonConfiguration
+
+extension PaymentOptionsForm: YandexPayButtonSyncDelegate {
+    
+    private func initializeYandexPay() {
+        
+        mainYandexView.isHidden = false
+        yandexPayContainer.isHidden = false
+        
+        // Укажите тему для кнопки
+        let theme: YandexPayButtonTheme
+        if #available(iOS 13.0, *) {
+            // Параметр `dynamic` позволяет указать, нужно ли кнопке
+            // менять свою цветовую палитру вместе со сменой системной темы
+            theme = YandexPayButtonTheme(appearance: .dark, dynamic: true)
+        } else {
+            theme = YandexPayButtonTheme(appearance: .dark)
+        }
+        
+        // Инициализируйте конфигурацию
+        let configuration = YandexPayButtonConfiguration(theme: theme)
+        
+        // Создайте кнопку
+        let button = YandexPaySDKApi.instance.createButton(configuration: configuration, delegate: self)
+        
+        // Укажите скругления для кнопки (по умолчанию - 8px)
+        button.layer.cornerRadius = 8
+        
+        // Установите layout для кнопки
+        yandexPayContainer.addSubview(button)
+        button.bindFrameToSuperviewBounds()
+    }
     
     // Обработайте результат оплаты
-    func yandexPayButton(_ button: YandexPayButton, didCompletePaymentWithResult result: YPPaymentResult) {
+    func yandexPayButton(_ button: YandexPaySDK.YandexPayButton, didCompletePaymentWithResult result: YandexPaySDK.YPPaymentResult) {
+        
+        let email = configuration.paymentData.email
+        
         switch result {
         case .succeeded(let paymentInfo):
             // Оплата была совершена успешно
@@ -813,11 +831,11 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
                 self.dismiss(animated: true) { [weak self] in
                     guard let self = self else {
                         return
-
+                        
                     }
-
+                    
                     if parent != nil {
-                        PaymentProcessForm.present(with: self.configuration, cryptogram: decodedToken, email: nil, state: .inProgress, from: parent!, completion: nil)
+                        PaymentProcessForm.present(with: self.configuration, cryptogram: decodedToken, email: email, state: .inProgress, from: parent!, completion: nil)
                     }
                 }
             }
@@ -834,12 +852,12 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     }
     
     // Предоставьте UIViewController, с которого необходимо показать форму YandexPay по нажатию на кнопку
-    func yandexPayButtonDidRequestViewControllerForPresentation(_ button: YandexPayButton) -> UIViewController? {
+    func yandexPayButtonDidRequestViewControllerForPresentation(_ button: YandexPaySDK.YandexPayButton) -> UIViewController? {
         return self
     }
     
     // Предоставьте информацию о продавце и о корзине
-    func yandexPayButtonDidRequestPaymentSheet(_ button: YandexPayButton) -> YPPaymentSheet? {
+    func yandexPayButtonDidRequestPaymentSheet(_ button: YandexPaySDK.YandexPayButton) -> YandexPaySDK.YPPaymentSheet? {
         
         return YPPaymentSheet(
             // Код страны
@@ -891,7 +909,7 @@ extension PaymentOptionsForm: UITextFieldDelegate {
                 self.setButtonsAndContainersEnabled(isEnabled: true)
                 configureEmailFieldToDefault(borderView: .mainBlue, textColor: .mainText, placeholderColor: .border)
                 setupEmailPlaceholder()
-                configuration.changedEmail = updatedText
+                configuration.paymentData.email = updatedText
                 
                 if updatedText.isEmpty {
                     footer.emailBorderColor = UIColor.mainBlue
@@ -963,7 +981,7 @@ private extension PaymentOptionsForm {
 }
 
 @objc private extension PaymentOptionsForm {
-    // MARK: Pan gesture handler
+    // MARK: Setup PanGesture 
     func setupPanGesture() {
         let panGesture = UIPanGestureRecognizer()
         panGesture.delaysTouchesBegan = false
@@ -1023,9 +1041,9 @@ private extension PaymentOptionsForm {
         self.currentContainerHeight = 0
         
         UIView.animate(withDuration: 0.35, delay: 0, options: .curveEaseInOut) {
-            self.heightConstraint.isActive = isPresent
             self.heightConstraint.constant = 0
-            self.view.backgroundColor = .init(red: 1, green: 1, blue: 1, alpha: alpha)
+            self.heightConstraint.isActive = isPresent
+            self.view.backgroundColor = .black.withAlphaComponent(alpha)
             self.view.layoutIfNeeded()
         } completion: { _ in
             completion()

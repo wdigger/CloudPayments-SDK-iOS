@@ -649,7 +649,7 @@
         <!--Payment Options Form-->
         <scene sceneID="b2v-mo-euJ">
             <objects>
-                <viewController storyboardIdentifier="PaymentOptionsForm" definesPresentationContext="YES" providesPresentationContextTransitionStyle="YES" modalPresentationStyle="fullScreen" id="1Yz-Du-ae4" customClass="PaymentOptionsForm" customModule="Cloudpayments" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PaymentOptionsForm" definesPresentationContext="YES" providesPresentationContextTransitionStyle="YES" modalTransitionStyle="crossDissolve" modalPresentationStyle="fullScreen" id="1Yz-Du-ae4" customClass="PaymentOptionsForm" customModule="Cloudpayments" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="W9V-aT-4CT">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="783"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -664,7 +664,7 @@
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HGh-3C-ngX">
                                 <rect key="frame" x="0.0" y="783" width="393" height="266"/>
                                 <subviews>
-                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yDU-pE-2eL" customClass="View" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yDU-pE-2eL" userLabel="TopElementView" customClass="View" customModule="CloudpaymentsSDK" customModuleProvider="target">
                                         <rect key="frame" x="129" y="21" width="135" height="5"/>
                                         <color key="backgroundColor" name="color_black"/>
                                         <constraints>

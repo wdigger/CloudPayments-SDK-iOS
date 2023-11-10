@@ -74,6 +74,14 @@ public class PaymentForm: BaseViewController {
         controller.present(self, animated: true, completion: completion)
     }
     
+    internal func open(inViewController controller: UIViewController, completion: (() -> ())?) {
+        self.transitioningDelegate = customTransitionDelegateInstance
+        self.modalPresentationStyle = .overFullScreen
+        self.modalTransitionStyle = .crossDissolve
+        
+        controller.present(self, animated: true, completion: completion)
+    }
+    
     func hide(completion: (()->())?) {
         self.dismiss(animated: true) {
             completion?()
@@ -124,7 +132,6 @@ public class PaymentForm: BaseViewController {
                      email: email,
                      paymentData: self.configuration.paymentData) { [weak self] response, error in
             if let response = response {
-                //TODO: - 1
                 self?.checkTransactionResponse(transactionResponse: response, completion: completion)
             } else if let error = error {
                 completion?(false, false, nil, error.localizedDescription)

@@ -257,7 +257,7 @@ public struct Card {
     }
     
     /// Метод создания криптограммы с внешним ключом
-    public static func makeCardCryptogramPacket(_ cardNumber: String, expDate: String, cvv: String, merchantPublicID: String, publicKey: String, keyVersion: Int) -> String? {
+    public static func makeCardCryptogramPacket(cardNumber: String, expDate: String, cvv: String, merchantPublicID: String, publicKey: String, keyVersion: Int) -> String? {
         guard self.isCardNumberValid(cardNumber) else {
             return nil
         }

@@ -31,19 +31,7 @@ final public class CloudPaymentsSDK {
 
         initialized = true
     }
-
-    final public func applicationWillEnterForeground() {
-        if Self.yandexPayAppId != nil {
-            YandexPaySDKApi.instance.applicationWillEnterForeground()
-        }
-    }
-
-    final public func applicationDidBecomeActive() {
-        if Self.yandexPayAppId != nil {
-            YandexPaySDKApi.instance.applicationDidBecomeActive()
-        }
-    }
-
+    
     final public func applicationDidReceiveOpen(_ url: URL, sourceApplication: String?) -> Bool {
         if Self.yandexPayAppId != nil {
             return YandexPaySDKApi.instance.applicationDidReceiveOpen(url, sourceApplication: sourceApplication)

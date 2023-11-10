@@ -55,7 +55,6 @@ public struct PaymentDataPayer: Codable {
 }
 
 public class PaymentData {
-    private (set) var email: String?
     private (set) var payer: PaymentDataPayer?
     private (set) var amount: String = "0"
     private (set) var currency: String = "RUB"
@@ -69,6 +68,7 @@ public class PaymentData {
     private (set) var cultureName: String?
     private (set) var jsonData: String?
     
+    var email: String?
     var saveCard: Bool?
     var cryptogram: String?
     
