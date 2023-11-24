@@ -78,7 +78,7 @@ struct QrResponseModel: Codable {
 // MARK: - QrPayResponse
 struct QrPayResponse: Codable {
     let qrURL: String?
-    let transactionId: Int?
+    let transactionId: Int64?
     let providerQrId: String?
     let amount: Int?
     let message: String?
@@ -95,7 +95,7 @@ struct QrPayResponse: Codable {
         case banks = "Banks"
     }
     
-    init(qrURL: String?, transactionId: Int?, amount: Int?, message: String?, isTest: Bool?, banks: SbpQRModel? = nil, providerQrId: String? = nil) {
+    init(qrURL: String?, transactionId: Int64?, amount: Int?, message: String?, isTest: Bool?, banks: SbpQRModel? = nil, providerQrId: String? = nil) {
         self.qrURL = qrURL
         self.transactionId = transactionId
         self.amount = amount
@@ -121,7 +121,7 @@ struct RepsonseTransactionModel: Codable {
 
 // MARK: - RepsonseStatusModel
 struct RepsonseStatusModel: Codable {
-    let transactionId: Int?
+    let transactionId: Int64?
     let status: StatusPay.RawValue?
     let statusCode: Int?
     let providerQrId: String?

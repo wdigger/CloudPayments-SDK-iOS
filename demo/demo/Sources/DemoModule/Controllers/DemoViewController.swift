@@ -159,7 +159,7 @@ extension DemoViewController: UITableViewDelegate, UITableViewDataSource {
 
 // MARK: - PaymentDelegate
 extension DemoViewController: PaymentDelegate {
-    func onPaymentFinished(_ transactionId: Int?) {
+    func onPaymentFinished(_ transactionId: Int64?) {
         navigationController?.popViewController(animated: true)
         
         if let transactionId = transactionId {

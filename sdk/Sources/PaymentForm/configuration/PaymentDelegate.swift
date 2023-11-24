@@ -7,7 +7,7 @@
 //
 
 public protocol PaymentDelegate: AnyObject {
-    func onPaymentFinished(_ transactionId: Int?)
+    func onPaymentFinished(_ transactionId: Int64?)
     func onPaymentFailed(_ errorMessage: String?)
 }
 

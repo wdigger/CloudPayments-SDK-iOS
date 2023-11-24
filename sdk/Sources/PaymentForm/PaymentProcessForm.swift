@@ -78,7 +78,7 @@ public class PaymentProcessForm: PaymentForm {
     private var state: State = .inProgress
     private var cryptogram: String?
     private var email: String?
-    private var transactionId: Int?
+    private var transactionId: Int64?
     private var tinkoffState: Bool = false
     private var isSaveCard: Bool? = nil
     

@@ -50,6 +50,7 @@ public class CloudpaymentsURLSessionNetworkDispatcher: NSObject, CloudpaymentsNe
         
         var headers = request.headers
         headers["Content-Type"] = "application/json"
+        headers["User-Agent"] = "iOS SDK 1.5.0"
         urlRequest.allHTTPHeaderFields = headers
         
         session.dataTask(with: urlRequest) { (data, response, error) in

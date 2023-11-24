@@ -41,7 +41,7 @@ class SbpRequest {
         }
         
         //MARK: - get status transactionId
-        fileprivate init(baseURL: String, transactionId: Int, publicId: String) {
+        fileprivate init(baseURL: String, transactionId: Int64, publicId: String) {
             let baseURL = baseURL + "payments/qr/status/wait"
             
             let params = [
@@ -73,7 +73,7 @@ extension SbpRequest {
         }
     }
     
-    public static func getStatusSBPPay(baseURL: String, publicId: String, transactionId: Int) {
+    public static func getStatusSBPPay(baseURL: String, publicId: String, transactionId: Int64) {
         let model = PrivateSbpRequest<RepsonseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
 
         model.execute { value in

@@ -79,7 +79,7 @@ class GatewayRequest {
         }
         
         //MARK: - get status transactionId
-        fileprivate init(baseURL: String, transactionId: Int, publicId: String) {
+        fileprivate init(baseURL: String, transactionId: Int64, publicId: String) {
             let baseURL = baseURL + "payments/qr/status/wait"
             
             let params = [
@@ -164,7 +164,7 @@ extension GatewayRequest {
         }
     }
     
-    public static func getStatusTransactionId(baseURL: String, publicId: String, transactionId: Int) {
+    public static func getStatusTransactionId(baseURL: String, publicId: String, transactionId: Int64) {
         let model = TinkoffPayRequestData<RepsonseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
         
         model.execute { value in
