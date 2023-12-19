@@ -76,7 +76,7 @@ struct QrResponseModel: Codable {
 
 
 // MARK: - QrPayResponse
-struct QrPayResponse: Codable {
+public struct QrPayResponse: Codable {
     let qrURL: String?
     let transactionId: Int64?
     let providerQrId: String?
@@ -107,10 +107,10 @@ struct QrPayResponse: Codable {
 }
 
 // MARK: - RepsonseTransactionModel
-struct RepsonseTransactionModel: Codable {
+struct ResponseTransactionModel: Codable {
     let success: Bool?
     let message: String?
-    let model: RepsonseStatusModel?
+    let model: ResponseStatusModel?
     
     enum CodingKeys: String, CodingKey {
         case success = "Success"
@@ -120,7 +120,7 @@ struct RepsonseTransactionModel: Codable {
 }
 
 // MARK: - RepsonseStatusModel
-struct RepsonseStatusModel: Codable {
+struct ResponseStatusModel: Codable {
     let transactionId: Int64?
     let status: StatusPay.RawValue?
     let statusCode: Int?

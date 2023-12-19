@@ -9,11 +9,12 @@
 import Foundation
 
 enum CloudpaymentsHTTPResource: String {
-    //private static let baseURLString = "https://api.cloudpayments.ru/"
-    
     case charge = "payments/cards/charge"
     case auth = "payments/cards/auth"
     case post3ds = "payments/ThreeDSCallback"
+    case configuration = "merchant/configuration"
+    case qrLinkTinkoffPay = "payments/qr/tinkoffpay/link"
+    case waitStatus = "payments/qr/status/wait"
     
     func asUrl(apiUrl: String) -> String {
         return apiUrl.appending(self.rawValue)

@@ -18,6 +18,10 @@ extension String {
     static let infoOutdated = "Данные могли устареть"
     static let noBankApps = "Приложение банка не найдено"
     
+    static let payResponse = "Ждем ответа от Тинькофф Pay"
+    static let failedPay = "Если перейти и оплатить в приложении не удалось, попробуйте снова или выберите другой способ оплаты"
+    static let paymentMethod = "Выбрать способ оплаты"
+    
     static let RUBLE_SIGN = "\u{20BD}"
     static let EURO_SIGN = "\u{20AC}"
     static let GBP_SIGN = "\u{00A3}"

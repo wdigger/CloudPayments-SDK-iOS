@@ -89,7 +89,6 @@ class DemoViewController: BaseViewController {
               let jsonData = getText(.jsonData)
         else { return }
         
-        
         let payer = PaymentDataPayer(
             firstName: payerFirstName,
             lastName: payerLastName,
@@ -107,7 +106,6 @@ class DemoViewController: BaseViewController {
             .setAmount(amount)
             .setCurrency(currency)
             .setApplePayMerchantId(Constants.applePayMerchantID)
-            .setYandexPayMerchantId(Constants.yandexPayMerchantID)
             .setCardholderName("CP SDK")
             .setIpAddress("98.21.123.32")
             .setInvoiceId(invoiceId)
@@ -126,11 +124,16 @@ class DemoViewController: BaseViewController {
             requireEmail: false,
             useDualMessagePayment: footer.demoActionSwitch.isOn,
             disableApplePay: true,
-            disableYandexPay: false,
             apiUrl: apiUrl,
             customListBanks: false
         )
-
+        
+//         проверка кастомного TPay
+//         let vc = TPayDemoViewController()
+//         vc.modalPresentationStyle = .overFullScreen
+//         present(vc, animated: true)
+        
+//         проверка Стандартной платёжной формы
         PaymentForm.present(with: configuration, from: self)
     }
 }

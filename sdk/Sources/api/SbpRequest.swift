@@ -74,7 +74,7 @@ extension SbpRequest {
     }
     
     public static func getStatusSBPPay(baseURL: String, publicId: String, transactionId: Int64) {
-        let model = PrivateSbpRequest<RepsonseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
+        let model = PrivateSbpRequest<ResponseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
 
         model.execute { value in
             NotificationCenter.default.post(name: ObserverKeys.qrPayStatus.key, object: value)

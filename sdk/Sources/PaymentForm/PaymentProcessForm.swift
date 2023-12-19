@@ -81,6 +81,7 @@ public class PaymentProcessForm: PaymentForm {
     private var transactionId: Int64?
     private var tinkoffState: Bool = false
     private var isSaveCard: Bool? = nil
+    private var buttonStatus: PayButtonStatus?
     
     @discardableResult
     public class func present(with configuration: PaymentConfiguration, cryptogram: String?, email: String?, state: State = .inProgress, from: UIViewController, isOnTinkoffPay: Bool = false, isSaveCard: Bool? = nil, completion: (() -> ())? = nil) -> PaymentForm? {
@@ -103,7 +104,7 @@ public class PaymentProcessForm: PaymentForm {
         let parent = self.presentingViewController
         self.dismiss(animated: true) {
             if let parent = parent {
-                if !self.configuration.disableApplePay || !self.configuration.disableYandexPay {
+                if !self.configuration.disableApplePay {
                     PaymentForm.present(with: self.configuration, from: parent)
                 } else {
                     PaymentForm.present(with: self.configuration, from: parent)
@@ -298,6 +299,8 @@ extension PaymentProcessForm {
         let email = configuration.paymentData.email
         let sсheme: Scheme = configuration.useDualMessagePayment ? .auth : .charge
         let jsonData = configuration.paymentData.jsonData
+        let successRedirectUrl = configuration.successRedirectUrl
+        let failRedirectUrl = configuration.failRedirectUrl
         
         let model = TinkoffPayData(publicId: publicId,
                                    amount: amount ,
@@ -311,8 +314,8 @@ extension PaymentProcessForm {
                                    os: nil,
                                    scheme: sсheme.rawValue,
                                    ttlMinutes: 30,
-                                   successRedirectURL: "https://cp.ru",
-                                   failRedirectURL: "https://cp.ru",
+                                   successRedirectURL: successRedirectUrl,
+                                   failRedirectURL: failRedirectUrl,
                                    saveCard: isSaveCard,
                                    jsonData: jsonData)
         
@@ -364,7 +367,7 @@ extension PaymentProcessForm {
     @objc private func observerPayStatus(_ notification: NSNotification) {
         guard let vc = self.presentingViewController else { return }
         
-        guard let result = notification.object as? RepsonseTransactionModel,
+        guard let result = notification.object as? ResponseTransactionModel,
               let rawValue = result.model?.status,
               let status = StatusPay(rawValue: rawValue)
         else {

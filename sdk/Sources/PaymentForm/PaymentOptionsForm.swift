@@ -8,15 +8,12 @@
 
 import UIKit
 import PassKit
-import YandexPaySDK
 
 final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControllerDelegate  {
-    @IBOutlet private weak var yandexPayContainer: View!
     @IBOutlet private weak var applePayContainer: View!
     @IBOutlet private weak var payWithCardButton: Button!
     @IBOutlet private weak var footer: FooterForPresentCard!
     @IBOutlet private weak var mainAppleView: View!
-    @IBOutlet private weak var mainYandexView: View!
     @IBOutlet private weak var mainTinkoffView: View!
     @IBOutlet private weak var tinkoffButton: Button!
     @IBOutlet private weak var sbpButton: Button!
@@ -167,6 +164,15 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
             loaderView.startAnimated(LoaderType.loaderText.toString())
 
             GatewayRequest.isOnGatewayAction(baseURL: baseUrl, terminalPublicId: terminalPublicId) { [weak self] status in
+                
+                if let successRedirectUrl = status?.successRedirectUrl, configuration.successRedirectUrl == nil || configuration.successRedirectUrl == "" {
+                    configuration.successRedirectUrl = successRedirectUrl
+                }
+                
+                if let failRedirectUrl = status?.failRedirectUrl, configuration.failRedirectUrl == nil || configuration.failRedirectUrl == "" {
+                    configuration.failRedirectUrl = failRedirectUrl
+                }
+                
                 guard let self = self, let status = status else {
                     self?.showAlert(title: .noData, message: .noConnection) {
                         self?.presentesionView(false) {
@@ -234,7 +240,7 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     
     // MARK: - Private methods
     private func setButtonsAndContainersEnabled(isEnabled: Bool, select: UIButton! = nil) {
-        let views: [UIView?] = [payWithCardButton, applePayContainer, yandexPayContainer, tinkoffButton, sbpButton]
+        let views: [UIView?] = [payWithCardButton, applePayContainer, tinkoffButton, sbpButton]
 
         views.forEach {
             guard let view = $0, select != view else { return }
@@ -493,13 +499,6 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         } else {
             initializeApplePay()
             
-        }
-        
-        if configuration.disableYandexPay == true {
-            mainYandexView.isHidden = true
-            yandexPayContainer.isHidden = true
-        } else {
-            initializeYandexPay()
         }
     }
     
@@ -781,119 +780,6 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         } else {
             completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
         }
-    }
-}
-
-//MARK: - YandexPayButtonConfiguration
-
-extension PaymentOptionsForm: YandexPayButtonSyncDelegate {
-    
-    private func initializeYandexPay() {
-        
-        mainYandexView.isHidden = false
-        yandexPayContainer.isHidden = false
-        
-        // Укажите тему для кнопки
-        let theme: YandexPayButtonTheme
-        if #available(iOS 13.0, *) {
-            // Параметр `dynamic` позволяет указать, нужно ли кнопке
-            // менять свою цветовую палитру вместе со сменой системной темы
-            theme = YandexPayButtonTheme(appearance: .dark, dynamic: true)
-        } else {
-            theme = YandexPayButtonTheme(appearance: .dark)
-        }
-        
-        // Инициализируйте конфигурацию
-        let configuration = YandexPayButtonConfiguration(theme: theme)
-        
-        // Создайте кнопку
-        let button = YandexPaySDKApi.instance.createButton(configuration: configuration, delegate: self)
-        
-        // Укажите скругления для кнопки (по умолчанию - 8px)
-        button.layer.cornerRadius = 8
-        
-        // Установите layout для кнопки
-        yandexPayContainer.addSubview(button)
-        button.bindFrameToSuperviewBounds()
-    }
-    
-    // Обработайте результат оплаты
-    func yandexPayButton(_ button: YandexPaySDK.YandexPayButton, didCompletePaymentWithResult result: YandexPaySDK.YPPaymentResult) {
-        
-        let email = configuration.paymentData.email
-        
-        switch result {
-        case .succeeded(let paymentInfo):
-            // Оплата была совершена успешно
-            if let decodedData = Data(base64Encoded: paymentInfo.paymentToken),
-               let decodedToken = String(data: decodedData, encoding: .utf8) {
-                let parent = self.presentingViewController
-                self.dismiss(animated: true) { [weak self] in
-                    guard let self = self else {
-                        return
-                        
-                    }
-                    
-                    if parent != nil {
-                        PaymentProcessForm.present(with: self.configuration, cryptogram: decodedToken, email: email, state: .inProgress, from: parent!, completion: nil)
-                    }
-                }
-            }
-            break
-        case .failed(let paymentError):
-            print("Error!: \(paymentError)")
-            break
-            // В процессе оплаты произошла ошибка
-        case .cancelled: break
-            // Пользователь закрыл/смахнул форму YandexPay
-        @unknown default: break
-            
-        }
-    }
-    
-    // Предоставьте UIViewController, с которого необходимо показать форму YandexPay по нажатию на кнопку
-    func yandexPayButtonDidRequestViewControllerForPresentation(_ button: YandexPaySDK.YandexPayButton) -> UIViewController? {
-        return self
-    }
-    
-    // Предоставьте информацию о продавце и о корзине
-    func yandexPayButtonDidRequestPaymentSheet(_ button: YandexPaySDK.YandexPayButton) -> YandexPaySDK.YPPaymentSheet? {
-        
-        return YPPaymentSheet(
-            // Код страны
-            countryCode: .ru,
-            // Код валюты
-            currencyCode: .rub,
-            // Информация о заказе
-            order: YPOrder(
-                // ID заказа
-                id: "ORDER-ID",
-                // Стоимость заказа
-                amount: self.configuration.paymentData.amount
-            ),
-            // Доступные способы оплаты
-            paymentMethods: [
-                // Пока что доступна только оплата картой
-                .card(
-                    YPCardPaymentMethod(
-                        // ID поставщика платежных услуг
-                        gateway: "cloudpayments",
-                        // ID продавца в системе поставщика платежных услуг
-                        gatewayMerchantId: self.configuration.paymentData.accountId ?? "",
-                        // Что будет содержаться в платежном токене: зашифрованные данные банковской карты или токенизированная карта
-                        allowedAuthMethods: [
-                            .panOnly
-                        ],
-                        // Список поддерживаемых платежных систем
-                        allowedCardNetworks: [
-                            .mastercard,
-                            .visa,
-                            .mir
-                        ]
-                    )
-                )
-            ]
-        )
     }
 }
 

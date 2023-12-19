@@ -8,14 +8,12 @@
 import Foundation
 
 enum CaseOfBank: Int {
-    case sberbank = 1
-    case qiwi = 2
     case sbp = 5
     case tinkoff = 6
 }
 
 // MARK: - GatewayConfiguration
-struct GatewayConfiguration: Codable {
+public struct GatewayConfiguration: Codable {
     let model: GatewayPaymentModel
     let success: Bool
     let message: String?
@@ -31,6 +29,7 @@ struct GatewayConfiguration: Codable {
 struct GatewayPaymentModel: Codable {
     let logoURL: String?
     let terminalURL: String?
+    let terminalFullUrl: String?
     let widgetURL: String?
     let isCharity, isTest: Bool?
     let terminalName: String?
@@ -44,6 +43,7 @@ struct GatewayPaymentModel: Codable {
     enum CodingKeys: String, CodingKey {
         case logoURL = "LogoUrl"
         case terminalURL = "TerminalUrl"
+        case terminalFullUrl = "TerminalFullUrl"
         case widgetURL = "WidgetUrl"
         case isCharity = "IsCharity"
         case isTest = "IsTest"

@@ -204,7 +204,7 @@ public class PaymentCardForm: PaymentForm {
                 let parent = self.presentingViewController
                 self.dismiss(animated: true) {
                     if let parent = parent {
-                        if !self.configuration.disableApplePay || !self.configuration.disableYandexPay {
+                        if !self.configuration.disableApplePay {
                             PaymentForm.present(with: self.configuration, from: parent)
                         } else {
                             PaymentForm.present(with: self.configuration, from: parent)

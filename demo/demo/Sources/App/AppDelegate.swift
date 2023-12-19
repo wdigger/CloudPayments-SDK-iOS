@@ -17,28 +17,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
-        do {
-                // Инициализируйте SDK
-                // Если в проекте используется YandexPay, то необходимо указать соответсвующие параметры:
-                // yandexPayAppId - ваш appId для YandexPay
-                // sandboxMode - режим песочницы YandexPay
-                let yaAppId = "3cf72c47-3027-44f5-b80f-054b0763a298"
-                try CloudPaymentsSDK.initialize(yandexPayAppId: yaAppId, yandexPaySandboxMode: true)
-            } catch {
-                fatalError("Unable to initialize CloudPaymentsSDK.")
-            }
-               
         return true
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        _ = CloudPaymentsSDK.instance.applicationDidReceiveUserActivity(userActivity)
         return true
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        _ = CloudPaymentsSDK.instance.applicationDidReceiveOpen(url, sourceApplication: options[.sourceApplication] as? String)
         return true
     }
         

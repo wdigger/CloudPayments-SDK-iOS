@@ -9,6 +9,7 @@
 import UIKit
 
 extension UIImage {
+    
     public class func named(_ name: String) -> UIImage {
         
         let image2 = UIImage.init(named: name, in: Bundle.mainSdk, compatibleWith: nil)
@@ -45,10 +46,26 @@ extension UIImage {
     public class var icn_sbp_logo: UIImage {
         return self.named("icon_sbp_logo")
     }
+    
+    public class var iconLogo: UIImage {
+        return self.named("footerLogoPayments")
+    }
 }
 
 extension UIImageView {
     
+    convenience init(image: UIImage? = nil, contentMode: UIView.ContentMode?) {
+            self.init()
+            
+            if let image = image {
+                self.image = image
+            }
+            
+            if let contentMode = contentMode {
+                self.contentMode = contentMode
+            }
+        }
+
     var colorRenderForImage:UIColor {
         get {return self.tintColor}
         set {
@@ -57,3 +74,4 @@ extension UIImageView {
         }
     }
 }
+

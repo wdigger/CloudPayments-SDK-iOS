@@ -4,14 +4,7 @@
 <dict>
 	<key>CFBundleURLTypes</key>
 	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>YandexLoginSDK</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>yxd1bde9dcd612410e88a4a3f9fef7721c</string>
-			</array>
-		</dict>
+		<dict/>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
@@ -35,25 +28,23 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-        <string>tinkoffbank</string>
-		<string>yandexauth</string>
-		<string>yandexauth2</string>
+		<string>tinkoffbank</string>
 		<string>mailto</string>
 		<string>tel</string>
-        <string>bank100000000001</string>
-        <string>bank100000000003</string>
-        <string>bank100000000004</string>
-        <string>bank100000000005</string>
-        <string>bank100000000006</string>
-        <string>bank100000000007</string>
-        <string>bank100000000008</string>
-        <string>bank100000000009</string>
-        <string>bank100000000010</string>
-        <string>bank100000000011</string>
-        <string>bank100000000012</string>
-        <string>bank100000000013</string>
-        <string>bank100000000014</string>
-        <string>bank100000000015</string>
+		<string>bank100000000001</string>
+		<string>bank100000000003</string>
+		<string>bank100000000004</string>
+		<string>bank100000000005</string>
+		<string>bank100000000006</string>
+		<string>bank100000000007</string>
+		<string>bank100000000008</string>
+		<string>bank100000000009</string>
+		<string>bank100000000010</string>
+		<string>bank100000000011</string>
+		<string>bank100000000012</string>
+		<string>bank100000000013</string>
+		<string>bank100000000014</string>
+		<string>bank100000000015</string>
 		<string>bank100000000016</string>
 		<string>bank100000000017</string>
 		<string>bank100000000018</string>
@@ -86,21 +77,21 @@
 		<string>bank100000000064</string>
 		<string>bank100000000065</string>
 		<string>bank100000000066</string>
-        <string>bank100000000230</string>
-        <string>bank100000000231</string>
-        <string>bank100000000232</string>
-        <string>bank100000000233</string>
-        <string>bank100000000235</string>
-        <string>bank100000000236</string>
-        <string>bank100000000239</string>
-        <string>bank100000000243</string>
-        <string>bank100000000246</string>
-        <string>bank100000000247</string>
-        <string>bank100000000248</string>
-        <string>bank100000000250</string>
-        <string>bank100000000253</string>
-        <string>bank100000000258</string>
-        <string>bank100000000272</string>
+		<string>bank100000000230</string>
+		<string>bank100000000231</string>
+		<string>bank100000000232</string>
+		<string>bank100000000233</string>
+		<string>bank100000000235</string>
+		<string>bank100000000236</string>
+		<string>bank100000000239</string>
+		<string>bank100000000243</string>
+		<string>bank100000000246</string>
+		<string>bank100000000247</string>
+		<string>bank100000000248</string>
+		<string>bank100000000250</string>
+		<string>bank100000000253</string>
+		<string>bank100000000258</string>
+		<string>bank100000000272</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

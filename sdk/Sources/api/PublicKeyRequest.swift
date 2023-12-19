@@ -8,7 +8,7 @@
 import Foundation
 import CloudpaymentsNetworking
 
-class Network: BaseRequest, CloudpaymentsRequestType {
+final class Network: BaseRequest, CloudpaymentsRequestType {
     var data: CloudpaymentsNetworking.CloudpaymentsRequest
     typealias ResponseType = PublicKeyData
     

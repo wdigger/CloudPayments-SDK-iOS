@@ -48,3 +48,19 @@ class Button: UIButton {
         }
     }
 }
+
+extension UIButton {
+    
+    convenience init(_ color: UIColor,
+                     _ cornerRadius: CGFloat,
+                     _ borderWidth: CGFloat,
+                     _ buttonText: String,
+                     _ textColor: UIColor) {
+        self.init()
+        self.layer.borderColor = color.cgColor
+        self.layer.cornerRadius = cornerRadius
+        self.layer.borderWidth = borderWidth
+        self.setTitle(buttonText, for: .normal)
+        self.setTitleColor(textColor, for: .normal)
+    }
+}

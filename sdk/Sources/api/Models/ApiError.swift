@@ -74,8 +74,6 @@ public class ApiError {
     
     public static func getFullErrorDescription(code: String) -> String {
         
-        //"String1 # String2"
-        
         let error = "\(getErrorDescription(code: code))#\(getErrorDescriptionExtra(code: code))"
         
         return error
@@ -91,6 +89,17 @@ public class ApiError {
         
         let description: String = errors[code + "_extra"] ?? "Свяжитесь с вашим банком или воспользуйтесь другой картой"
         return description
+    }
+    
+    static func getErrorDescription(error: Error?) -> String {
+        guard let error = error else {
+            return "Операция не может быть обработана"
+        }
+        
+//        let code = String(error._code)
+//
+//        let description = errors[code + "_extra"]
+        return error.localizedDescription
     }
 }
 

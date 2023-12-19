@@ -217,7 +217,7 @@ extension SbpViewController {
     
     @objc private func observerPayStatus(_ notification: NSNotification) {
         
-        guard let result = notification.object as? RepsonseTransactionModel else {
+        guard let result = notification.object as? ResponseTransactionModel else {
             _ = checkNotificationError(notification)
             return
         }

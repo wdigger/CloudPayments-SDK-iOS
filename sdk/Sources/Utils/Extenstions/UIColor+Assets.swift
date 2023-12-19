@@ -17,11 +17,11 @@ extension UIColor {
         }
     }
     
-    public class var mainText: UIColor {
+    public class var mainText: UIColor! {
         return color(named: "color_text_main")
     }
     
-    public class var mainTextPlaceholder: UIColor {
+    public class var mainTextPlaceholder: UIColor! {
         return color(named: "color_text_placeholder")
     }
     
@@ -37,28 +37,32 @@ extension UIColor {
         return color(named: "color_text_button")
     }
     
-    public class var errorBorder: UIColor {
+    public class var errorBorder: UIColor! {
         return color(named: "color_red")
     }
     
-    public class var blackColor: UIColor {
+    public class var blackColor: UIColor! {
         return color(named: "color_black")
     }
     
-    public class var whiteColor: UIColor {
+    public class var whiteColor: UIColor! {
         return UIColor.white
     }
     
-    public class var colorAlertView: UIColor {
+    public class var colorAlertView: UIColor! {
         return color(named: "color_alert_view")
     }
     
-    public class var colorLoader: UIColor {
+    public class var colorLoader: UIColor! {
         return color(named: "color_loader")
     }
     
-    public class var colorProgressText: UIColor {
+    public class var colorProgressText: UIColor! {
         return color(named: "color_progress_text")
+    }
+    
+    public class var colorBlue: UIColor! {
+        return color(named: "color_blue")
     }
     
     private class func color(named colorName: String) -> UIColor! {

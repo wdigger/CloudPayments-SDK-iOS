@@ -1,6 +1,20 @@
 
 import CloudpaymentsNetworking
 
+public struct TPayButtonConfiguration {
+    public let isOnButton: Bool
+    public let saveCard: Int?
+    public let successRedirectUrl: String?
+    public let failRedirectUrl: String?
+    
+    init(isOnButton: Bool, saveCard: Int?, successRedirectUrl: String? = nil, failRedirectUrl: String? = nil) {
+        self.isOnButton = isOnButton
+        self.saveCard = saveCard
+        self.successRedirectUrl = successRedirectUrl
+        self.failRedirectUrl = failRedirectUrl
+    }
+}
+
 public class CloudpaymentsApi {
     enum Source: String {
         case cpForm = "Cloudpayments SDK iOS (Default form)"
@@ -18,7 +32,7 @@ public class CloudpaymentsApi {
     private let apiUrl: String
     private let source: Source
         
-    public required convenience init(publicId: String, apiUrl: String) {
+    public required convenience init(publicId: String, apiUrl: String = baseURLString) {
         self.init(publicId: publicId, apiUrl: apiUrl, source: .ownForm)
     }
     
@@ -85,6 +99,109 @@ public class CloudpaymentsApi {
         })
     }
     
+    public class func getMerchantConfiguration(publicId: String,
+                                               completion: @escaping (TPayButtonConfiguration?) -> Void) {
+        let request = ConfigurationRequest(queryItems: ["terminalPublicId" : publicId],
+                                           apiUrl: baseURLString)
+        
+        request.execute { result in
+            var isOnTinkoff: Bool = false
+            
+            for element in result.model.externalPaymentMethods {
+                guard let rawValue = element.type, let value = CaseOfBank(rawValue: rawValue) else { continue }
+                
+                switch value {
+                case .tinkoff: isOnTinkoff = element.enabled
+                default: continue
+                }
+            }
+            
+            let value = TPayButtonConfiguration(isOnButton: isOnTinkoff,
+                                                saveCard: result.model.features?.isSaveCard,
+                                                successRedirectUrl: result.model.terminalFullUrl,
+                                                failRedirectUrl: result.model.terminalFullUrl)
+            
+            completion(value)
+            
+        } onError: { string in
+            return completion(.init(isOnButton: false, saveCard: nil))
+        }
+    }
+    
+    public class func getTinkoffPayLink(with configuration: PaymentConfiguration,
+                                        completion handler: @escaping (QrPayResponse?) -> Void) {
+                
+        let publicId = configuration.publicId
+        let amount = configuration.paymentData.amount
+        let accountId = configuration.paymentData.accountId
+        let invoiceId = configuration.paymentData.invoiceId
+        let description = configuration.paymentData.description
+        let currency = configuration.paymentData.currency
+        let email = configuration.paymentData.email
+        let sсheme: Scheme = configuration.useDualMessagePayment ? .auth : .charge
+        let jsonData = configuration.paymentData.jsonData
+        let saveCard = configuration.paymentData.saveCard
+        let successRedirectUrl = configuration.successRedirectUrl
+        let failRedirectUrl = configuration.failRedirectUrl
+        
+        var params = [
+            "PublicId": publicId,
+            "Amount" : amount,
+            "AccountId": accountId,
+            "InvoiceId": invoiceId,
+            "Browser" : nil,
+            "Currency" : currency,
+            "Device" : "MobileApp",
+            "Description" : description,
+            "Email" : email,
+            "IpAddress": "123.123.123.123",
+            "Os" : nil,
+            "Scheme" : sсheme.rawValue,
+            "TtlMinutes" : 30,
+            "SuccessRedirectUrl" : successRedirectUrl,
+            "FailRedirectUrl" : failRedirectUrl,
+            "Webview" : true,
+            "Scenario": "7",
+            "JsonData": jsonData,
+        ] as [String : Any?]
+        
+        if let saveCard = saveCard {
+            params["SaveCard"] = saveCard
+        }
+        
+        let request = TinkoffPayRequest(params: params,
+                                        apiUrl: baseURLString)
+        
+        request.execute { result in
+            handler(result.model)
+        } onError: { error in
+            print(error)
+            handler(nil)
+        }
+    }
+    
+    public class func waitStatus(_ transactionId: Int64,
+                                 _ publicId: String) {
+        
+        let params = [
+            "TransactionId": transactionId,
+            "PublicId": publicId,
+        ] as [String : Any?]
+        
+        let request = WaitStatusRequest(params: params,
+                                        apiUrl: baseURLString)
+        
+        request.execute { value in
+            NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key,
+                                            object: value)
+
+        } onError: { string in
+            NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key,
+                                            object: string)
+            return
+        }
+    }
+    
     public func post3ds(transactionId: String, threeDsCallbackId: String, paRes: String, completion: @escaping (_ result: ThreeDsResponse) -> ()) {
         let mdParams = ["TransactionId": transactionId,
                         "ThreeDsCallbackId": threeDsCallbackId,
@@ -102,8 +219,6 @@ public class CloudpaymentsApi {
                 guard let self = self else {
                     return true
                 }
-                
-            
                 
                 if let url = request.url {
                     let items = url.absoluteString.split(separator: "&").filter { $0.contains("ReasonCode")}

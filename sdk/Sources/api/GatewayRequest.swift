@@ -11,11 +11,20 @@ struct PayButtonStatus {
     var isOnSbp: Bool
     var isOnTinkoff: Bool
     var isSaveCard: Int?
+    var successRedirectUrl: String?
+    var failRedirectUrl: String?
     
-    init(isOnSbp: Bool = false, isOnTinkoff: Bool = false, isSaveCard: Int? = nil) {
+    init(isOnSbp: Bool = false,
+         isOnTinkoff: Bool = false,
+         isSaveCard: Int? = nil,
+         successRedirectUrl: String? = nil,
+         failRedirectUrl: String? = nil ) {
+        
         self.isOnSbp = isOnSbp
         self.isOnTinkoff = isOnTinkoff
         self.isSaveCard = isSaveCard
+        self.successRedirectUrl = successRedirectUrl
+        self.failRedirectUrl = failRedirectUrl
     }
 }
 
@@ -74,7 +83,6 @@ class GatewayRequest {
                 params["SaveCard"] = saveCard
             }
             
-    
             data = .init(path: baseURL, method: .post, params: params)
         }
         
@@ -89,7 +97,6 @@ class GatewayRequest {
             
             data = .init(path: baseURL, method: .post, params: params)
         }
-        
     }
 }
 
@@ -100,6 +107,8 @@ extension GatewayRequest {
         
         TinkoffPayRequestData<GatewayConfiguration>(baseURL: baseURL, terminalPublicId: terminalPublicId).execute { value in
             result.isSaveCard = value.model.features?.isSaveCard
+            result.successRedirectUrl = value.model.terminalFullUrl
+            result.failRedirectUrl = value.model.terminalFullUrl
             
             for element in value.model.externalPaymentMethods {
                 guard let rawValue = element.type, let value = CaseOfBank(rawValue: rawValue) else { continue }
@@ -165,7 +174,7 @@ extension GatewayRequest {
     }
     
     public static func getStatusTransactionId(baseURL: String, publicId: String, transactionId: Int64) {
-        let model = TinkoffPayRequestData<RepsonseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
+        let model = TinkoffPayRequestData<ResponseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
         
         model.execute { value in
             NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key, object: value)

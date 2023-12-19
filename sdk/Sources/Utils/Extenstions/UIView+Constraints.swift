@@ -9,6 +9,22 @@
 import UIKit
 
 extension UIView {
+    convenience init(backgroundColor: UIColor? = .white, cornerRadius: CGFloat? = nil, clipsToBounds: Bool? = true) {
+        self.init()
+        
+        if let backgroundColor = backgroundColor {
+            self.backgroundColor = backgroundColor
+        }
+        
+        if let cornerRadius = cornerRadius {
+            self.layer.cornerRadius = cornerRadius
+        }
+        
+        if let clipsToBounds = clipsToBounds {
+            self.clipsToBounds = clipsToBounds
+        }
+    }
+    
     func bindFrameToSuperviewBounds(){
         guard let superview = self.superview else {
             print("Error! `superview` was nil – call `addSubview(view: UIView)` before calling `bindFrameToSuperviewBounds()` to fix this.")
@@ -42,4 +58,11 @@ extension UIView {
                 self.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: trailing),
             ])
         }
+    
+    func addSubviews(_ views: UIView...) {
+        views.forEach({
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview($0)
+        })
+    }
 }

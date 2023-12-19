@@ -31,25 +31,15 @@ pod 'CloudpaymentsNetworking', :git =>  "https://gitpub.cloudpayments.ru/integra
 
 ```swift
 func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-    CloudPaymentsSDK.instance.applicationDidReceiveUserActivity(userActivity)
     return true
 }
 
 func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    CloudPaymentsSDK.instance.applicationDidReceiveOpen(url, sourceApplication: options[.sourceApplication] as? String)
     return true
-}
-    
-func applicationWillEnterForeground(_ application: UIApplication) {
-    CloudPaymentsSDK.instance.applicationWillEnterForeground()
-}
-    
-func applicationDidBecomeActive(_ application: UIApplication) {
-    CloudPaymentsSDK.instance.applicationDidBecomeActive()
 }
 ```
 
-### Использование встроенной платежной формы от CloudPayments:
+### Использование стандартной платёжной формы от CloudPayments:
 
 1. Cоздайте объект PaymentDataPayer и проинициализируйте его, затем создайте объект PaymentData передайте в него объект PaymentDataPayer, сумму платежа, валюту и дополнительные данные. Если хотите иметь возможность оплаты с помощью Apple Pay, передайте также Apple pay merchant id.
 
@@ -64,7 +54,6 @@ let paymentData = PaymentData()
     .setAmount(String(totalAmount)) // Cумма платежа в валюте, максимальное количество не нулевых знаков после запятой: 2
     .setCurrency(.ruble) // Валюта
     .setApplePayMerchantId("") // Apple pay merchant id (Необходимо получить у Apple)
-    .setYandexPayMerchantId("") // Yandex pay merchant id (Необходимо получить у Yandex)
     .setDescription("Корзина цветов") // Описание оплаты в свободной форме
     .setAccountId("111") // Обязательный идентификатор пользователя для создания подписки и получения токена
     .setIpAddress("98.21.123.32") // IP-адрес плательщика
@@ -86,11 +75,12 @@ let configuration = PaymentConfiguration.init(
     requireEmail: true, // Обязательный email, (по умолчанию false)
     useDualMessagePayment: true, // Использовать двухстадийную схему проведения платежа, (по умолчанию используется одностадийная схема)
     disableApplePay: false, // Выключить Apple Pay, (по умолчанию Apple Pay включен)
-    disableYandexPay: false, // Выключить Yandex Pay, (по умолчанию Yandex Pay включен)
+    successRedirectUrl: "" // Только для TinkoffPay, Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
+    failRedirectUrl: "" // Только для TinkoffPay, Ваш deeplink для редиректа из приложения банка после неуспешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
     customListBanks: false // Включить фильтрацию банков по установленным на устройстве, (по умолчанию false)
 ```
 
-### Использование TinkoffPay:
+### Использование TinkoffPay в стандартной платёжной форме:
 
 1. Включить TinkoffPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
 
@@ -101,11 +91,136 @@ let configuration = PaymentConfiguration.init(
 <array>
   <string>tinkoffbank</string>
 </array>
+
 ```
 
 Благодаря этому SDK сможет корректно определить наличие приложения Тинькофф на устройстве пользователя.
 
-### Использование СБП: 
+### Использование отдельной кнопки TinkoffPay:
+
+1. Включить TinkoffPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
+
+2. Для определения наличия мобильного приложения Тинькофф на устройстве пользователя, добавьте значение **tinkoffbank** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
+
+```
+<key>LSApplicationQueriesSchemes</key>
+<array>
+  <string>tinkoffbank</string>
+</array>
+
+```
+
+3.Создайте объект PaymentTPayView и разместите его
+
+   ``` 
+   
+    private lazy var tinkoffView = PaymentTPayView() 
+    private lazy var tinkoffLabel = UILabel()
+    
+    private func setupTinkoffView() {
+    
+    // делегат
+    tinkoffView.delegate = self 
+
+    view.addSubview(tinkoffView)
+    tinkoffView.addSubview(tinkoffLabel)
+
+    tinkoffView.backgroundColor = .black
+    tinkoffView.layer.cornerRadius = 8
+
+    tinkoffLabel.text = "Тинькофф Pay"
+    tinkoffLabel.textColor = .white
+
+    tinkoffView.translatesAutoresizingMaskIntoConstraints = false
+    tinkoffLabel.translatesAutoresizingMaskIntoConstraints = false
+
+    NSLayoutConstraint.activate([
+    tinkoffView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+    tinkoffView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+    tinkoffView.heightAnchor.constraint(equalToConstant: 50),
+    tinkoffView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+
+    tinkoffLabel.centerXAnchor.constraint(equalTo: tinkoffView.centerXAnchor),
+    tinkoffLabel.centerYAnchor.constraint(equalTo: tinkoffView.centerYAnchor)
+    ])
+    
+    }
+    
+   ```
+4.Создайте метод с конфигурацией  
+
+    ``` 
+    private func addConfiguration() {
+
+    let jsonObject: [String: Any?] = [:]
+
+    func JSONStringify(value: [String: Any?], prettyPrinted:Bool = false) -> String {
+    let options = prettyPrinted ? JSONSerialization.WritingOptions.prettyPrinted : JSONSerialization.WritingOptions(rawValue: 0)
+    if JSONSerialization.isValidJSONObject(value) {
+    do {
+    let data = try JSONSerialization.data(withJSONObject: value, options: options)
+    if let string = NSString(data: data, encoding: NSUTF8StringEncoding) {
+    return string as String
+    }
+    } catch {
+
+    print("parsing error")
+        }
+    }
+    return ""
+    }
+
+    let dataString = JSONStringify(value: jsonObject) 
+
+    let paymentData = PaymentData()
+    .setAmount("10")
+    .setCurrency("RUB")
+    .setDescription("Корзина цветов")
+    .setAccountId("111")
+    .setInvoiceId("123")
+    .setEmail("test@cp.ru")
+    .setJsonData(dataString)
+
+    let configuration = PaymentConfiguration(
+    publicId: "", // // Ваш Public_id из личного кабинета
+    paymentData: paymentData, // Информация о платеже
+    successRedirectUrl: "" // Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
+    failRedirectUrl: "" // Ваш deeplink для редиректа из приложения банка после неуспешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
+    useDualMessagePayment: true) // Использовать двухстадийную схему проведения платежа, (по умолчанию используется одностадийная схема)
+
+    tinkoffView.configuration = configuration // передайте конфигурацию в объект PaymentTPayView
+    }
+    ```
+    
+5.Создайте метод для проверки доступности TinkoffPay  
+    
+    ``` 
+    private func checkTPayView() {
+        tinkoffView.getMerchantConfiguration(publicId: "Ваш Public_id") { [ weak self ] result in
+            guard let self = self, let result = result else { return }
+            // проверка доступности TinkoffPay и её отображение 
+            self.tinkoffView.isHidden = !result.isOnButton     
+        }
+    }
+    ``` 
+6.Подпишитесь на протокол PaymentTPayDelegate и обработайте результаты
+
+    ``` 
+    extension TPayDemoViewController: PaymentTPayDelegate {
+    func resultPayment(_ tPay: Cloudpayments.PaymentTPayView, result: Cloudpayments.PaymentTPayView.PaymentAction, error: String?, transactionId: Int64?) {
+    switch result {
+    case .success:
+    print("Оплата прошла успешно")
+    case .error:
+    print("Ошибка")
+    case .close:
+    print("Пользователь закрыл платёжную форму TinkoffPay")
+    }
+    } }
+    
+    ```
+    
+### Использование СБП в стандартной платёжной форме: 
 
 1. Включить СБП через вашего курирующего менеджера.
 
@@ -176,39 +291,6 @@ let configuration = PaymentConfiguration.init(
 ```
 
 Если вам необходимо изменить список из пункта **2.4** вы можете его отредактировать самостоятельно в вашем файле **Info.plist**
-
-### Использование Yandex Pay:
-Если вы планируете использовать Yandex Pay, вам необходимо:
-
-1. Зарегистрировать приложение на [Яндекс.OAuth](https://oauth.yandex.ru/) и получить YANDEX CLIENT ID
-2. Зарегистрироваться в консоли [Yandex Pay](https://console.pay.yandex.ru). (указать данные компании и нажать "Далее")
-3. Попадаем на страницу выбора платежного провайдера, нажимаем "В личный кабинет"
-4. В ЛК, нажимаем настройки и забираем там Merchant ID для Yandex Pay.
-5. Написать в службу поддержки Yandex Pay, на электронную почту yandex-pay@support.yandex.ru , с просьбой объединить YANDEX CLIENT ID и Merchant ID.
-6. Далее полученные YANDEX CLIENT ID и Merchant ID используем в нашем SDK
-
-В `AppDelegate.swift` вашего проекта в методе `application(_:didFinishLaunchingWithOptions:)` осуществите инициализацию SDK:
-
-Если в проекте используется YandexPay, то для настройки YandexLoginSDK используйте пункты 1-3 [инструкции](https://yandex.ru/dev/mobileauthsdk/doc/sdk/concepts/ios/2.0.0/sdk-ios-install.html).
-
-Если в проекте не используется YandexPay, инициализацию проводить не нужно, также если вы не планируете использовать Yandex Pay , вам необходимо в объекте PaymentConfiguration при инициализации указать `disableYandexPay: true`
-
-```swift
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    do {
-        // Инициализируйте SDK 
-        // Если в проекте используется YandexPay, то необходимо указать соответсвующие параметры:
-        // yandexPayAppId - ваш appId, который вы получили при настройке YandexLoginSDK
-        // yandexPaySandboxMode - режим песочницы YandexPay
-        let yaAppId = "..." 
-        try CloudPaymentsSDK.initialize(yandexPayAppId: yaAppId, yandexPaySandboxMode: false) 
-    } catch {
-        fatalError("Unable to initialize CloudPaymentsSDK")
-    }
-        
-    return true
-}
-```
 
 3. Вызовите форму оплаты внутри своего контроллера
 
@@ -452,6 +534,16 @@ public protocol ThreeDsDelegate: class {
 ```
 
 ### История обновлений:
+
+#### 1.5.1
+* Добавлен режим запуска SDK TinkoffPay
+
+* Добавлена возможность педедать deeplink для перехода из приложения Tinkoff после оплаты
+
+* Отключен YandexPay
+
+#### 1.5.0
+* Повышена надежность
 
 #### 1.4.2
 * Обновлен YandexPay SDK

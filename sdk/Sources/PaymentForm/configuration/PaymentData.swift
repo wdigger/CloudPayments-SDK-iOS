@@ -58,18 +58,17 @@ public class PaymentData {
     private (set) var payer: PaymentDataPayer?
     private (set) var amount: String = "0"
     private (set) var currency: String = "RUB"
-    private (set) var applePayMerchantId: String?
-    private (set) var yandexPayMerchantId: String?
+    private (set) var applePayMerchantId: String? = ""
     private (set) var cardholderName: String?
     private (set) var description: String?
     private (set) var accountId: String?
     private (set) var invoiceId: String?
-    private (set) var ipAddress: String?
+    private (set) var ipAddress: String? = "98.21.123.32"
     private (set) var cultureName: String?
     private (set) var jsonData: String?
     
     var email: String?
-    var saveCard: Bool?
+    var saveCard: Bool? = nil
     var cryptogram: String?
     
     public init() {
@@ -91,11 +90,6 @@ public class PaymentData {
     
     public func setApplePayMerchantId(_ applePayMerchantId: String) -> PaymentData {
         self.applePayMerchantId = applePayMerchantId
-        return self
-    }
-    
-    public func setYandexPayMerchantId(_ yandexPayMerchantId: String) -> PaymentData {
-        self.yandexPayMerchantId = yandexPayMerchantId
         return self
     }
     
@@ -162,11 +156,17 @@ public class PaymentData {
                 let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:AnyObject]
                 return json
             } catch {
-                print("Something went wrong")
+                print("JSON data is empty")
             }
         }
         return nil
     }
+    
+    public func setSaveCard(_ saveCard: Bool?) -> PaymentData {
+        self.saveCard = saveCard
+        return self
+    }
+    
 }
 
 
