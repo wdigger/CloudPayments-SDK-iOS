@@ -7,7 +7,7 @@
 //
 
 public struct Transaction: Codable {
-    public private(set) var transactionId: Int?
+    public private(set) var transactionId: Int64?
     public private(set) var amount: Double?
     public private(set) var currency: String?
     public private(set) var currencyCode: Int?

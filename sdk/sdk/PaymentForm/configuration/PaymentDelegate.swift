@@ -9,7 +9,7 @@
 import Foundation
 
 public protocol PaymentDelegate: class {
-    func onPaymentFinished(_ transactionId: Int?)
+    func onPaymentFinished(_ transactionId: Int64?)
     func onPaymentFailed(_ errorMessage: String?)
 }
 
