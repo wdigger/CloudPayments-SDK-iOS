@@ -30,11 +30,15 @@ class SbpRequest {
                 "IpAddress":model.ipAddress,
                 "TtlMinutes" : model.ttlMinutes,
                 "Scenario": "7",
-                "JsonData": model.jsonData
+                "JsonData": model.jsonData,
             ] as [String : Any?]
             
             if let saveCard = model.saveCard {
                 params["SaveCard"] = saveCard
+            }
+            
+            if let successRedirectUrl = model.successRedirectUrl {
+                params["SuccessRedirectUrl"] = successRedirectUrl
             }
     
             data = .init(path: baseURL, method: .post, params: params)

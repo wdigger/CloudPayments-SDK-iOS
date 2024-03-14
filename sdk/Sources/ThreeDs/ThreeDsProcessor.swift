@@ -15,7 +15,7 @@ public protocol ThreeDsDelegate: AnyObject  {
 }
 
 public class ThreeDsProcessor: NSObject, WKNavigationDelegate {
-    private static let POST_BACK_URL = "https://demo.cloudpayments.ru/WebFormPost/GetWebViewData"
+    private static let POST_BACK_URL = "https://api.cloudpayments.ru/payments/get3dsData"
     
     private weak var delegate: ThreeDsDelegate?
     

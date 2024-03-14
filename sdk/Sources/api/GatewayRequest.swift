@@ -11,20 +11,27 @@ struct PayButtonStatus {
     var isOnSbp: Bool
     var isOnTinkoff: Bool
     var isSaveCard: Int?
-    var successRedirectUrl: String?
+    var terminalUrl: String?
     var failRedirectUrl: String?
+    var isCvvRequired: Bool?
+    var isAllowedNotSanctionedCards: Bool?
+    var isQiwi: Bool?
     
     init(isOnSbp: Bool = false,
          isOnTinkoff: Bool = false,
          isSaveCard: Int? = nil,
-         successRedirectUrl: String? = nil,
-         failRedirectUrl: String? = nil ) {
+         terminalUrl: String? = nil,
+         isCvvRequired: Bool? = nil,
+         isAllowedNotSanctionedCards: Bool? = nil,
+         isQiwi: Bool? = nil) {
         
         self.isOnSbp = isOnSbp
         self.isOnTinkoff = isOnTinkoff
         self.isSaveCard = isSaveCard
-        self.successRedirectUrl = successRedirectUrl
-        self.failRedirectUrl = failRedirectUrl
+        self.terminalUrl = terminalUrl
+        self.isCvvRequired = isCvvRequired
+        self.isAllowedNotSanctionedCards = isAllowedNotSanctionedCards
+        self.isQiwi = isQiwi
     }
 }
 
@@ -50,8 +57,8 @@ class GatewayRequest {
             ]
             path.queryItems = queryItems
             
-            let string = path.url?.absoluteString ?? ""
-            data = .init(path: string)
+            let fullUrl = path.url?.absoluteString ?? ""
+            data = .init(path: fullUrl)
         }
         
         //MARK: - QR Link
@@ -107,8 +114,10 @@ extension GatewayRequest {
         
         TinkoffPayRequestData<GatewayConfiguration>(baseURL: baseURL, terminalPublicId: terminalPublicId).execute { value in
             result.isSaveCard = value.model.features?.isSaveCard
-            result.successRedirectUrl = value.model.terminalFullUrl
-            result.failRedirectUrl = value.model.terminalFullUrl
+            result.terminalUrl = value.model.terminalFullUrl
+            result.isCvvRequired = value.model.isCvvRequired
+            result.isAllowedNotSanctionedCards = value.model.features?.isAllowedNotSanctionedCards
+            result.isQiwi = value.model.features?.isQiwi
             
             for element in value.model.externalPaymentMethods {
                 guard let rawValue = element.type, let value = CaseOfBank(rawValue: rawValue) else { continue }
@@ -116,7 +125,6 @@ extension GatewayRequest {
                 switch value {
                 case .tinkoff: result.isOnTinkoff = element.enabled
                 case .sbp: result.isOnSbp = element.enabled
-                default: continue
                 }
             }
             
@@ -141,8 +149,8 @@ extension GatewayRequest {
         if !connectNetworkNotification { return }
         DispatchQueue.global().asyncAfter(wallDeadline: .now() + 3) {
             // проверка соединения
-            let string = "https://www.google.com"
-            guard let url = URL(string: string) else { return }
+            let api = CloudpaymentsApi.baseURLString
+            guard let url = URL(string: api) else { return }
             let task = URLSession.shared.dataTask(with: .init(url: url)) {_,_,error in
                 guard let error = error, error._code == 1009 || error._code == -1009  else {
                     DispatchQueue.main.async {

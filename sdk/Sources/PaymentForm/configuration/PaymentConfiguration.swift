@@ -18,6 +18,7 @@ public class PaymentConfiguration {
     let apiUrl: String
     var successRedirectUrl: String?
     var failRedirectUrl: String?
+   
     let customListBanks: Bool
 
     public init(publicId: String, paymentData: PaymentData, delegate: PaymentDelegate? = nil, uiDelegate: PaymentUIDelegate? = nil, scanner: PaymentCardScanner? = nil,

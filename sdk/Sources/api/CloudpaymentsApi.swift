@@ -25,8 +25,8 @@ public class CloudpaymentsApi {
     
     private let defaultCardHolderName = "Cloudpayments SDK"
     
-    private let threeDsSuccessURL = "https://demo.cloudpayments.ru/success"
-    private let threeDsFailURL = "https://demo.cloudpayments.ru/fail"
+    private let threeDsSuccessURL = "https://cloudpayments.ru/success"
+    private let threeDsFailURL = "https://cloudpayments.ru/fail"
     
     private let publicId: String
     private let apiUrl: String
@@ -67,6 +67,63 @@ public class CloudpaymentsApi {
                 completion?(nil, CloudpaymentsError.defaultCardError)
             }
         })
+    }
+    
+    public class func getBinInfo(cleanCardNumber: String, with configuration: PaymentConfiguration, completion: @escaping (BankInfo?, Bool?) -> Void) {
+      
+        var sevenNumberHash: String? = nil
+        var eightNumberHash: String? = nil
+        var firstSixDigits: String? = nil
+        
+        if cleanCardNumber.count >= 6 {
+            let firstSixIndex = cleanCardNumber.index(cleanCardNumber.startIndex, offsetBy: 6)
+            firstSixDigits = String(cleanCardNumber[..<firstSixIndex])
+        }
+        
+        if cleanCardNumber.count >= 7 {
+            let firstSevenIndex = cleanCardNumber.index(cleanCardNumber.startIndex, offsetBy: 7)
+            let firstSevenDigits = String(cleanCardNumber[..<firstSevenIndex])
+            
+            sevenNumberHash = RSAUtils.sha512HashString(input: firstSevenDigits)
+        }
+        
+        if cleanCardNumber.count >= 8 {
+            let firstEightIndex = cleanCardNumber.index(cleanCardNumber.startIndex, offsetBy: 8)
+            let firstEightDigits = String(cleanCardNumber[..<firstEightIndex])
+            
+            eightNumberHash = RSAUtils.sha512HashString(input: firstEightDigits)
+        }
+    
+        var queryItems = [
+            "Bin": firstSixDigits,
+            "Currency": configuration.paymentData.currency,
+            "Amount": configuration.paymentData.amount,
+        ] as [String: String?]
+        
+        if let isQiwi = configuration.paymentData.isQiwi {
+            queryItems["isQiwi"] = String(isQiwi)
+        }
+        
+        if let isAllowedNotSanctionedCards = configuration.paymentData.isAllowedNotSanctionedCards {
+            queryItems["isAllowedNotSanctionedCards"] = String(isAllowedNotSanctionedCards)
+        }
+
+        if let sevenNumberHash = sevenNumberHash {
+            queryItems["SevenNumberHash"] = sevenNumberHash
+        }
+        
+        if let eightNumberHash = eightNumberHash {
+            queryItems["EightNumberHash"] = eightNumberHash
+        }
+        
+        let request = BinInfoRequest(queryItems: queryItems, apiUrl: configuration.apiUrl)
+
+        request.execute { result in
+            completion(result.model, result.success)
+        } onError: { error in
+            print(error)
+            completion(nil, false)
+        }
     }
     
     public func charge(cardCryptogramPacket: String,
@@ -275,7 +332,12 @@ public class CloudpaymentsApi {
         if let saveCard = paymentData.saveCard {
             parameters["SaveCard"] = saveCard
         }
-
+        
+        if let splitsDataArray = paymentData.splits {
+            let splitsDictArray = splitsDataArray.flatMap { $0.splits.map { $0.dictionary } }
+            parameters["Splits"] = splitsDictArray
+        }
+        
         return parameters
     }
 

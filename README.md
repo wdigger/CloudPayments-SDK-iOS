@@ -60,7 +60,20 @@ let paymentData = PaymentData()
     .setInvoiceId("123") // Номер счета или заказа
     .setEmail("test@cp.ru") // E-mail плательщика, на который будет отправлена квитанция об оплате
     .setPayer(payer) // Информация о плательщике
-    .setJsonData(jsonData) // Любые другие данные, которые будут связаны с транзакцией                    
+    .setJsonData(jsonData) // Любые другие данные, которые будут связаны с транзакцией               
+```
+
+1.1. Сплитование 
+
+Данный функционал работает только при оплате банковской картой, поэтому при передаче объекта splitsData в PaymentData все остальные способы оплаты будут отключены.
+
+```
+let split1 = Split(publicID: "SubMerchantPublicID_1",amount: "5")
+let split2 = Split(publicID: "SubMerchantPublicID_2",amount: "6")
+                            
+let splits = Splits(splits: [split1, split2])
+
+paymentData.setSplits([splits])
 ```
 
 2. Создайте объект PaymentConfiguration, передайте в него объект PaymentData и ваш **Public_id** из [личного кабинета Cloudpayments](https://merchant.cloudpayments.ru/). Реализуйте протокол PaymentDelegate, чтобы узнать о завершении платежа
@@ -75,10 +88,15 @@ let configuration = PaymentConfiguration.init(
     requireEmail: true, // Обязательный email, (по умолчанию false)
     useDualMessagePayment: true, // Использовать двухстадийную схему проведения платежа, (по умолчанию используется одностадийная схема)
     disableApplePay: false, // Выключить Apple Pay, (по умолчанию Apple Pay включен)
-    successRedirectUrl: "" // Только для TinkoffPay, Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
-    failRedirectUrl: "" // Только для TinkoffPay, Ваш deeplink для редиректа из приложения банка после неуспешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
+    successRedirectUrl: "" // Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
+    failRedirectUrl: "" //  Ваш deeplink для редиректа из приложения банка после неуспешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
     customListBanks: false // Включить фильтрацию банков по установленным на устройстве, (по умолчанию false)
 ```
+2.1. Для передачи deeplink при использовании CБП и TinkoffPay нужно использовать Universal Links:
+
+2.2. Документация от Apple: [Universal Links](https://developer.apple.com/documentation/xcode/supporting-universal-links-in-your-app)
+
+2.3. В вашем приложении реализуйте метод application(_:continue:restorationHandler:) в классе вашего AppDelegate для обработки Universal Links
 
 ### Использование TinkoffPay в стандартной платёжной форме:
 
@@ -91,9 +109,7 @@ let configuration = PaymentConfiguration.init(
 <array>
   <string>tinkoffbank</string>
 </array>
-
 ```
-
 Благодаря этому SDK сможет корректно определить наличие приложения Тинькофф на устройстве пользователя.
 
 ### Использование отдельной кнопки TinkoffPay:
@@ -107,13 +123,11 @@ let configuration = PaymentConfiguration.init(
 <array>
   <string>tinkoffbank</string>
 </array>
-
 ```
 
 3.Создайте объект PaymentTPayView и разместите его
 
    ``` 
-   
     private lazy var tinkoffView = PaymentTPayView() 
     private lazy var tinkoffLabel = UILabel()
     
@@ -143,13 +157,10 @@ let configuration = PaymentConfiguration.init(
     tinkoffLabel.centerXAnchor.constraint(equalTo: tinkoffView.centerXAnchor),
     tinkoffLabel.centerYAnchor.constraint(equalTo: tinkoffView.centerYAnchor)
     ])
-    
     }
-    
    ```
 4.Создайте метод с конфигурацией  
 
-    ``` 
     private func addConfiguration() {
 
     let jsonObject: [String: Any?] = [:]
@@ -190,11 +201,9 @@ let configuration = PaymentConfiguration.init(
 
     tinkoffView.configuration = configuration // передайте конфигурацию в объект PaymentTPayView
     }
-    ```
     
 5.Создайте метод для проверки доступности TinkoffPay  
     
-    ``` 
     private func checkTPayView() {
         tinkoffView.getMerchantConfiguration(publicId: "Ваш Public_id") { [ weak self ] result in
             guard let self = self, let result = result else { return }
@@ -202,10 +211,9 @@ let configuration = PaymentConfiguration.init(
             self.tinkoffView.isHidden = !result.isOnButton     
         }
     }
-    ``` 
+
 6.Подпишитесь на протокол PaymentTPayDelegate и обработайте результаты
 
-    ``` 
     extension TPayDemoViewController: PaymentTPayDelegate {
     func resultPayment(_ tPay: Cloudpayments.PaymentTPayView, result: Cloudpayments.PaymentTPayView.PaymentAction, error: String?, transactionId: Int64?) {
     switch result {
@@ -217,8 +225,6 @@ let configuration = PaymentConfiguration.init(
     print("Пользователь закрыл платёжную форму TinkoffPay")
     }
     } }
-    
-    ```
     
 ### Использование СБП в стандартной платёжной форме: 
 
@@ -534,6 +540,12 @@ public protocol ThreeDsDelegate: class {
 ```
 
 ### История обновлений:
+
+
+#### 1.5.2
+* Улучшена валидация
+
+* Повышена надежность
 
 #### 1.5.1
 * Добавлен режим запуска SDK TinkoffPay

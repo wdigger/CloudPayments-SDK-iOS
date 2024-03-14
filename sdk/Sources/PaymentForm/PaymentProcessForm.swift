@@ -299,8 +299,16 @@ extension PaymentProcessForm {
         let email = configuration.paymentData.email
         let sсheme: Scheme = configuration.useDualMessagePayment ? .auth : .charge
         let jsonData = configuration.paymentData.jsonData
-        let successRedirectUrl = configuration.successRedirectUrl
-        let failRedirectUrl = configuration.failRedirectUrl
+        var successRedirectUrl = configuration.successRedirectUrl
+        var failRedirectUrl = configuration.failRedirectUrl
+        
+        if successRedirectUrl.isNilOrEmpty {
+            successRedirectUrl = configuration.paymentData.terminalUrl
+        }
+        
+        if failRedirectUrl.isNilOrEmpty {
+            failRedirectUrl = configuration.paymentData.terminalUrl
+        }
         
         let model = TinkoffPayData(publicId: publicId,
                                    amount: amount ,

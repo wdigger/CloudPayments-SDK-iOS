@@ -42,6 +42,7 @@ struct GetSbpModel: Codable {
     let ttlMinutes: Int?
     let saveCard: Bool?
     let jsonData: String?
+    let successRedirectUrl: String?
 
     enum CodingKeys: String, CodingKey {
         case publicId = "PublicId"
@@ -56,5 +57,6 @@ struct GetSbpModel: Codable {
         case ttlMinutes = "TtlMinutes"
         case saveCard = "SaveCard"
         case jsonData = "JsonData"
+        case successRedirectUrl = "SuccessRedirectUrl"
     }
 }
