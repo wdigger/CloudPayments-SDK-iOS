@@ -132,8 +132,7 @@ class DemoViewController: BaseViewController {
             requireEmail: false,
             useDualMessagePayment: footer.demoActionSwitch.isOn,
             disableApplePay: true,
-            apiUrl: apiUrl,
-            customListBanks: false
+            apiUrl: apiUrl
         )
         
 //         проверка кастомного TPay

@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class SbpNoAppsViewController: BaseViewController {
+final class SbpNoAppsViewController: BaseViewController {
     
     @IBOutlet private weak var contentView: UIView!
     @IBOutlet private weak var bottomConstraint: NSLayoutConstraint!

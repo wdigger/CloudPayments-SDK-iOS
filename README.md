@@ -90,7 +90,6 @@ let configuration = PaymentConfiguration.init(
     disableApplePay: false, // Выключить Apple Pay, (по умолчанию Apple Pay включен)
     successRedirectUrl: "" // Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
     failRedirectUrl: "" //  Ваш deeplink для редиректа из приложения банка после неуспешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
-    customListBanks: false // Включить фильтрацию банков по установленным на устройстве, (по умолчанию false)
 ```
 2.1. Для передачи deeplink при использовании CБП и TinkoffPay нужно использовать Universal Links:
 
@@ -228,75 +227,7 @@ let configuration = PaymentConfiguration.init(
     
 ### Использование СБП в стандартной платёжной форме: 
 
-1. Включить СБП через вашего курирующего менеджера.
-
-2. По умолчанию в SDK реализовано отображение всего списка банков. Если вы хотите включить функционал фильтрации банков в зависимости от того, какие банки установлены у пользователя на устройстве, то вам необходимо выполнить:
-
-2.1. Параметр **customListBanks** в PaymentConfiguration передать `true` 
-
-2.2. Чтобы SDK могло определить наличие установленных банковских приложений на устройстве, добавьте в файл **Info.plist** вашего приложения в массив по ключу **LSApplicationQueriesSchemes** список банков из пункта **2.4**
-
-2.3. Согласно [документации](https://developer.apple.com/documentation/uikit/uiapplication/1622952-canopenurl#discussion), системный метод `canOpenURL(:)` возвращает корректный ответ только при внесении схемы в массив с ключом **LSApplicationQueriesSchemes** в **Info.plist**. Также там сказано, что в этот список вы можете внести не более 50 схем.
-
-2.4. Ниже Подготовленный список из 50 актуальных банков:
-
-```
-<key>LSApplicationQueriesSchemes</key>
-<array>
-    <string>bank100000000004</string>
-    <string>bank100000000111</string>
-    <string>bank110000000005</string>
-    <string>bank100000000008</string>
-    <string>bank100000000007</string>
-    <string>bank100000000015</string>
-    <string>bank100000000001</string>
-    <string>bank100000000013</string>
-    <string>bank100000000010</string>
-    <string>bank100000000012</string>
-    <string>bank100000000020</string>
-    <string>bank100000000025</string>
-    <string>bank100000000030</string>
-    <string>bank100000000003</string>
-    <string>bank100000000043</string>
-    <string>bank100000000028</string>
-    <string>bank100000000086</string>
-    <string>bank100000000011</string>
-    <string>bank100000000044</string>
-    <string>bank100000000049</string>
-    <string>bank100000000095</string>
-    <string>bank100000000900</string>
-    <string>bank100000000056</string>
-    <string>bank100000000053</string>
-    <string>bank100000000121</string>
-    <string>bank100000000082</string>
-    <string>bank100000000127</string>
-    <string>bank100000000017</string>
-    <string>bank100000000087</string>
-    <string>bank100000000052</string>
-    <string>bank100000000006</string>
-    <string>bank100000000098</string>
-    <string>bank100000000092</string>
-    <string>bank100000000229</string>
-    <string>bank100000000027</string>
-    <string>bank100000000080</string>
-    <string>bank100000000122</string>
-    <string>bank100000000124</string>
-    <string>bank100000000118</string>
-    <string>bank100000000159</string>
-    <string>bank100000000146</string>
-    <string>bank100000000069</string>
-    <string>bank100000000140</string>
-    <string>bank100000000047</string>
-    <string>bank100000000099</string>
-    <string>bank100000000135</string>
-    <string>bank100000000139</string>
-    <string>bank100000000166</string>
-    <string>bank100000000172</string>
-    <string>bank100000000187</string>
-</array>
-```
-
-Если вам необходимо изменить список из пункта **2.4** вы можете его отредактировать самостоятельно в вашем файле **Info.plist**
+Включить СБП через вашего курирующего менеджера.
 
 3. Вызовите форму оплаты внутри своего контроллера
 

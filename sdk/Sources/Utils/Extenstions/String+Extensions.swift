@@ -16,7 +16,7 @@ extension String {
     static let informationWord = "Информация"
     static let noConnection = "Проверьте подключение к интернету"
     static let infoOutdated = "Данные могли устареть"
-    static let noBankApps = "Приложение банка не найдено"
+    static let noBankApps = "Отсутствует приложение, выберите другой банк для оплаты"
     
     static let payResponse = "Ждем ответа от Тинькофф Pay"
     static let failedPay = "Если перейти и оплатить в приложении не удалось, попробуйте снова или выберите другой способ оплаты"

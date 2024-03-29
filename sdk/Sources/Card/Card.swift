@@ -216,7 +216,6 @@ public struct Card {
         return .unknown
     }
     
-    /// Новый метод создания криптограммы
     public static func makeCardCryptogramPacket(_ cardNumber: String, expDate: String, cvv: String, merchantPublicID: String) -> String? {
         guard self.isCardNumberValid(cardNumber) else {
             return nil
@@ -254,7 +253,6 @@ public struct Card {
         return encodeBase64
     }
     
-    /// Метод создания криптограммы с внешним ключом
     public static func makeCardCryptogramPacket(cardNumber: String, expDate: String, cvv: String, merchantPublicID: String, publicKey: String, keyVersion: Int) -> String? {
         guard self.isCardNumberValid(cardNumber) else {
             return nil

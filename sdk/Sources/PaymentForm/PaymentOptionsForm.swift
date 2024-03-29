@@ -430,8 +430,8 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
                                 jsonData: jsonData,
                                 successRedirectUrl: successRedirectUrl)
         
-        SbpRequest.getSbpParametrs(baseURL: baseURL, model: model) { [weak self] value, isOnNetwork  in
-            guard let _ = self,  let value = value else {
+        SbpRequest.getSbpParametrs(baseURL: baseURL, model: model) { [weak self] response, isOnNetwork  in
+            guard let _ = self,  let response = response else {
                 self?.showAlert(title: .noData, message: .noConnection, shouldDismiss: {
                     self?.isAnimatedSbpProgress = false
                     self?.loaderSBPView.superview?.isHidden = true
@@ -442,36 +442,9 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
                 return
             }
             
-            guard let newArray = self?.isActiveBanks(value) else { return }
             self?.isAnimatedSbpProgress = false
-            self?.openSbpViewController(from: parent, newArray)
+            self?.openSbpViewController(from: parent, response)
         }
-    }
-    
-    private func isActiveBanks(_ payResponse: QrPayResponse) -> QrPayResponse? {
-        guard let banks = payResponse.banks else {openSbpNoAppsViewController(); return nil }
-        
-        var array: [SbpQRDataModel] {
-            if !configuration.customListBanks { return banks.dictionary }
-            
-            return banks.dictionary.filter({ bank in
-                guard let url = bank.deeplink else { return false }
-                
-                return UIApplication.shared.canOpenURL(url)
-            })
-        }
-        
-        var value = payResponse
-        
-        value.banks?.dictionary = array
-        
-        if array.isEmpty {
-            openSbpNoAppsViewController()
-        } else {
-            return value
-        }
-
-        return nil
     }
     
     private func openSbpViewController(from: UIViewController, _ payResponse: QrPayResponse) {

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SbpViewController: BaseViewController {
+final class SbpViewController: BaseViewController {
 
     @IBOutlet private weak var sbpTableView: UITableView!
     @IBOutlet private weak var payInformationView: UIView!
@@ -181,16 +181,36 @@ extension SbpViewController {
     
     private func setupLinkForBank(value: SbpQRDataModel) {
         guard let qrURL = payResponse.qrURL else { return }
-        let stringURL = value.schema
-        let string = qrURL.replacingOccurrences(of: "https", with: stringURL)
-        guard let url = URL(string: string) else { return }
+        var stringUri = qrURL
         
-        if UIApplication.shared.canOpenURL(url) {
-            checkSbpTransactionId()
-            UIApplication.shared.open(url)
+        if let isWebClientActive = value.isWebClientActive, let webClientURL = value.webClientURL, let providerQrId = payResponse.providerQrId {
+            stringUri = "\(webClientURL)/\(providerQrId)"
+            openSafariViewController(stringUri)
         } else {
-            showAlert(title: .errorWord, message: .noBankApps)
+            stringUri = qrURL.replacingOccurrences(of: "https", with: value.schema)
+            openBanksApp(stringUri)
         }
+    }
+    
+    private func openBanksApp(_ url: String) {
+        guard let finalURL = URL(string: url) else { return }
+        
+        UIApplication.shared.open(finalURL) { success in
+            if success {
+                self.checkSbpTransactionId()
+            } else {
+                self.showAlert(title: .errorWord, message: .noBankApps)
+            }
+        }
+    }
+
+    private func openSafariViewController(_ string: String) {
+        guard let finalURL = URL(string: string) else { return }
+        let safariViewController = SafariViewController(url: finalURL)
+        if let viewController = UIApplication.topViewController() {
+            viewController.present(safariViewController, animated: true)
+        }
+        checkSbpTransactionId()
     }
     
     private func checkSbpTransactionId() {
