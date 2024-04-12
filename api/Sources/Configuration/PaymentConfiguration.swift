@@ -7,17 +7,17 @@
 //
 
 public class PaymentConfiguration {
-    let publicId: String
-    let paymentData: PaymentData
-    let paymentDelegate: PaymentDelegateImpl
-    let paymentUIDelegate: PaymentUIDelegateImpl
-    let scanner: PaymentCardScanner?
-    let requireEmail: Bool
-    let useDualMessagePayment: Bool
-    let disableApplePay: Bool
-    let apiUrl: String
-    var successRedirectUrl: String?
-    var failRedirectUrl: String?
+    public let publicId: String
+    public let paymentData: PaymentData
+    public let paymentDelegate: PaymentDelegateImpl
+    public let paymentUIDelegate: PaymentUIDelegateImpl
+    public let scanner: PaymentCardScanner?
+    public let requireEmail: Bool
+    public let useDualMessagePayment: Bool
+    public let disableApplePay: Bool
+    public let apiUrl: String
+    public var successRedirectUrl: String?
+    public var failRedirectUrl: String?
    
     public init(publicId: String, paymentData: PaymentData, delegate: PaymentDelegate? = nil, uiDelegate: PaymentUIDelegate? = nil, scanner: PaymentCardScanner? = nil,
                 requireEmail: Bool = false, useDualMessagePayment: Bool = false, disableApplePay: Bool = false, apiUrl: String = "https://api.cloudpayments.ru/", successRedirectUrl: String? = nil, failRedirectUrl: String? = nil) {

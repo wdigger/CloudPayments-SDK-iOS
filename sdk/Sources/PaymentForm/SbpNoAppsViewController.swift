@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CloudPaymentsAPI
 
 final class SbpNoAppsViewController: BaseViewController {
     

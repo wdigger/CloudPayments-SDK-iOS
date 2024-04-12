@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CloudPaymentsAPI
 
 final class SbpViewController: BaseViewController {
 
@@ -183,7 +184,7 @@ extension SbpViewController {
         guard let qrURL = payResponse.qrURL else { return }
         var stringUri = qrURL
         
-        if let isWebClientActive = value.isWebClientActive, let webClientURL = value.webClientURL, let providerQrId = payResponse.providerQrId {
+        if value.isWebClientActive != nil, let webClientURL = value.webClientURL, let providerQrId = payResponse.providerQrId {
             stringUri = "\(webClientURL)/\(providerQrId)"
             openSafariViewController(stringUri)
         } else {

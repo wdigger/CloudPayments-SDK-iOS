@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CloudPaymentsAPI
 
 protocol ProgressTPayProtocol: AnyObject {
     func resultPayment(result: PaymentTPayView.PaymentAction, error: String?, transactionId: Int64?)

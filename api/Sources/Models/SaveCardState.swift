@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum SaveCardState {
+public enum SaveCardState {
     case isOnCheckbox
     case isOnHint
     case none

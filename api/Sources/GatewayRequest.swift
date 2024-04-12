@@ -8,15 +8,15 @@
 import Foundation
 import CloudpaymentsNetworking
 
-struct PayButtonStatus {
-    var isOnSbp: Bool
-    var isOnTinkoff: Bool
-    var isSaveCard: Int?
-    var terminalUrl: String?
-    var failRedirectUrl: String?
-    var isCvvRequired: Bool?
-    var isAllowedNotSanctionedCards: Bool?
-    var isQiwi: Bool?
+public struct PayButtonStatus {
+    public var isOnSbp: Bool
+    public var isOnTinkoff: Bool
+    public var isSaveCard: Int?
+    public var terminalUrl: String?
+    public var failRedirectUrl: String?
+    public var isCvvRequired: Bool?
+    public var isAllowedNotSanctionedCards: Bool?
+    public var isQiwi: Bool?
     
     init(isOnSbp: Bool = false,
          isOnTinkoff: Bool = false,
@@ -36,9 +36,9 @@ struct PayButtonStatus {
     }
 }
 
-class GatewayRequest {
-    static var payButtonStatus: PayButtonStatus?
-    static var connectNetworkNotification: Bool = false
+public class GatewayRequest {
+    public static var payButtonStatus: PayButtonStatus?
+    public static var connectNetworkNotification: Bool = false
     
     private class TinkoffPayRequestData<Model: Codable>: BaseRequest, CloudpaymentsRequestType {
         

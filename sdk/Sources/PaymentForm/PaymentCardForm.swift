@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CloudPaymentsAPI
 
 public class PaymentCardForm: PaymentForm {
     // MARK: - Private properties

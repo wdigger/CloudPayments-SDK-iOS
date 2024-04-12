@@ -7,13 +7,13 @@
 
 import Foundation
 
-enum Scheme: String, Codable {
+public enum Scheme: String, Codable {
     case charge = "0"
     case auth = "1"
 }
 
 // MARK: - TinkoffPayData
-struct TinkoffPayData: Codable {
+public struct TinkoffPayData: Codable {
     let publicId: String?
     let amount: String?
     let accountId: String?
@@ -28,6 +28,28 @@ struct TinkoffPayData: Codable {
     let failRedirectURL: String?
     let saveCard: Bool?
     let jsonData: String?
+    
+    public init(publicId: String?, amount: String?, accountId: String?, invoiceId: String?,
+                browser: String?, description: String?, currency: String?, email: String?,
+                ipAddress: String?, os: String?, scheme: Scheme.RawValue, ttlMinutes: Int?,
+                successRedirectURL: String?, failRedirectURL: String?, saveCard: Bool?, jsonData: String?) {
+        self.publicId = publicId
+        self.amount = amount
+        self.accountId = accountId
+        self.invoiceId = invoiceId
+        self.browser = browser
+        self.description = description
+        self.currency = currency
+        self.email = email
+        self.ipAddress = ipAddress
+        self.os = os
+        self.scheme = scheme
+        self.ttlMinutes = ttlMinutes
+        self.successRedirectURL = successRedirectURL
+        self.failRedirectURL = failRedirectURL
+        self.saveCard = saveCard
+        self.jsonData = jsonData
+    }
 
     enum CodingKeys: String, CodingKey {
         case publicId = "PublicId"
@@ -77,13 +99,13 @@ struct QrResponseModel: Codable {
 
 // MARK: - QrPayResponse
 public struct QrPayResponse: Codable {
-    let qrURL: String?
-    let transactionId: Int64?
-    let providerQrId: String?
-    let amount: Int?
-    let message: String?
-    let isTest: Bool?
-    var banks: SbpQRModel?
+    public let qrURL: String?
+    public let transactionId: Int64?
+    public let providerQrId: String?
+    public let amount: Int?
+    public let message: String?
+    public let isTest: Bool?
+    public var banks: SbpQRModel?
 
     enum CodingKeys: String, CodingKey {
         case qrURL = "QrUrl"
@@ -107,10 +129,10 @@ public struct QrPayResponse: Codable {
 }
 
 // MARK: - RepsonseTransactionModel
-struct ResponseTransactionModel: Codable {
-    let success: Bool?
-    let message: String?
-    let model: ResponseStatusModel?
+public struct ResponseTransactionModel: Codable {
+    public let success: Bool?
+    public let message: String?
+    public let model: ResponseStatusModel?
     
     enum CodingKeys: String, CodingKey {
         case success = "Success"
@@ -120,11 +142,11 @@ struct ResponseTransactionModel: Codable {
 }
 
 // MARK: - RepsonseStatusModel
-struct ResponseStatusModel: Codable {
-    let transactionId: Int64?
-    let status: StatusPay.RawValue?
-    let statusCode: Int?
-    let providerQrId: String?
+public struct ResponseStatusModel: Codable {
+    public let transactionId: Int64?
+    public let status: StatusPay.RawValue?
+    public let statusCode: Int?
+    public let providerQrId: String?
     
     enum CodingKeys: String, CodingKey {
         case transactionId = "TransactionId"

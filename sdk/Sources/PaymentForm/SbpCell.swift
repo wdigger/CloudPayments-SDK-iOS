@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CloudPaymentsAPI
 
 class SbpCell: UITableViewCell {
     @IBOutlet weak var logoImageView: UIImageView!

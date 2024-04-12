@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum StatusPay: String {
+public enum StatusPay: String {
     case created = "Created"
     case pending = "Pending"
     case authorized = "Authorized"

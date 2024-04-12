@@ -8,7 +8,7 @@
 import Foundation
 import CloudpaymentsNetworking
 
-class SbpRequest {
+public class SbpRequest {
     private class PrivateSbpRequest<Model: Codable>: BaseRequest, CloudpaymentsRequestType {
         
         var data: CloudpaymentsNetworking.CloudpaymentsRequest

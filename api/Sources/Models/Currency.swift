@@ -30,7 +30,7 @@ public class Currency {
     static let uzs: String = "UZS"        //    Узбекский сум
     static let bgl: String = "BGL"        //    Болгарский лев
     
-    static func getCurrencySign(code: String) -> String {
+    public static func getCurrencySign(code: String) -> String {
         switch code {
             case ruble:
                 return .RUBLE_SIGN

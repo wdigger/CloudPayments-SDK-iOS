@@ -40,4 +40,8 @@ public struct Transaction: Codable {
     public private(set) var paReq: String?
     public private(set) var acsUrl: String?
     public private(set) var threeDsCallbackId: String?
+    
+    public init(transactionId: Int64?) {
+        self.transactionId = transactionId
+    }
 }

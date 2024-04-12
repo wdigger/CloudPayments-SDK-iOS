@@ -17,7 +17,7 @@ public struct TPayButtonConfiguration {
 }
 
 public class CloudpaymentsApi {
-    enum Source: String {
+    public enum Source: String {
         case cpForm = "Cloudpayments SDK iOS (Default form)"
         case ownForm = "Cloudpayments SDK iOS (Custom form)"
     }
@@ -29,15 +29,15 @@ public class CloudpaymentsApi {
     private let threeDsSuccessURL = "https://cloudpayments.ru/success"
     private let threeDsFailURL = "https://cloudpayments.ru/fail"
     
-    private let publicId: String
-    private let apiUrl: String
+    public let publicId: String
+    public let apiUrl: String
     private let source: Source
         
     public required convenience init(publicId: String, apiUrl: String = baseURLString) {
         self.init(publicId: publicId, apiUrl: apiUrl, source: .ownForm)
     }
     
-    init(publicId: String, apiUrl: String = baseURLString, source: Source) {
+    public init(publicId: String, apiUrl: String = baseURLString, source: Source) {
         self.publicId = publicId
         
         if (apiUrl.isEmpty) {

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CloudPaymentsAPI
 
 public protocol PaymentTPayDelegate: AnyObject {
     func resultPayment(_ tPay: PaymentTPayView, result: PaymentTPayView.PaymentAction, error: String?, transactionId: Int64?)

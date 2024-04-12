@@ -9,6 +9,7 @@
 import UIKit
 import PassKit
 import WebKit
+import CloudPaymentsAPI
 
 typealias PaymentCallback = (_ status: Bool, _ canceled: Bool, _ trasaction: Transaction?, _ errorMessage: String?) -> ()
 
