@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CloudPaymentsAPI
 
 public class Assembly {
     class func createTPayVC(configuration: PaymentConfiguration) -> ProgressTPayViewController {

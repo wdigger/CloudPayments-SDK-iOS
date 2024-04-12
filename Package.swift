@@ -10,6 +10,9 @@ let package = Package(
         .library(
             name: "CloudPaymentsSDK",
             targets: ["CloudPaymentsSDK"]),
+        .library(
+            name: "CloudPaymentsAPI",
+            targets: ["CloudPaymentsAPI"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -21,7 +24,7 @@ let package = Package(
         .target(
             name: "CloudPaymentsSDK",
             dependencies: [
-                "CloudpaymentsNetworking",
+                "CloudPaymentsAPI",
                 "YandexPaySDK",
             ],
             path: "sdk",
@@ -33,6 +36,12 @@ let package = Package(
             name: "CloudpaymentsNetworking",
             path: "networking",
             exclude: ["Tests"]),
+        .target(
+            name: "CloudPaymentsAPI",
+            dependencies: [
+                "CloudpaymentsNetworking",
+            ],
+            path: "api"),
         .binaryTarget(
             name: "YandexPaySDK",
             url: "https://yandexpay-ios-sdk.s3.yandex.net/1.4.0/YandexPaySDK.xcframework.zip",

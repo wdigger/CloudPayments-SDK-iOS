@@ -55,26 +55,26 @@ public struct PaymentDataPayer: Codable {
 }
 
 public class PaymentData {
-    private (set) var splits: [Splits]?
-    private (set) var payer: PaymentDataPayer?
-    private (set) var amount: String = "0"
-    private (set) var currency: String = "RUB"
-    private (set) var applePayMerchantId: String? = ""
-    private (set) var cardholderName: String?
-    private (set) var description: String?
-    private (set) var accountId: String?
-    private (set) var invoiceId: String?
-    private (set) var ipAddress: String? = "98.21.123.32"
-    private (set) var cultureName: String?
-    private (set) var jsonData: String?
+    public private (set) var splits: [Splits]?
+    public private (set) var payer: PaymentDataPayer?
+    public private (set) var amount: String = "0"
+    public private (set) var currency: String = "RUB"
+    public private (set) var applePayMerchantId: String? = ""
+    public private (set) var cardholderName: String?
+    public private (set) var description: String?
+    public private (set) var accountId: String?
+    public private (set) var invoiceId: String?
+    public private (set) var ipAddress: String? = "98.21.123.32"
+    public private (set) var cultureName: String?
+    public private (set) var jsonData: String?
     
-    var email: String?
-    var terminalUrl: String? = nil
-    var saveCard: Bool? = nil
-    var cryptogram: String?
-    var isCvvRequired: Bool?
-    var isAllowedNotSanctionedCards: Bool? = nil
-    var isQiwi: Bool? = nil
+    public var email: String?
+    public var terminalUrl: String? = nil
+    public var saveCard: Bool? = nil
+    public var cryptogram: String?
+    public var isCvvRequired: Bool?
+    public var isAllowedNotSanctionedCards: Bool? = nil
+    public var isQiwi: Bool? = nil
     
     public init() {
     }

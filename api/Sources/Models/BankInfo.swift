@@ -7,11 +7,11 @@
 //
 
 public struct BankInfo: Codable {
-    let logoURL: String?
-    let convertedAmount: String?
-    let currency: String?
-    let hideCvvInput: Bool?
-    let cardType: NameCardType.RawValue?
+    public let logoURL: String?
+    public let convertedAmount: String?
+    public let currency: String?
+    public let hideCvvInput: Bool?
+    public let cardType: NameCardType.RawValue?
     
     enum CodingKeys: String, CodingKey {
         case logoURL = "LogoUrl"
@@ -22,7 +22,7 @@ public struct BankInfo: Codable {
     }
 }
 
-enum NameCardType: String, Codable {
+public enum NameCardType: String, Codable {
     case unknown = "Unknown"
     case visa = "Visa"
     case masterCard = "MasterCard"

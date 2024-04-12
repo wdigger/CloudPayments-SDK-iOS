@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CloudPaymentsAPI
 
 final class FooterForPresentCard: UIView {
     
