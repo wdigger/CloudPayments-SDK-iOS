@@ -8,19 +8,24 @@
 import UIKit
 
 final class SbpViewController: BaseViewController {
-
+    
+    @IBOutlet private weak var searchBar: UISearchBar!
     @IBOutlet private weak var sbpTableView: UITableView!
-    @IBOutlet private weak var payInformationView: UIView!
     @IBOutlet private weak var contentView: UIView!
     @IBOutlet private weak var sbpImageView: UIImageView!
-    @IBOutlet private weak var progressInfoImageView: UIImageView!
     @IBOutlet private weak var closedConstraint: NSLayoutConstraint!
     @IBOutlet private weak var tableViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var notFoundBanksView: UIView!
+    @IBOutlet private weak var notFoundBanksLabel: UILabel!
     private lazy var currentContainerHeight: CGFloat = contentView.bounds.height
     private var isCloused = false
     private var heightPresentView: CGFloat { return contentView.bounds.height }
     private var payResponse: QrPayResponse!
     private var sbpBanks: [SbpQRDataModel] { payResponse.banks?.dictionary ?? [] }
+    private var filteredBanks: [SbpQRDataModel] = []
+    var defaultBorderColor: CGColor?
+    
+    private lazy var tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapAction))
     
     var configuration: PaymentConfiguration!
     private let contentInsetBottom = 50.0
@@ -40,11 +45,24 @@ final class SbpViewController: BaseViewController {
         view.backgroundColor = .init(red: 1, green: 1, blue: 1, alpha: 0.0)
         let nib = UINib(nibName: SbpCell.identifier, bundle: .mainSdk)
         sbpTableView.register(nib, forCellReuseIdentifier: SbpCell.identifier)
+       
+        filteredBanks = sbpBanks
         sbpTableView.delegate = self
         sbpTableView.dataSource = self
+        searchBar.delegate = self
         setupView()
         addGesture()
         sbpTableView.contentInset.bottom = contentInsetBottom
+        customizeSearchBar()
+        
+        view.addGestureRecognizer(tapGestureRecognizer)
+        tapGestureRecognizer.cancelsTouchesInView = false
+    }
+    
+    override var isKeyboardShowing: Bool {
+        didSet {
+            tapGestureRecognizer.cancelsTouchesInView = isKeyboardShowing
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -57,6 +75,27 @@ final class SbpViewController: BaseViewController {
         presentesionView(true) {}
     }
     
+    @objc private func tapAction() {
+        view.endEditing(true)
+    }
+    
+    private func customizeSearchBar() {
+        searchBar.layer.cornerRadius = 8
+        searchBar.clipsToBounds = true
+        searchBar.layer.borderWidth = 2
+        searchBar.layer.borderColor = UIColor(red: 0.89, green: 0.91, blue: 0.94, alpha: 1).cgColor
+        defaultBorderColor = searchBar.layer.borderColor
+        
+        searchBar.barTintColor = UIColor.white
+        searchBar.backgroundColor = UIColor.white
+        notFoundBanksLabel.textColor = UIColor(red: 0.55, green: 0.58, blue: 0.62, alpha: 1)
+        
+        if let textfield = searchBar.value(forKey: "searchField") as? UITextField {
+            textfield.textColor = UIColor(red: 0.15, green: 0.15, blue: 0.27, alpha: 1)
+            textfield.backgroundColor = UIColor.white
+        }
+    }
+    
     private func updateHeightTableViewContent() {
         //count banks 350
         let defaultHeightTableViewContent = 350.0
@@ -67,19 +106,15 @@ final class SbpViewController: BaseViewController {
     
     private func setupView() {
         contentView.layer.cornerRadius = 20
-        payInformationView.layer.cornerRadius = 8
         contentView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         contentView.clipsToBounds = true
-        payInformationView.clipsToBounds = true
         
         sbpImageView.image = UIImage.icn_sbp_logo
-        progressInfoImageView.image = UIImage.iconProgress
     }
     
     @IBAction private func clousedButton(_ sender: UIButton) {
         presentesionView(false) {
             guard let parent = self.presentingViewController else {return}
-
             self.dismiss(animated: true) {
                 PaymentOptionsForm.present(with: self.configuration, from: parent, completion: nil)
             }
@@ -152,25 +187,58 @@ final class SbpViewController: BaseViewController {
     }
 }
 
+extension SbpViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        let trimmedSearchText = searchText.trimmingCharacters(in: .whitespaces)
+        
+        if trimmedSearchText.isEmpty {
+            filteredBanks = sbpBanks
+        } else {
+            filteredBanks = sbpBanks.filter { item in
+                guard let bankName = item.bankName else { return false }
+                return bankName.lowercased().contains(trimmedSearchText.lowercased())
+            }
+        }
+        sbpTableView.reloadData()
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+        filteredBanks = sbpBanks
+        sbpTableView.reloadData()
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.layer.borderColor = UIColor(red: 0.18, green: 0.44, blue: 0.99, alpha: 1).cgColor
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        searchBar.layer.borderColor = defaultBorderColor
+    }
+}
+
 extension SbpViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sbpBanks.count
+        let count = filteredBanks.count
+        notFoundBanksView.isHidden = count > 0
+        return count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SbpCell.identifier, for: indexPath) as? SbpCell else {
             return UITableViewCell()
         }
-        let value = sbpBanks[indexPath.row]
+        let value = filteredBanks[indexPath.row]
         cell.setupCell(model: value)
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         removePayObserver()
-        let value = sbpBanks[indexPath.row]
+        let value = filteredBanks[indexPath.row]
         setupLinkForBank(value: value)
-   }
+    }
 }
 
 extension SbpViewController {
@@ -203,7 +271,7 @@ extension SbpViewController {
             }
         }
     }
-
+    
     private func openSafariViewController(_ string: String) {
         guard let finalURL = URL(string: string) else { return }
         let safariViewController = SafariViewController(url: finalURL)
@@ -257,7 +325,7 @@ extension SbpViewController {
         
         switch status {
         case .created, .pending:
-        checkSbpTransactionId()
+            checkSbpTransactionId()
             
         case .authorized,.completed, .cancelled:
             removePayObserver()

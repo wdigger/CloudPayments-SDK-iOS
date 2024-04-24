@@ -126,24 +126,26 @@ public struct Card {
         guard let cardNumber = cardNumber else {
             return false
         }
+        
         let number = cardNumber.onlyNumbers()
         guard number.count >= 14 && number.count <= 19 else {
             return false
         }
         
-        var digits = number.map { Int(String($0))! }
-        stride(from: digits.count - 2, through: 0, by: -2).forEach { i in
-            var value = digits[i] * 2
-            if value > 9 {
-                value = value % 10 + 1
-            }
-            digits[i] = value
+        var checkSum = 0
+        
+        for element in stride(from: number.count - 1, through: 0, by: -2) {
+            checkSum += Int(String(number[number.index(number.startIndex, offsetBy: element)])) ?? 0
         }
         
-        let sum = digits.reduce(0, +)
-        return sum % 10 == 0
+        for i in stride(from: number.count - 2, through: 0, by: -2) {
+            let n = (Int(String(number[number.index(number.startIndex, offsetBy: i)])) ?? 0) * 2
+            checkSum += n > 9 ? n - 9 : n
+        }
+        
+        return checkSum % 10 == 0
     }
-
+    
     public static func isExpDateValid(_ expDate: String?) -> Bool {
         guard let expDate = expDate else {
             return false
@@ -157,36 +159,47 @@ public struct Card {
         }
         
         return month > 0 && month <= 12
-
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "MM/yy"
-//
-//        guard let date = dateFormatter.date(from: expDate) else {
-//            return false
-//        }
-//
-//        var calendar = Calendar.init(identifier: .gregorian)
-//        calendar.timeZone = TimeZone.current
-//
-//        let dayRange = calendar.range(of: .day, in: .month, for: date)
-//        var comps = calendar.dateComponents([.year, .month, .day], from: date)
-//        comps.day = dayRange?.count ?? 1
-//        comps.hour = 24
-//        comps.minute = 0
-//        comps.second = 0
-//
-//        guard let aNewDate = calendar.date(from: comps) else {
-//            return false
-//        }
-//
-//        let dateNow = dateFormatter.date(from: "02/22")!
-//        //let dateNow = Date()
-//
-//        guard aNewDate.compare(dateNow) == .orderedDescending else {
-//            return false
-//        }
-//
-//        return true
+        
+        //        var digits = number.map { Int(String($0))! }
+        //        stride(from: digits.count - 2, through: 0, by: -2).forEach { i in
+        //            var value = digits[i] * 2
+        //            if value > 9 {
+        //                value = value % 10 + 1
+        //            }
+        //            digits[i] = value
+        //        }
+        //
+        //        let sum = digits.reduce(0, +)
+        
+        //        let dateFormatter = DateFormatter()
+        //        dateFormatter.dateFormat = "MM/yy"
+        //
+        //        guard let date = dateFormatter.date(from: expDate) else {
+        //            return false
+        //        }
+        //
+        //        var calendar = Calendar.init(identifier: .gregorian)
+        //        calendar.timeZone = TimeZone.current
+        //
+        //        let dayRange = calendar.range(of: .day, in: .month, for: date)
+        //        var comps = calendar.dateComponents([.year, .month, .day], from: date)
+        //        comps.day = dayRange?.count ?? 1
+        //        comps.hour = 24
+        //        comps.minute = 0
+        //        comps.second = 0
+        //
+        //        guard let aNewDate = calendar.date(from: comps) else {
+        //            return false
+        //        }
+        //
+        //        let dateNow = dateFormatter.date(from: "02/22")!
+        //        //let dateNow = Date()
+        //
+        //        guard aNewDate.compare(dateNow) == .orderedDescending else {
+        //            return false
+        //        }
+        //
+        //        return true
     }
     
     public static func isValidCvv(cvv: String?, isCvvRequired: Bool = true) -> Bool {

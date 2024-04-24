@@ -22,12 +22,12 @@ public class ThreeDsProcessor: NSObject, WKNavigationDelegate {
     public func make3DSPayment(with data: ThreeDsData, delegate: ThreeDsDelegate) {
         self.delegate = delegate
         
-        if let url = URL.init(string: data.acsUrl) {
-            var request = URLRequest.init(url: url)
+        if let url = URL(string: data.acsUrl) {
+            var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.cachePolicy = .reloadIgnoringCacheData
             
-            let requestBody = String.init(format: "MD=%@&PaReq=%@&TermUrl=%@", data.transactionId, data.paReq, ThreeDsProcessor.POST_BACK_URL).replacingOccurrences(of: "+", with: "%2B")
+            let requestBody = String(format: "MD=%@&PaReq=%@&TermUrl=%@", data.transactionId, data.paReq, ThreeDsProcessor.POST_BACK_URL).replacingOccurrences(of: "+", with: "%2B")
             request.httpBody = requestBody.data(using: .utf8)
             
             URLCache.shared.removeCachedResponse(for: request)
@@ -43,7 +43,7 @@ public class ThreeDsProcessor: NSObject, WKNavigationDelegate {
                             return
                         }
                         
-                        let webView = WKWebView.init()
+                        let webView = WKWebView()
                         webView.navigationDelegate = self
                         if let mimeType = httpResponse.mimeType,
                            let url = httpResponse.url {
@@ -63,7 +63,7 @@ public class ThreeDsProcessor: NSObject, WKNavigationDelegate {
         }
     }
 
-    //MARK: - WKNavigationDelegate -
+    //MARK: - WKNavigationDelegate
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         let url = webView.url
