@@ -476,10 +476,10 @@ extension PaymentCardForm {
                     setInputFieldValues(fieldType: .card, placeholderColor: ValidState.border.color, placeholderText: PlaceholderType.correctCard.toString(), borderViewColor: ValidState.normal.color)
                 }
                 
-                let cleanCardNumber = cardNumber.clearCardNumber()
+                let _ = cardNumber.clearCardNumber()
                 
                 //MAX CARD NUMBER LENGHT
-                cardNumberTextField.isErrorMode = cleanCardNumber.count == 19
+                cardNumberTextField.isErrorMode = false
             }
             
         case cardExpDateTextField:

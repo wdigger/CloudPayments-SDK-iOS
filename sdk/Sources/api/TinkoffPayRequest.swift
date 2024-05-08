@@ -27,3 +27,22 @@ final class TinkoffPayRequest: BaseRequest, CloudpaymentsRequestType {
         return CloudpaymentsRequest(path: fullPath, method: .post, params: params, headers: headers)
     }
 }
+
+final class SbpLinkRequest: BaseRequest, CloudpaymentsRequestType {
+    typealias ResponseType = QrResponseModel
+    var data: CloudpaymentsRequest {
+        let path = CloudpaymentsHTTPResource.qrLinkSbp.asUrl(apiUrl: apiUrl)
+       
+        guard var component = URLComponents(string: path) else { return CloudpaymentsRequest(path: path, method: .post, params: params, headers: headers) }
+       
+        if !queryItems.isEmpty {
+            let items = queryItems.compactMap { return URLQueryItem(name: $0, value: $1) }
+            component.queryItems = items
+        }
+        
+        guard let url = component.url else { return CloudpaymentsRequest(path: path, method: .post, params: params, headers: headers) }
+        let fullPath = url.absoluteString
+        
+        return CloudpaymentsRequest(path: fullPath, method: .post, params: params, headers: headers)
+    }
+}

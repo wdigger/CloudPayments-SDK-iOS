@@ -2,7 +2,7 @@
 //  SplitsData.swift
 //  sdk
 //
-//  Created by i.belkin on 05.02.2024.
+//  Created by Cloudpayments on 05.02.2024.
 //  Copyright © 2024 Cloudpayments. All rights reserved.
 //
 

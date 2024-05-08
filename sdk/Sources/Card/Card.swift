@@ -128,7 +128,7 @@ public struct Card {
         }
         
         let number = cardNumber.onlyNumbers()
-        guard number.count >= 14 && number.count <= 19 else {
+        guard number.count >= 13 && number.count <= 19 else {
             return false
         }
         

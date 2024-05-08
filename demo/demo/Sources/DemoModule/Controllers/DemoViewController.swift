@@ -89,13 +89,6 @@ class DemoViewController: BaseViewController {
               let jsonData = getText(.jsonData)
         else { return }
         
-        let split1 = Split(publicID: "SubMerchantPublicID_1",
-                            amount: "5")
-        let split2 = Split(publicID: "SubMerchantPublicID_2",
-                            amount: "6")
-        
-        let splits = Splits(splits: [split1, split2])
-        
         let payer = PaymentDataPayer(
             firstName: payerFirstName,
             lastName: payerLastName,
@@ -121,7 +114,6 @@ class DemoViewController: BaseViewController {
             .setPayer(payer)
             .setEmail(email)
             .setJsonData(jsonData)
-//            .setSplits([splits])
 
         let configuration = PaymentConfiguration(
             publicId: publicId,
@@ -135,8 +127,8 @@ class DemoViewController: BaseViewController {
             apiUrl: apiUrl
         )
         
-//         проверка кастомного TPay
-//         let vc = TPayDemoViewController()
+//         проверка кастомных кнопок
+//         let vc = TestSinglePaymentMethodsController()
 //         vc.modalPresentationStyle = .overFullScreen
 //         present(vc, animated: true)
         

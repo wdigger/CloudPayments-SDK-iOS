@@ -451,17 +451,8 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
         DispatchQueue.main.async {
             self.presentesionView(false) {
                 self.dismiss(animated: false) {
-                    SbpViewController.present(with: self.configuration, from: from, payResponse: payResponse)
+                    ProgressSbpViewController.present(with: self.configuration, from: from, payResponse: payResponse)
                 }
-            }
-        }
-    }
-    
-    private func openSbpNoAppsViewController() {
-        guard let parent = self.presentingViewController else { return}
-        DispatchQueue.main.async {
-            self.dismiss(animated: true) {
-                SbpNoAppsViewController.present(with: self.configuration, from: parent)
             }
         }
     }

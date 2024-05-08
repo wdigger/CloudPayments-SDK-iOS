@@ -1,15 +1,15 @@
 
 import CloudpaymentsNetworking
 
-public struct TPayButtonConfiguration {
-    public let isOnButton: Bool
-    public let saveCard: Int?
+public struct ButtonConfiguration {
+    public let isOnTinkoffButton: Bool
+    public let isOnSbpButton: Bool
     public let successRedirectUrl: String?
     public let failRedirectUrl: String?
     
-    init(isOnButton: Bool, saveCard: Int?, successRedirectUrl: String? = nil, failRedirectUrl: String? = nil) {
-        self.isOnButton = isOnButton
-        self.saveCard = saveCard
+    init(isOnTinkoffButton: Bool, isOnSbpButton: Bool, successRedirectUrl: String? = nil, failRedirectUrl: String? = nil) {
+        self.isOnTinkoffButton = isOnTinkoffButton
+        self.isOnSbpButton = isOnSbpButton
         self.successRedirectUrl = successRedirectUrl
         self.failRedirectUrl = failRedirectUrl
     }
@@ -157,31 +157,80 @@ public class CloudpaymentsApi {
     }
     
     public class func getMerchantConfiguration(publicId: String,
-                                               completion: @escaping (TPayButtonConfiguration?) -> Void) {
+                                               completion: @escaping (ButtonConfiguration?) -> Void) {
         let request = ConfigurationRequest(queryItems: ["terminalPublicId" : publicId],
                                            apiUrl: baseURLString)
         
         request.execute { result in
             var isOnTinkoff: Bool = false
+            var isOnSbp: Bool = false
             
             for element in result.model.externalPaymentMethods {
                 guard let rawValue = element.type, let value = CaseOfBank(rawValue: rawValue) else { continue }
                 
                 switch value {
                 case .tinkoff: isOnTinkoff = element.enabled
-                default: continue
+                case .sbp: isOnSbp = element.enabled
                 }
             }
             
-            let value = TPayButtonConfiguration(isOnButton: isOnTinkoff,
-                                                saveCard: result.model.features?.isSaveCard,
+            let value = ButtonConfiguration(isOnTinkoffButton: isOnTinkoff,
+                                                isOnSbpButton: isOnSbp,
                                                 successRedirectUrl: result.model.terminalFullUrl,
                                                 failRedirectUrl: result.model.terminalFullUrl)
             
             completion(value)
             
         } onError: { string in
-            return completion(.init(isOnButton: false, saveCard: nil))
+            return completion(.init(isOnTinkoffButton: false, isOnSbpButton: false))
+        }
+    }
+    
+    public class func getSbpLink(with configuration: PaymentConfiguration, completion handler: @escaping (QrPayResponse?) -> Void) {
+        
+        let publicId = configuration.publicId
+        let amount = configuration.paymentData.amount
+        let accountId = configuration.paymentData.accountId
+        let invoiceId = configuration.paymentData.invoiceId
+        let description = configuration.paymentData.description
+        let currency = configuration.paymentData.currency
+        let email = configuration.paymentData.email
+        let jsonData = configuration.paymentData.jsonData
+        let saveCard = configuration.saveCardForSinglePaymentMode
+        let successRedirectUrl = configuration.successRedirectUrl
+        let ipAddress = configuration.paymentData.ipAddress
+        
+        var params = [
+            "PublicId": publicId,
+            "Amount" :  amount,
+            "InvoiceId": invoiceId,
+            "Currency" : currency,
+            "AccountId": accountId,
+            "Device" : "MobileApp",
+            "Description" : description,
+            "Email" : email,
+            "IpAddress": ipAddress,
+            "TtlMinutes" : 30,
+            "Scenario": "7",
+            "JsonData": jsonData,
+        ] as [String : Any?]
+        
+        if let saveCard = saveCard {
+            params["SaveCard"] = saveCard
+        }
+        
+        if let successRedirectUrl = successRedirectUrl {
+            params["SuccessRedirectUrl"] = successRedirectUrl
+        }
+        
+        let request = SbpLinkRequest(params: params,
+                                     apiUrl: baseURLString)
+        
+        request.execute { result in
+            handler(result.model)
+        } onError: { error in
+            print(error.localizedDescription)
+            handler(nil)
         }
     }
     
@@ -232,7 +281,7 @@ public class CloudpaymentsApi {
         request.execute { result in
             handler(result.model)
         } onError: { error in
-            print(error)
+            print(error.localizedDescription)
             handler(nil)
         }
     }

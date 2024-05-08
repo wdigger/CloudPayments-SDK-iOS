@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class Assembly {
+public class TpayAssembly {
     class func createTPayVC(configuration: PaymentConfiguration) -> ProgressTPayViewController {
         let presenter = ProgressTPayPresenter(configuration: configuration)
         let view = ProgressTPayViewController(presenter: presenter)

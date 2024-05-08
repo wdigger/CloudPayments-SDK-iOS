@@ -26,6 +26,7 @@ class SbpRequest {
                 "Currency" : model.currency,
                 "AccountId": model.accountId,
                 "Device" : "MobileApp",
+                "Description" : model.description,
                 "Email" : model.email,
                 "IpAddress":model.ipAddress,
                 "TtlMinutes" : model.ttlMinutes,

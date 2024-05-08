@@ -63,19 +63,6 @@ let paymentData = PaymentData()
     .setJsonData(jsonData) // Любые другие данные, которые будут связаны с транзакцией               
 ```
 
-1.1. Сплитование 
-
-Данный функционал работает только при оплате банковской картой, поэтому при передаче объекта splitsData в PaymentData все остальные способы оплаты будут отключены.
-
-```
-let split1 = Split(publicID: "SubMerchantPublicID_1",amount: "5")
-let split2 = Split(publicID: "SubMerchantPublicID_2",amount: "6")
-                            
-let splits = Splits(splits: [split1, split2])
-
-paymentData.setSplits([splits])
-```
-
 2. Создайте объект PaymentConfiguration, передайте в него объект PaymentData и ваш **Public_id** из [личного кабинета Cloudpayments](https://merchant.cloudpayments.ru/). Реализуйте протокол PaymentDelegate, чтобы узнать о завершении платежа
 
 ```
@@ -130,7 +117,7 @@ let configuration = PaymentConfiguration.init(
     private lazy var tinkoffView = PaymentTPayView() 
     private lazy var tinkoffLabel = UILabel()
     
-    private func setupTinkoffView() {
+    private func setupViews() {
     
     // делегат
     tinkoffView.delegate = self 
@@ -203,26 +190,131 @@ let configuration = PaymentConfiguration.init(
     
 5.Создайте метод для проверки доступности TinkoffPay  
     
-    private func checkTPayView() {
-        tinkoffView.getMerchantConfiguration(publicId: "Ваш Public_id") { [ weak self ] result in
-            guard let self = self, let result = result else { return }
-            // проверка доступности TinkoffPay и её отображение 
-            self.tinkoffView.isHidden = !result.isOnButton     
+    private func checkButtons() {
+    tinkoffView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
+    guard let self = self, let result = result else { return }
+    // проверка доступности TinkoffPay и её отображение 
+    self.tinkoffView.isHidden = !result.isOnTinkoffButton
         }
     }
 
 6.Подпишитесь на протокол PaymentTPayDelegate и обработайте результаты
 
-    extension TPayDemoViewController: PaymentTPayDelegate {
+    extension TestSinglePaymentMethodsController: PaymentTPayDelegate {
     func resultPayment(_ tPay: Cloudpayments.PaymentTPayView, result: Cloudpayments.PaymentTPayView.PaymentAction, error: String?, transactionId: Int64?) {
-    switch result {
-    case .success:
-    print("Оплата прошла успешно")
-    case .error:
-    print("Ошибка")
-    case .close:
-    print("Пользователь закрыл платёжную форму TinkoffPay")
+        switch result {
+        case .success:
+            print("Оплата прошла успешно c транзакцией \(String(describing: transactionId))")
+        case .error:
+            print("Операция отклонена")
+        case .close:
+            print("Пользователь закрыл платёжную форму TinkoffPay")
+        }
+    } }
+    
+### Использование отдельной кнопки СБП:
+
+Включить СБП через вашего курирующего менеджера.
+
+1.Создайте объект PaymentSbpView и разместите его
+
+   ``` 
+    private lazy var sbpView = PaymentSbpView()
+    private lazy var sbpLabel = UILabel()
+    
+    private func setupViews() {
+    
+    // делегат
+    sbpView.delegate = self 
+
+    view.addSubview(sbpView)
+    tinkoffView.addSubview(sbpLabel)
+
+    sbpView.backgroundColor = .systemPink
+    sbpView.layer.cornerRadius = 8
+
+    sbpLabel.text = "СБП"
+    sbpLabel.textColor = .white
+
+    sbpView.translatesAutoresizingMaskIntoConstraints = false
+    sbpLabel.translatesAutoresizingMaskIntoConstraints = false
+
+    NSLayoutConstraint.activate([
+    sbpView.topAnchor.constraint(equalTo: tinkoffView.bottomAnchor, constant: 20),
+    sbpView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+    sbpView.heightAnchor.constraint(equalToConstant: 50),
+    sbpView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+    sbpView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+    sbpLabel.centerXAnchor.constraint(equalTo: sbpView.centerXAnchor),
+    sbpLabel.centerYAnchor.constraint(equalTo: sbpView.centerYAnchor),
+    ])
     }
+   ```
+2.Создайте метод с конфигурацией  
+
+    private func addConfiguration() {
+
+    let jsonObject: [String: Any?] = [:]
+
+    func JSONStringify(value: [String: Any?], prettyPrinted:Bool = false) -> String {
+    let options = prettyPrinted ? JSONSerialization.WritingOptions.prettyPrinted : JSONSerialization.WritingOptions(rawValue: 0)
+    if JSONSerialization.isValidJSONObject(value) {
+    do {
+    let data = try JSONSerialization.data(withJSONObject: value, options: options)
+    if let string = NSString(data: data, encoding: NSUTF8StringEncoding) {
+    return string as String
+    }
+    } catch {
+
+    print("parsing error")
+        }
+    }
+    return ""
+    }
+
+    let dataString = JSONStringify(value: jsonObject) 
+
+    let paymentData = PaymentData()
+    .setAmount("10")
+    .setCurrency("RUB")
+    .setDescription("Корзина цветов")
+    .setAccountId("111")
+    .setInvoiceId("123")
+    .setEmail("test@cp.ru")
+    .setJsonData(dataString)
+
+    let configuration = PaymentConfiguration(
+    publicId: "", // // Ваш Public_id из личного кабинета
+    paymentData: paymentData, // Информация о платеже
+    useDualMessagePayment: false, // Использовать двухстадийную схему проведения платежа, (Для СБП используется одностадийная схема)
+    saveCardForSinglePaymentMode: false) // Галочка для сохранения или не сохранения карты (по умолчанию nil)
+
+    sbpView.configuration = configuration // передайте конфигурацию в объект PaymentTPayView
+    }
+    
+3.Создайте метод для проверки доступности СБП  
+    
+    private func checkButtons() {
+    tinkoffView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
+    guard let self = self, let result = result else { return }
+    // проверка доступности CБП и её отображение
+    self.sbpView.isHidden = !result.isOnSbpButton
+        }
+    }
+
+4.Подпишитесь на протокол PaymentSbpDelegate и обработайте результаты
+
+    extension TestSinglePaymentMethodsController: PaymentSbpDelegate {
+    func resultPayment(_ sbp: Cloudpayments.PaymentSbpView, result: Cloudpayments.PaymentSbpView.PaymentAction, error: String?, transactionId: Int64?) {
+        switch result {
+        case .success:
+            print("Оплата прошла успешно c транзакцией \(String(describing: transactionId))")
+        case .error:
+            print("Операция отклонена")
+        case .close:
+            print("Пользователь закрыл платежную форму со списком банков")
+        }
     } }
     
 ### Использование СБП в стандартной платёжной форме: 
@@ -472,6 +564,8 @@ public protocol ThreeDsDelegate: class {
 
 ### История обновлений:
 
+#### 1.5.5
+* Добавлен режим запуска SDK СБП
 
 #### 1.5.4
 * Добавлен поиск по списку банков при оплате по СБП

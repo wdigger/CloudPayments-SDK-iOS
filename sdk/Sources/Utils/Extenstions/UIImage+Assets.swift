@@ -47,6 +47,10 @@ extension UIImage {
         return self.named("icon_sbp_logo")
     }
     
+    public class var icon_not_found_banks: UIImage {
+        return self.named("icon_not_found_banks")
+    }
+    
     public class var iconLogo: UIImage {
         return self.named("footerLogoPayments")
     }

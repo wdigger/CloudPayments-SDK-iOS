@@ -16,7 +16,7 @@ final class LoaderView: UIView {
     private var isAnimated: Bool = true
     
     var text: String? {
-        get { label.text} set { label.text = newValue}
+        get { label.text } set { label.text = newValue }
     }
     
     override var isHidden: Bool {
@@ -26,7 +26,6 @@ final class LoaderView: UIView {
         }
     }
 
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         let height = 80.0
