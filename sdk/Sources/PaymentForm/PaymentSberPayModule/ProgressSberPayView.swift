@@ -1,21 +1,21 @@
 //
-//  ProgressTPayView.swift
+//  ProgressSberPayView.swift
 //  sdk
 //
-//  Created by Cloudpayments on 15.11.2023.
-//  Copyright © 2023 Cloudpayments. All rights reserved.
+//  Created by Cloudpayments on 20.05.2024.
+//  Copyright © 2024 Cloudpayments. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-protocol CustomTPayViewDelegate: AnyObject {
+protocol CustomSberPayViewDelegate: AnyObject {
     func closePaymentButton()
 }
 
-final class ProgressTPayView: UIView {
+final class ProgressSberPayView: UIView {
     
-    weak var delegate: CustomTPayViewDelegate?
+    weak var delegate: CustomSberPayViewDelegate?
     
     //MARK: - Constants
     
@@ -104,9 +104,9 @@ final class ProgressTPayView: UIView {
     }
 }
 
-//MARK: - Progress TPay View
+//MARK: - ProgressSberPayView
 
-private extension ProgressTPayView {
+private extension ProgressSberPayView {
     
     //MARK: - Add Views
     
@@ -122,7 +122,7 @@ private extension ProgressTPayView {
     func setupComponents() {
         backgroundColor = .clear
         
-        setupLabel(withText: .payResponse,
+        setupLabel(withText: .payResponseSberPay,
                    textColor: .mainText,
                    fontSize: Constants.Font.bold,
                    containerView: titleView)

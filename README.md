@@ -183,7 +183,8 @@ let configuration = PaymentConfiguration.init(
     paymentData: paymentData, // Информация о платеже
     successRedirectUrl: "" // Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
     failRedirectUrl: "" // Ваш deeplink для редиректа из приложения банка после неуспешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
-    useDualMessagePayment: true) // Использовать двухстадийную схему проведения платежа, (по умолчанию используется одностадийная схема)
+    useDualMessagePayment: true, // Использовать двухстадийную схему проведения платежа, (по умолчанию используется одностадийная схема)
+    saveCardMode: false) // Передача сохранения карты (только для отдельной кнопки)
 
     tinkoffView.configuration = configuration // передайте конфигурацию в объект PaymentTPayView
     }
@@ -290,7 +291,7 @@ let configuration = PaymentConfiguration.init(
     useDualMessagePayment: false, // Использовать двухстадийную схему проведения платежа, (Для СБП используется одностадийная схема)
     saveCardForSinglePaymentMode: false) // Галочка для сохранения или не сохранения карты (по умолчанию nil)
 
-    sbpView.configuration = configuration // передайте конфигурацию в объект PaymentTPayView
+    sbpView.configuration = configuration // передайте конфигурацию в объект PaymentSbpView
     }
     
 3.Создайте метод для проверки доступности СБП  
@@ -321,7 +322,33 @@ let configuration = PaymentConfiguration.init(
 
 Включить СБП через вашего курирующего менеджера.
 
-3. Вызовите форму оплаты внутри своего контроллера
+### Использование отдельной кнопки SberPay:
+
+1. Включить SberPay через вашего курирующего менеджера.
+
+2. Для определения наличия мобильного приложения Cбербанка на устройстве пользователя, добавьте значение **sberpay** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
+
+3. Создайте объект PaymentSberPayView и разместите его
+
+4. Создайте метод для проверки доступности SberPay  
+    ```
+    private func checkButtons() {
+    tinkoffView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
+    guard let self = self, let result = result else { return }
+    // проверка доступности SberPay и её отображение
+    self.sberPayView.isHidden = !result.isOnSberPayButton
+        } 
+    }
+    ```
+
+5. Подпишитесь на протокол PaymentSberPayDelegate и обработайте результаты
+
+### Использование SberPay в стандартной платёжной форме: 
+
+Включить SberPay через вашего курирующего менеджера.
+
+
+3. Вызовите форму оплаты внутри своего контроллера (Для стандартной формы)
 
 ```
 PaymentForm.present(with: configuration, from: self)
@@ -563,6 +590,10 @@ public protocol ThreeDsDelegate: class {
 ```
 
 ### История обновлений:
+
+#### 1.5.6
+* Добавлен режим запуска SDK SberPay
+* Добавлен Privacy Manifest
 
 #### 1.5.5
 * Добавлен режим запуска SDK СБП

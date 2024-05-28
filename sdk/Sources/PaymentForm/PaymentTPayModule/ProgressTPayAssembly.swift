@@ -1,5 +1,5 @@
 //
-//  Assembly.swift
+//  ProgressTPayAssembly.swift
 //  sdk
 //
 //  Created by Cloudpayments on 16.11.2023.

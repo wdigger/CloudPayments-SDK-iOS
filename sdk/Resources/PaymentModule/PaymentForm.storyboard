@@ -800,6 +800,33 @@
                                                                     <constraint firstItem="PR8-rR-Vk2" firstAttribute="leading" secondItem="vfX-2B-FR1" secondAttribute="leading" id="gmy-72-9Jj"/>
                                                                 </constraints>
                                                             </view>
+                                                            <view hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lcn-U0-o7V" userLabel="SberPay View">
+                                                                <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
+                                                                <subviews>
+                                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mcD-ws-ZeM" userLabel="SberPay Button" customClass="Button" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                                        <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
+                                                                        <color key="backgroundColor" name="color_sber_pay_button"/>
+                                                                        <constraints>
+                                                                            <constraint firstAttribute="height" constant="56" id="uXw-eJ-2W4"/>
+                                                                        </constraints>
+                                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                                        <state key="normal" image="icon_sber_pay_button"/>
+                                                                        <userDefinedRuntimeAttributes>
+                                                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                                                <real key="value" value="8"/>
+                                                                            </userDefinedRuntimeAttribute>
+                                                                        </userDefinedRuntimeAttributes>
+                                                                    </button>
+                                                                </subviews>
+                                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                                <constraints>
+                                                                    <constraint firstItem="mcD-ws-ZeM" firstAttribute="top" secondItem="lcn-U0-o7V" secondAttribute="top" id="Lph-a5-yvs"/>
+                                                                    <constraint firstItem="mcD-ws-ZeM" firstAttribute="leading" secondItem="lcn-U0-o7V" secondAttribute="leading" id="QZ2-Fe-7iL"/>
+                                                                    <constraint firstAttribute="bottom" secondItem="mcD-ws-ZeM" secondAttribute="bottom" id="o0y-2u-Aku"/>
+                                                                    <constraint firstAttribute="trailing" secondItem="mcD-ws-ZeM" secondAttribute="trailing" id="pxb-yn-dEt"/>
+                                                                </constraints>
+                                                            </view>
                                                             <view hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NVM-nf-zTd" userLabel="Sbp">
                                                                 <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
                                                                 <subviews>
@@ -959,6 +986,7 @@
                         <outlet property="mainTinkoffView" destination="vfX-2B-FR1" id="Fbo-8c-ERE"/>
                         <outlet property="payWithCardButton" destination="Ds8-4r-6Pa" id="DN2-cU-CVW"/>
                         <outlet property="paymentLabel" destination="8Gs-ry-pVK" id="lby-Af-LQQ"/>
+                        <outlet property="sberPayButton" destination="mcD-ws-ZeM" id="rK8-d1-1dP"/>
                         <outlet property="sbpButton" destination="tsl-aQ-bDt" id="1Gh-Ea-mnM"/>
                         <outlet property="tinkoffButton" destination="ogz-S0-gAM" id="ZAO-fW-bmB"/>
                     </connections>
@@ -978,6 +1006,7 @@
         <image name="ic_tpay" width="66" height="30"/>
         <image name="icn_cvv" width="30" height="22"/>
         <image name="icn_eye_closed" width="14" height="13"/>
+        <image name="icon_sber_pay_button" width="69" height="24"/>
         <image name="icon_spb_button" width="60" height="34"/>
         <namedColor name="card_color_border">
             <color red="0.88599997758865356" green="0.9100000262260437" blue="0.93699997663497925" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -996,6 +1025,9 @@
         </namedColor>
         <namedColor name="color_red">
             <color red="0.92156862745098034" green="0.3411764705882353" blue="0.3411764705882353" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="color_sber_pay_button">
+            <color red="0.12941176470588237" green="0.62745098039215685" blue="0.2196078431372549" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="color_text_button">
             <color red="0.54509803921568623" green="0.57647058823529407" blue="0.62352941176470589" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

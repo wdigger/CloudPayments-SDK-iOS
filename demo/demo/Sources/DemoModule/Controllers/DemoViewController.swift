@@ -9,8 +9,10 @@
 import UIKit
 import Cloudpayments
 
-class DemoViewController: BaseViewController {
+final class DemoViewController: BaseViewController {
+    
     // MARK: - Private properties
+    
     @IBOutlet private weak var tableView: UITableView!
     
     private var viewModels = PaymentViewModel.getViewModel()
@@ -43,7 +45,7 @@ class DemoViewController: BaseViewController {
         enum Constants: CGFloat {
             case headerHeight = 80
             case footerWidth = 250
-            case footerHeight = 120
+            case footerHeight = 200
             case position = 0
             
             func toCGFloat() -> CGFloat { return self.rawValue }
@@ -53,7 +55,8 @@ class DemoViewController: BaseViewController {
         tableView.tableHeaderView = header
         
         footer.frame = CGRect(x: Constants.position.toCGFloat(), y: Constants.position.toCGFloat(), width: Constants.footerWidth.toCGFloat(), height: Constants.footerHeight.toCGFloat())
-        footer.addTarget(target: self, action: #selector(run(_:)))
+        footer.addTarget(target: self, action: #selector(run(_:)), .demo)
+        footer.addTarget(target: self, action: #selector(singlePaymentMethodsButtonRun(_:)), .singPay)
         tableView.tableFooterView = footer
     }
     
@@ -64,8 +67,79 @@ class DemoViewController: BaseViewController {
         return nil
     }
     
-    // MARK: - Button run
+    //MARK: - Single Payment Methods
+    
+    @objc private func singlePaymentMethodsButtonRun(_ sender: UIButton) {
+        
+        guard let apiUrl = getText(.api),
+              let publicId =  getText(.publicId),
+              let amount = getText(.amount),
+              let currency = getText(.currency),
+              let invoiceId =  getText(.invoiceId),
+              let descript = getText(.description),
+              let account = getText(.accountId),
+              let email = getText(.email),
+              let payerFirstName = getText(.payerFirstName),
+              let payerLastName = getText(.payerLastName),
+              let payerMiddleName = getText(.payerMiddleName),
+              let payerBirthday = getText(.payerBirthday),
+              let payerAddress = getText(.payerAddress),
+              let payerStreet = getText(.payerStreet),
+              let payerCity = getText(.payerCity),
+              let payerCountry = getText(.payerCountry),
+              let payerPhone = getText(.payerPhone),
+              let payerPostcode = getText(.payerPostcode),
+              let jsonData = getText(.jsonData)
+        else { return }
+        
+        let payer = PaymentDataPayer(
+            firstName: payerFirstName,
+            lastName: payerLastName,
+            middleName: payerMiddleName,
+            birth: payerBirthday,
+            address: payerAddress,
+            street: payerStreet,
+            city: payerCity,
+            country: payerCountry,
+            phone: payerPhone,
+            postcode: payerPostcode
+        )
+        
+        let paymentData = PaymentData()
+            .setAmount(amount)
+            .setCurrency(currency)
+            .setApplePayMerchantId(Constants.applePayMerchantID)
+            .setCardholderName("CP SDK")
+            .setIpAddress("98.21.123.32")
+            .setInvoiceId(invoiceId)
+            .setDescription(descript)
+            .setAccountId(account)
+            .setPayer(payer)
+            .setEmail(email)
+            .setJsonData(jsonData)
+        
+        let configuration = PaymentConfiguration(
+            publicId: publicId,
+            paymentData: paymentData,
+            useDualMessagePayment: footer.demoActionSwitch.isOn,
+            apiUrl: apiUrl,
+            saverCardMode: false
+        )
+        
+        if let _ = self.navigationController {
+            self.dismiss(animated: true) { [weak self] in
+                let testController = TestSinglePaymentMethodsController()
+                testController.configuration = configuration
+                testController.modalPresentationStyle = .formSheet
+                self?.present(testController, animated: true)
+            }
+        }
+    }
+    
+    // MARK: - Standart Form
+    
     @objc private func run(_ sender: UIButton) {
+        
         PaymentViewModel.saving(viewModels)
         
         guard let apiUrl = getText(.api),
@@ -127,12 +201,6 @@ class DemoViewController: BaseViewController {
             apiUrl: apiUrl
         )
         
-//         проверка кастомных кнопок
-//         let vc = TestSinglePaymentMethodsController()
-//         vc.modalPresentationStyle = .overFullScreen
-//         present(vc, animated: true)
-        
-//         проверка Стандартной платёжной формы
         PaymentForm.present(with: configuration, from: self)
     }
 }

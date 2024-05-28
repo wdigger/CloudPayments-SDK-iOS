@@ -46,3 +46,4 @@ final class SbpLinkRequest: BaseRequest, CloudpaymentsRequestType {
         return CloudpaymentsRequest(path: fullPath, method: .post, params: params, headers: headers)
     }
 }
+

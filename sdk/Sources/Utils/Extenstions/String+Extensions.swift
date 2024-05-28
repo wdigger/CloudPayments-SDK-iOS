@@ -19,8 +19,10 @@ extension String {
     static let noBankApps = "Отсутствует приложение, выберите другой банк для оплаты"
     
     static let payResponse = "Ждем ответа от Тинькофф Pay"
+    static let payResponseSberPay = "Ждем ответа от SberPay"
     static let failedPay = "Если перейти и оплатить в приложении не удалось, попробуйте снова или выберите другой способ оплаты"
     static let paymentMethod = "Выбрать способ оплаты"
+    static let closeForm = "Закрыть"
     
     static let RUBLE_SIGN = "\u{20BD}"
     static let EURO_SIGN = "\u{20AC}"

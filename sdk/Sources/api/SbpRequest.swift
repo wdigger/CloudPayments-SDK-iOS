@@ -70,8 +70,6 @@ extension SbpRequest {
             print(error.localizedDescription)
             let code = error._code < 0 ? -error._code : error._code
             if code == 1009 {
-                GatewayRequest.connectNetworkNotification = true
-                GatewayRequest.connectNetworkNotification()
                 return completion(nil, false)
             }
             completion(nil, true)
@@ -82,10 +80,10 @@ extension SbpRequest {
         let model = PrivateSbpRequest<ResponseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
 
         model.execute { value in
-            NotificationCenter.default.post(name: ObserverKeys.qrPayStatus.key, object: value)
+            NotificationCenter.default.post(name: ObserverKeys.generalObserver.key, object: value)
 
         } onError: { string in
-            NotificationCenter.default.post(name: ObserverKeys.qrPayStatus.key, object: string)
+            NotificationCenter.default.post(name: ObserverKeys.generalObserver.key, object: string)
             return
         }
     }

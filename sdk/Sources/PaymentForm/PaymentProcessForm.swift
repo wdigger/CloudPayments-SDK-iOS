@@ -171,8 +171,6 @@ public class PaymentProcessForm: PaymentForm {
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        //self.startAnimation()
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
@@ -319,7 +317,7 @@ extension PaymentProcessForm {
                                    currency: currency,
                                    email: email,
                                    ipAddress: "123.123.123.123",
-                                   os: nil,
+                                   os: "iOS",
                                    scheme: sсheme.rawValue,
                                    ttlMinutes: 30,
                                    successRedirectURL: successRedirectUrl,
@@ -332,15 +330,11 @@ extension PaymentProcessForm {
             
             guard let parent = self?.presentingViewController else { return }
             
-            guard let string = value?.qrURL, let id = value?.transactionId else {
-                GatewayRequest.connectNetworkNotification = false
-                NotificationCenter.default.removeObserver(self as Any, name: ObserverKeys.networkConnectStatus.key, object: nil)
+            guard let qrURL = value?.qrURL, let id = value?.transactionId else {
                 
-                self?.showAlert(title: .noData, message: .noConnection) {
-                    self?.dismiss(animated: false) {
-                        guard let self = self else { return }
-                        PaymentForm.present(with: self.configuration, from: parent)
-                    }
+                self?.dismiss(animated: false) {
+                    guard let self = self else { return }
+                    PaymentForm.present(with: self.configuration, from: parent)
                 }
                 return
             }
@@ -359,7 +353,7 @@ extension PaymentProcessForm {
                 return
             }
             
-            guard let url = URL(string: string) else { return }
+            guard let url = URL(string: qrURL) else { return }
             guard UIApplication.shared.canOpenURL(url) else {
                 let vc = SafariViewController(url: url)
                 if let viewController = UIApplication.topViewController() {
@@ -423,12 +417,12 @@ extension PaymentProcessForm {
     
     private func checkTinkoffPayTransactionId() {
         guard let id = transactionId else { return }
-        NotificationCenter.default.removeObserver(self, name: ObserverKeys.tinkoffPayStatus.key, object: nil)
+        NotificationCenter.default.removeObserver(self, name: ObserverKeys.generalObserver.key, object: nil)
         let url = configuration.apiUrl
         let publicId = configuration.publicId
         //TinkoffStatusPayObserver
         NotificationCenter.default.addObserver(self, selector: #selector(observerPayStatus(_:)),
-                                               name: ObserverKeys.tinkoffPayStatus.key, object: nil)
+                                               name: ObserverKeys.generalObserver.key, object: nil)
         GatewayRequest.getStatusTransactionId(baseURL: url, publicId: publicId, transactionId: id)
     }
 }

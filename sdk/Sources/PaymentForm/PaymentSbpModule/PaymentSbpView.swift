@@ -50,26 +50,13 @@ public class PaymentSbpView: UIView {
               let topVC = UIApplication.topViewController()
         else { return }
         
-        let loaderView = LoaderView()
-        topVC.view.addSubview(loaderView)
-        loaderView.frame = topVC.view.bounds
-        loaderView.layoutSubviews()
-        
-        loaderView.startAnimated("Загружаем список банков")
-        
-        CloudpaymentsApi.getSbpLink(with: configuration) { [ weak self] result in
-            guard let self = self else { return }
-            loaderView.endAnimated()
-            loaderView.isHidden = true
-            loaderView.removeFromSuperview()
-            guard let result = result else { return }
-            let vc = SbpAssembly.createSbpVC(configuration: configuration, from: topVC, payResponse: result)
-            vc.delegate = self
-            topVC.present(vc, animated: true)
-        }
         if let successRedirectUrl = buttonResult?.successRedirectUrl, configuration.successRedirectUrl == nil || configuration.successRedirectUrl == "" {
             configuration.successRedirectUrl = successRedirectUrl
         }
+        
+        let vc = SbpAssembly.createSbpVC(configuration: configuration, from: topVC)
+        vc.delegate = self
+        topVC.present(vc, animated: true)
     }
 }
 

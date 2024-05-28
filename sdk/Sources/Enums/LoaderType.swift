@@ -10,6 +10,7 @@ import Foundation
 
 enum LoaderType: String {
     case loaderText = "Загружаем способы оплаты"
+    case loadingBanks = "Загружаем список банков"
     
     func toString() -> String {
         return self.rawValue

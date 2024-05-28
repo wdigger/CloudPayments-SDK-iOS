@@ -4,12 +4,14 @@ import CloudpaymentsNetworking
 public struct ButtonConfiguration {
     public let isOnTinkoffButton: Bool
     public let isOnSbpButton: Bool
+    public let isOnSberPayButton: Bool
     public let successRedirectUrl: String?
     public let failRedirectUrl: String?
     
-    init(isOnTinkoffButton: Bool, isOnSbpButton: Bool, successRedirectUrl: String? = nil, failRedirectUrl: String? = nil) {
+    init(isOnTinkoffButton: Bool, isOnSbpButton: Bool, isOnSberPayButton: Bool, successRedirectUrl: String? = nil, failRedirectUrl: String? = nil) {
         self.isOnTinkoffButton = isOnTinkoffButton
         self.isOnSbpButton = isOnSbpButton
+        self.isOnSberPayButton = isOnSberPayButton
         self.successRedirectUrl = successRedirectUrl
         self.failRedirectUrl = failRedirectUrl
     }
@@ -48,7 +50,8 @@ public class CloudpaymentsApi {
         self.source = source
     }
     
-    public class func getBankInfo(cardNumber: String, completion: ((_ bankInfo: BankInfo?, _ error: CloudpaymentsError?) -> ())?) {
+    public class func getBankInfo(cardNumber: String, 
+                                  completion: ((_ bankInfo: BankInfo?, _ error: CloudpaymentsError?) -> ())?) {
         let cleanCardNumber = Card.cleanCreditCardNo(cardNumber)
         guard cleanCardNumber.count >= 6 else {
             completion?(nil, CloudpaymentsError.init(message: "You must specify at least the first 6 digits of the card number"))
@@ -69,7 +72,9 @@ public class CloudpaymentsApi {
         })
     }
     
-    public class func getBinInfo(cleanCardNumber: String, with configuration: PaymentConfiguration, completion: @escaping (BankInfo?, Bool?) -> Void) {
+    public class func getBinInfo(cleanCardNumber: String, 
+                                 with configuration: PaymentConfiguration,
+                                 completion: @escaping (BankInfo?, Bool?) -> Void) {
       
         var sevenNumberHash: String? = nil
         var eightNumberHash: String? = nil
@@ -156,14 +161,23 @@ public class CloudpaymentsApi {
         })
     }
     
-    public class func getMerchantConfiguration(publicId: String,
+    fileprivate static func determineSaveCardMode(_ configuration: PaymentConfiguration) -> Bool? {
+        if let saveCardMode = configuration.saveCardSinglePaymentMode {
+            return saveCardMode
+        } else {
+            return configuration.paymentData.saveCard
+        }
+    }
+    
+    public class func getMerchantConfiguration(configuration: PaymentConfiguration,
                                                completion: @escaping (ButtonConfiguration?) -> Void) {
-        let request = ConfigurationRequest(queryItems: ["terminalPublicId" : publicId],
-                                           apiUrl: baseURLString)
+        let request = ConfigurationRequest(queryItems: ["terminalPublicId" : configuration.publicId],
+                                           apiUrl: configuration.apiUrl)
         
         request.execute { result in
-            var isOnTinkoff: Bool = false
-            var isOnSbp: Bool = false
+            var isOnTinkoff = false
+            var isOnSbp = false
+            var isOnSberPay = false
             
             for element in result.model.externalPaymentMethods {
                 guard let rawValue = element.type, let value = CaseOfBank(rawValue: rawValue) else { continue }
@@ -171,22 +185,26 @@ public class CloudpaymentsApi {
                 switch value {
                 case .tinkoff: isOnTinkoff = element.enabled
                 case .sbp: isOnSbp = element.enabled
+                case .sberPay: isOnSberPay = element.enabled
                 }
             }
             
             let value = ButtonConfiguration(isOnTinkoffButton: isOnTinkoff,
                                                 isOnSbpButton: isOnSbp,
+                                                isOnSberPayButton: isOnSberPay,
                                                 successRedirectUrl: result.model.terminalFullUrl,
                                                 failRedirectUrl: result.model.terminalFullUrl)
             
             completion(value)
             
-        } onError: { string in
-            return completion(.init(isOnTinkoffButton: false, isOnSbpButton: false))
+        } onError: { error in
+            print(error.localizedDescription)
+            return completion(.init(isOnTinkoffButton: false, isOnSbpButton: false, isOnSberPayButton: false))
         }
     }
     
-    public class func getSbpLink(with configuration: PaymentConfiguration, completion handler: @escaping (QrPayResponse?) -> Void) {
+    public class func getSbpLink(with configuration: PaymentConfiguration, 
+                                 completion handler: @escaping (QrPayResponse?) -> Void) {
         
         let publicId = configuration.publicId
         let amount = configuration.paymentData.amount
@@ -196,9 +214,9 @@ public class CloudpaymentsApi {
         let currency = configuration.paymentData.currency
         let email = configuration.paymentData.email
         let jsonData = configuration.paymentData.jsonData
-        let saveCard = configuration.saveCardForSinglePaymentMode
         let successRedirectUrl = configuration.successRedirectUrl
         let ipAddress = configuration.paymentData.ipAddress
+        let apiUrl = configuration.apiUrl
         
         var params = [
             "PublicId": publicId,
@@ -214,8 +232,8 @@ public class CloudpaymentsApi {
             "Scenario": "7",
             "JsonData": jsonData,
         ] as [String : Any?]
-        
-        if let saveCard = saveCard {
+    
+        if let saveCard = determineSaveCardMode(configuration) {
             params["SaveCard"] = saveCard
         }
         
@@ -224,7 +242,7 @@ public class CloudpaymentsApi {
         }
         
         let request = SbpLinkRequest(params: params,
-                                     apiUrl: baseURLString)
+                                     apiUrl: apiUrl)
         
         request.execute { result in
             handler(result.model)
@@ -246,9 +264,9 @@ public class CloudpaymentsApi {
         let email = configuration.paymentData.email
         let sсheme: Scheme = configuration.useDualMessagePayment ? .auth : .charge
         let jsonData = configuration.paymentData.jsonData
-        let saveCard = configuration.paymentData.saveCard
         let successRedirectUrl = configuration.successRedirectUrl
         let failRedirectUrl = configuration.failRedirectUrl
+        let apiUrl = configuration.apiUrl
         
         var params = [
             "PublicId": publicId,
@@ -261,7 +279,7 @@ public class CloudpaymentsApi {
             "Description" : description,
             "Email" : email,
             "IpAddress": "123.123.123.123",
-            "Os" : nil,
+            "Os" : "iOS",
             "Scheme" : sсheme.rawValue,
             "TtlMinutes" : 30,
             "SuccessRedirectUrl" : successRedirectUrl,
@@ -271,12 +289,12 @@ public class CloudpaymentsApi {
             "JsonData": jsonData,
         ] as [String : Any?]
         
-        if let saveCard = saveCard {
+        if let saveCard = determineSaveCardMode(configuration) {
             params["SaveCard"] = saveCard
         }
         
         let request = TinkoffPayRequest(params: params,
-                                        apiUrl: baseURLString)
+                                        apiUrl: apiUrl)
         
         request.execute { result in
             handler(result.model)
@@ -286,8 +304,63 @@ public class CloudpaymentsApi {
         }
     }
     
-    public class func waitStatus(_ transactionId: Int64,
+    public class func getSberPayLink(with configuration: PaymentConfiguration,
+                                     completion handler: @escaping (QrPayResponse?) -> Void) {
+                
+        let publicId = configuration.publicId
+        let amount = configuration.paymentData.amount
+        let accountId = configuration.paymentData.accountId
+        let invoiceId = configuration.paymentData.invoiceId
+        let description = configuration.paymentData.description
+        let currency = configuration.paymentData.currency
+        let email = configuration.paymentData.email
+        let sсheme: Scheme = configuration.useDualMessagePayment ? .auth : .charge
+        let jsonData = configuration.paymentData.jsonData
+        let successRedirectUrl = configuration.successRedirectUrl
+        let failRedirectUrl = configuration.failRedirectUrl
+        let apiUrl = configuration.apiUrl
+        
+        var params = [
+            "PublicId": publicId,
+            "Amount" : amount,
+            "AccountId": accountId,
+            "InvoiceId": invoiceId,
+            "Browser" : nil,
+            "Currency" : currency,
+            "Device" : "MobileApp",
+            "Description" : description,
+            "Email" : email,
+            "IpAddress": "123.123.123.123",
+            "Os" : "iOS",
+            "Scheme" : sсheme.rawValue,
+            "TtlMinutes" : 30,
+            "SuccessRedirectUrl" : successRedirectUrl,
+            "FailRedirectUrl" : failRedirectUrl,
+            "Webview" : true,
+            "Scenario": "7",
+            "JsonData": jsonData,
+        ] as [String : Any?]
+        
+        if let saveCard = determineSaveCardMode(configuration) {
+            params["SaveCard"] = saveCard
+        }
+     
+        let request = SberPayLinkRequest(params: params,
+                                         apiUrl: apiUrl)
+        
+        request.execute { result in
+            handler(result.model)
+        } onError: { error in
+            print(error.localizedDescription)
+            handler(nil)
+        }
+    }
+    
+    public class func waitStatus(_ configuration: PaymentConfiguration,
+                                 _ transactionId: Int64,
                                  _ publicId: String) {
+        
+        let apiUrl = configuration.apiUrl
         
         let params = [
             "TransactionId": transactionId,
@@ -295,20 +368,24 @@ public class CloudpaymentsApi {
         ] as [String : Any?]
         
         let request = WaitStatusRequest(params: params,
-                                        apiUrl: baseURLString)
+                                        apiUrl: apiUrl)
         
         request.execute { value in
-            NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key,
+            NotificationCenter.default.post(name: ObserverKeys.generalObserver.key,
                                             object: value)
 
-        } onError: { string in
-            NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key,
-                                            object: string)
+        } onError: { error in
+            print(error.localizedDescription)
+            NotificationCenter.default.post(name: ObserverKeys.generalObserver.key,
+                                            object: error)
             return
         }
     }
     
-    public func post3ds(transactionId: String, threeDsCallbackId: String, paRes: String, completion: @escaping (_ result: ThreeDsResponse) -> ()) {
+    public func post3ds(transactionId: String, 
+                        threeDsCallbackId: String,
+                        paRes: String, completion: @escaping (_ result: ThreeDsResponse) -> ()) {
+        
         let mdParams = ["TransactionId": transactionId,
                         "ThreeDsCallbackId": threeDsCallbackId,
                         "SuccessUrl": self.threeDsSuccessURL,

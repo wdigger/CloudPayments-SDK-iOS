@@ -10,15 +10,17 @@ import CloudpaymentsNetworking
 struct PayButtonStatus {
     var isOnSbp: Bool
     var isOnTinkoff: Bool
+    var isOnSberPay: Bool
     var isSaveCard: Int?
-    var terminalUrl: String?
     var failRedirectUrl: String?
+    var successRedirectUrl: String?
     var isCvvRequired: Bool?
     var isAllowedNotSanctionedCards: Bool?
     var isQiwi: Bool?
     
     init(isOnSbp: Bool = false,
          isOnTinkoff: Bool = false,
+         isOnSberPay: Bool = false,
          isSaveCard: Int? = nil,
          terminalUrl: String? = nil,
          isCvvRequired: Bool? = nil,
@@ -27,8 +29,8 @@ struct PayButtonStatus {
         
         self.isOnSbp = isOnSbp
         self.isOnTinkoff = isOnTinkoff
+        self.isOnSberPay = isOnSberPay
         self.isSaveCard = isSaveCard
-        self.terminalUrl = terminalUrl
         self.isCvvRequired = isCvvRequired
         self.isAllowedNotSanctionedCards = isAllowedNotSanctionedCards
         self.isQiwi = isQiwi
@@ -37,7 +39,6 @@ struct PayButtonStatus {
 
 class GatewayRequest {
     static var payButtonStatus: PayButtonStatus?
-    static var connectNetworkNotification: Bool = false
     
     private class TinkoffPayRequestData<Model: Codable>: BaseRequest, CloudpaymentsRequestType {
         
@@ -114,7 +115,8 @@ extension GatewayRequest {
         
         TinkoffPayRequestData<GatewayConfiguration>(baseURL: baseURL, terminalPublicId: terminalPublicId).execute { value in
             result.isSaveCard = value.model.features?.isSaveCard
-            result.terminalUrl = value.model.terminalFullUrl
+            result.successRedirectUrl = value.model.terminalFullUrl
+            result.failRedirectUrl = value.model.terminalFullUrl
             result.isCvvRequired = value.model.isCvvRequired
             result.isAllowedNotSanctionedCards = value.model.features?.isAllowedNotSanctionedCards
             result.isQiwi = value.model.features?.isQiwi
@@ -125,6 +127,7 @@ extension GatewayRequest {
                 switch value {
                 case .tinkoff: result.isOnTinkoff = element.enabled
                 case .sbp: result.isOnSbp = element.enabled
+                case .sberPay: result.isOnSberPay = element.enabled
                 }
             }
             
@@ -133,35 +136,14 @@ extension GatewayRequest {
             return completion(result)
             
         } onError: { error in
+            print(error.localizedDescription)
             let code = error._code < 0 ? -error._code : error._code
             self.payButtonStatus = code == 1009 ? nil : result
             if code == 1009 {
-                connectNetworkNotification = true
-                self.connectNetworkNotification()
                 return completion(nil)
             }
             
             return completion(result)
-        }
-    }
-    
-    class func connectNetworkNotification(_ count: Int = 0) {
-        if !connectNetworkNotification { return }
-        DispatchQueue.global().asyncAfter(wallDeadline: .now() + 3) {
-            // проверка соединения
-            let api = CloudpaymentsApi.baseURLString
-            guard let url = URL(string: api) else { return }
-            let task = URLSession.shared.dataTask(with: .init(url: url)) {_,_,error in
-                guard let error = error, error._code == 1009 || error._code == -1009  else {
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: ObserverKeys.networkConnectStatus.key, object: true)
-                    }
-                    return
-                }
-                self.connectNetworkNotification(count + 1)
-            }
-            
-            task.resume()
         }
     }
     
@@ -170,10 +152,9 @@ extension GatewayRequest {
             return completion(value.model, true)
             
         } onError: { error in
+            print(error.localizedDescription)
             let code = error._code < 0 ? -error._code : error._code
             if code == 1009 {
-                connectNetworkNotification = true
-                connectNetworkNotification()
                 return completion(nil, false)
             }
             
@@ -185,10 +166,10 @@ extension GatewayRequest {
         let model = TinkoffPayRequestData<ResponseTransactionModel>(baseURL: baseURL, transactionId: transactionId, publicId: publicId)
         
         model.execute { value in
-            NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key, object: value)
+            NotificationCenter.default.post(name: ObserverKeys.generalObserver.key, object: value)
 
         } onError: { string in
-            NotificationCenter.default.post(name: ObserverKeys.tinkoffPayStatus.key, object: string)
+            NotificationCenter.default.post(name: ObserverKeys.generalObserver.key, object: string)
             return
         }
     }

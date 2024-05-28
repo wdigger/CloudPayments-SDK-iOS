@@ -171,10 +171,4 @@ public class PaymentData {
         }
         return nil
     }
-    
-    public func setSaveCard(_ saveCard: Bool?) -> PaymentData {
-        self.saveCard = saveCard
-        return self
-    }
-    
 }

@@ -28,6 +28,7 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>sberpay</string>
 		<string>mailto</string>
 		<string>tinkoffbank</string>
 		<string>tel</string>

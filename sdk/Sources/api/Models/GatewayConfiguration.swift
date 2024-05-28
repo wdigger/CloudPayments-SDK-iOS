@@ -10,6 +10,7 @@ import Foundation
 enum CaseOfBank: Int {
     case sbp = 5
     case tinkoff = 6
+    case sberPay = 12
 }
 
 // MARK: - GatewayConfiguration

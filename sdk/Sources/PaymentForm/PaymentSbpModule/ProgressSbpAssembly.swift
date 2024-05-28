@@ -10,11 +10,10 @@ import Foundation
 import UIKit
 
 public class SbpAssembly {
-    class func createSbpVC(configuration: PaymentConfiguration, from: UIViewController, payResponse: QrPayResponse) -> ProgressSbpViewController {
-        let presenter = ProgressSbpPresenter(configuration: configuration, payResponse: payResponse)
+    class func createSbpVC(configuration: PaymentConfiguration, from: UIViewController) -> ProgressSbpViewController {
+        let presenter = ProgressSbpPresenter(configuration: configuration)
         let view = ProgressSbpViewController(presenter: presenter)
         presenter.view = view
-        
         return view
     }
 }

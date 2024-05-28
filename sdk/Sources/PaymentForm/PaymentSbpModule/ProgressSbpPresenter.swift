@@ -14,6 +14,8 @@ protocol ProgressSbpViewControllerProtocol: AnyObject {
     func openBanksApp(_ url: URL)
     func openSafariViewController(_ url: URL)
     func presentError(_ error: String?)
+    func showAlert(message: String?, title: String?)
+    var loading: Bool { get set }
 }
 
 final class ProgressSbpPresenter {
@@ -21,25 +23,43 @@ final class ProgressSbpPresenter {
     //MARK: - Properties
     
     let configuration: PaymentConfiguration
-    let payResponse: QrPayResponse
-    var sbpBanks: [SbpQRDataModel] { payResponse.banks?.dictionary ?? [] }
+    private (set) var payResponse: QrPayResponse?
+    private var sbpBanks: [SbpQRDataModel] { payResponse?.banks?.dictionary ?? [] }
     private (set) var filteredBanks: [SbpQRDataModel] = []
     weak var view: ProgressSbpViewControllerProtocol?
     
     //MARK: - Init
     
-    init(configuration: PaymentConfiguration, payResponse: QrPayResponse) {
-        self.payResponse = payResponse
+    init(configuration: PaymentConfiguration) {
         self.configuration = configuration
     }
     
     //MARK: - Private Methods
     
+    private func getSbpLink() {
+        view?.loading = true
+        
+        CloudpaymentsApi.getSbpLink(with: configuration) { [ weak self] result in
+            guard let self = self else { return }
+            
+            guard let result = result else {
+                self.view?.loading = false
+                view?.showAlert(message: "Ошибка", title: "Данные отсутствуют")
+                return
+            }
+            
+            payResponse = result
+            filteredBanks = sbpBanks
+            view?.loading = false
+            view?.tableViewReloadData()
+        }
+    }
+
     private func setupLinkForBank(value: SbpQRDataModel) {
-        guard let qrURL = payResponse.qrURL else { return }
+        guard let qrURL = payResponse?.qrURL else { return }
         var stringUri = qrURL
         
-        if let _ = value.isWebClientActive, let webClientURL = value.webClientURL, let providerQrId = payResponse.providerQrId {
+        if let _ = value.isWebClientActive, let webClientURL = value.webClientURL, let providerQrId = payResponse?.providerQrId {
             stringUri = "\(webClientURL)/\(providerQrId)"
             openSafariViewController(stringUri)
         } else {
@@ -95,7 +115,7 @@ final class ProgressSbpPresenter {
             
         case .authorized, .completed, .cancelled:
             removePayObserver()
-            let transaction = Transaction(transactionId: payResponse.transactionId)
+            let transaction = Transaction(transactionId: payResponse?.transactionId)
             
             view?.resultPayment(result: .success, error: nil, transaction: transaction)
             
@@ -115,7 +135,7 @@ final class ProgressSbpPresenter {
 extension ProgressSbpPresenter {
     
     func viewDidLoad() {
-        filteredBanks = sbpBanks
+        getSbpLink()
     }
     
     func didSelectRow(_ row: Int) {
@@ -123,9 +143,8 @@ extension ProgressSbpPresenter {
         setupLinkForBank(value: value)
     }
     
-    
     func removePayObserver() {
-        NotificationCenter.default.removeObserver(self, name: ObserverKeys.qrPayStatus.key, object: nil)
+        NotificationCenter.default.removeObserver(self, name: ObserverKeys.generalObserver.key, object: nil)
     }
     
     func editingSearchBar(_ text: String) {
@@ -142,14 +161,12 @@ extension ProgressSbpPresenter {
     }
     
     func checkSbpTransactionId() {
-        guard let id = payResponse.transactionId else { return }
+        guard let transactionId = payResponse?.transactionId else { return }
         removePayObserver()
         
-        let url = configuration.apiUrl
         let publicId = configuration.publicId
-        //QRStatusPayObserver
         NotificationCenter.default.addObserver(self, selector: #selector(observerPayStatus(_:)),
-                                               name: ObserverKeys.qrPayStatus.key, object: nil)
-        SbpRequest.getStatusSBPPay(baseURL: url, publicId: publicId, transactionId: id)
+                                               name: ObserverKeys.generalObserver.key, object: nil)
+        CloudpaymentsApi.waitStatus(configuration, transactionId, publicId)
     }
 }

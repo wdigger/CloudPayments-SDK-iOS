@@ -46,7 +46,6 @@ final class FooterForPresentCard: UIView {
         }
     }
     
-    //email view
     var emailBorderColor: UIColor {
         get { return .clear }
         set { emailInputView.layer.borderColor = newValue.cgColor }
@@ -61,8 +60,14 @@ final class FooterForPresentCard: UIView {
     
     var isSelectedSave: Bool? {
         get {
-            guard let isOnHidden = savingButton.superview?.isHidden, !isOnHidden else { return nil}
-            return savingButton.isSelected
+            guard let isOnHidden = savingButton.superview?.isHidden, 
+                    !isOnHidden
+            else {
+                return nil
+            }
+            let isSelected = savingButton.isSelected
+           
+            return isSelected
         }
         set {
             guard let newValue = newValue else { return }
@@ -135,7 +140,9 @@ final class FooterForPresentCard: UIView {
     func setup(_ status: SaveCardState) {
         savingButton.superview?.isHidden = !(status == .isOnCheckbox)
         forcedInformationButton.superview?.isHidden = !(status == .isOnHint)
-        if status == .isOnCheckbox { isSelectedSave = false }
+        if status == .isOnCheckbox {
+            isSelectedSave = false
+        }
     }
 }
 

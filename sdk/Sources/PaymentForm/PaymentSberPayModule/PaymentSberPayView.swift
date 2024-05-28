@@ -1,21 +1,21 @@
 //
-//  PaymentTPayView.swift
+//  PaymentSberPayView.swift
 //  sdk
 //
-//  Created by Cloudpayments on 07.11.2023.
-//  Copyright © 2023 Cloudpayments. All rights reserved.
+//  Created by Cloudpayments on 20.05.2024.
+//  Copyright © 2024 Cloudpayments. All rights reserved.
 //
 
 import UIKit
 
-public protocol PaymentTPayDelegate: AnyObject {
-    func resultPayment(_ tPay: PaymentTPayView, result: PaymentTPayView.PaymentAction, error: String?, transactionId: Int64?)
+public protocol PaymentSberPayDelegate: AnyObject {
+    func resultPayment(_ sberPay: PaymentSberPayView, result: PaymentSberPayView.PaymentAction, error: String?, transactionId: Int64?)
 }
 
-//MARK: - PaymentTPayView
+//MARK: - PaymentSberPayView
 
-public class PaymentTPayView: UIView {
-    public weak var delegate: PaymentTPayDelegate?
+public class PaymentSberPayView: UIView {
+    public weak var delegate: PaymentSberPayDelegate?
     private var buttonResult: ButtonConfiguration?
     public var configuration: PaymentConfiguration! = nil
     
@@ -54,7 +54,7 @@ public class PaymentTPayView: UIView {
             configuration.failRedirectUrl = failRedirectUrl
         }
         
-        let vc = TpayAssembly.createTPayVC(configuration: configuration)
+        let vc = ProgressSberPayAssembly.createSberPayVC(configuration: configuration)
         vc.delegate = self
         topVC.present(vc, animated: true)
     }
@@ -62,7 +62,7 @@ public class PaymentTPayView: UIView {
 
 //MARK: - Callbacks
 
-extension PaymentTPayView {
+extension PaymentSberPayView {
     public enum PaymentAction {
         case success
         case error
@@ -70,22 +70,10 @@ extension PaymentTPayView {
     }
 }
 
-//MARK: - Progress TPay Protocol
+//MARK: - ProgressSberPayProtocol
 
-extension PaymentTPayView: ProgressTPayProtocol {
+extension PaymentSberPayView: ProgressSberPayProtocol {
     func resultPayment(result: PaymentAction, error: String?, transactionId: Int64?) {
         delegate?.resultPayment(self, result: result, error: error, transactionId: transactionId)
-    }
-}
-
-//MARK: - Get Merchant Configuration
-
-public extension PaymentTPayView {
-    func getMerchantConfiguration(completion: @escaping (ButtonConfiguration?) -> Void) {
-        CloudpaymentsApi.getMerchantConfiguration(configuration: configuration) { [weak self ] result in
-            guard let self = self else { return }
-            self.buttonResult = result
-            completion(result)
-        }
     }
 }

@@ -9,10 +9,8 @@
 import Foundation
 
 enum ObserverKeys: String {
-    case tinkoffPayStatus = "TinkoffStatusPayObserver"
-    case qrPayStatus = "QRStatusPayObserver"
-    case networkConnectStatus = "NetworkConnectStatusObserver"
-    
+    case generalObserver = "GeneralObserver"
+
     var key: NSNotification.Name {
         return NSNotification.Name(rawValue: rawValue)
     }

@@ -1,29 +1,29 @@
 //
-//  ProgressTPayPresenter.swift
+//  ProgressSberPayPresenter.swift
 //  sdk
 //
-//  Created by Cloudpayments on 15.11.2023.
-//  Copyright © 2023 Cloudpayments. All rights reserved.
+//  Created by Cloudpayments on 20.05.2024.
+//  Copyright © 2024 Cloudpayments. All rights reserved.
 //
 
 import Foundation
 
-protocol ProgressTPayProtocol: AnyObject {
-    func resultPayment(result: PaymentTPayView.PaymentAction, error: String?, transactionId: Int64?)
+protocol ProgressSberPayProtocol: AnyObject {
+    func resultPayment(result: PaymentSberPayView.PaymentAction, error: String?, transactionId: Int64?)
 }
 
-protocol ProgressTPayViewControllerProtocol: AnyObject {
-    func resultPayment(result: PaymentTPayView.PaymentAction, error: String?, transactionId: Transaction?)
+protocol ProgressSberPayViewControllerProtocol: AnyObject {
+    func resultPayment(result: PaymentSberPayView.PaymentAction, error: String?, transactionId: Transaction?)
     func openLinkURL(url: URL)
 }
 
-final class ProgressTPayPresenter {
+final class ProgressSberPayPresenter {
     
     //MARK: - Properties
     
     let configuration: PaymentConfiguration
     private var transactionId: Int64?
-    weak var view: ProgressTPayViewControllerProtocol?
+    weak var view: ProgressSberPayViewControllerProtocol?
     
     //MARK: - Init
     
@@ -44,25 +44,7 @@ final class ProgressTPayPresenter {
         CloudpaymentsApi.waitStatus(configuration, transactionId, publicId)
     }
 
-    @objc private func observerStatus(_ notification: NSNotification) {
-        
-        guard let result = notification.object as? ResponseTransactionModel,
-              let rawValue = result.model?.status,
-              let status = StatusPay(rawValue: rawValue)
-        else {
-            if let error = notification.object as? Error {
-                let code = error._code < 0 ? -error._code : error._code
-                if code > 1000 {checkTransactionId(); return }
-                let string = String(code)
-                let description = ApiError.getFullErrorDescription(code: string)
-                view?.resultPayment(result: .error, error: description, transactionId: nil)
-                return
-            }
-            
-            checkTransactionId()
-            return
-        }
-        
+    fileprivate func statusCodeNotification(_ status: StatusPay, _ notification: NSNotification) {
         switch status {
         case .created, .pending:
             checkTransactionId()
@@ -82,14 +64,46 @@ final class ProgressTPayPresenter {
             view?.resultPayment(result: .error, error: descriptionError, transactionId: nil)
         }
     }
+    
+    @objc private func observerStatus(_ notification: NSNotification) {
+        
+        guard let result = notification.object as? ResponseTransactionModel else {
+            
+            if let error = notification.object as? Error {
+                let code = error._code < 0 ? -error._code : error._code
+                if code > 1000 {checkTransactionId(); return }
+                let string = String(code)
+                let description = ApiError.getFullErrorDescription(code: string)
+                view?.resultPayment(result: .error, error: description, transactionId: nil)
+                return
+            }
+            
+            checkTransactionId()
+            return
+            
+        }
+        
+        guard let rawValue = result.model?.status,
+              let status = StatusPay(rawValue: rawValue)
+        else {
+            
+            if let statusCode = result.model?.statusCode, let statusPay = StatusPay(rawValue: statusCode) {
+                statusCodeNotification(statusPay, notification)
+                return
+            }
+            return
+        }
+        
+        statusCodeNotification(status, notification)
+    }
 }
 
 //MARK: Input
 
-extension ProgressTPayPresenter {
+extension ProgressSberPayPresenter {
     func getLink() {
-        CloudpaymentsApi.getTinkoffPayLink(with: configuration) { [weak self] result in
-            guard let self = self, let transactionId = result?.transactionId, let qrURL = result?.qrURL, let url = URL(string: qrURL) else {
+        CloudpaymentsApi.getSberPayLink(with: configuration) { [weak self] result in
+            guard let self = self, let transactionId = result?.transactionId, let string = result?.qrURL, let url = URL(string: string) else {
                 self?.view?.resultPayment(result: .error, error: result?.message, transactionId: nil)
                 return
             }
@@ -106,7 +120,7 @@ extension ProgressTPayPresenter {
             case .created, .pending:
                 self.checkTransactionId()
             default:
-                return
+                self.checkTransactionId()
             }
             
             self.view?.openLinkURL(url: url)

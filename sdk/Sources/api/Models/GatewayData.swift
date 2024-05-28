@@ -8,8 +8,8 @@
 import Foundation
 
 enum Scheme: String, Codable {
-    case charge = "0"
-    case auth = "1"
+    case charge = "charge"
+    case auth = "auth"
 }
 
 // MARK: - TinkoffPayData

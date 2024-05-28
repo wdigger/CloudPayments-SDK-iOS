@@ -15,4 +15,19 @@ enum StatusPay: String {
     case completed = "Completed"
     case cancelled = "Cancelled"
     case declined = "Declined"
+    
+    init?(rawValue: Int) {
+        switch StatusPayCode(rawValue: rawValue) {
+        case .created: self = .created
+        case .declined: self = .declined
+        case .completed: self = .completed
+        default: self = .declined
+        }
+    }
+}
+
+enum StatusPayCode: Int {
+    case created = 0
+    case declined = 5
+    case completed = 3
 }

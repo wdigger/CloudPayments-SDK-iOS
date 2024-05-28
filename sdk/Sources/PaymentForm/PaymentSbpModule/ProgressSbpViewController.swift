@@ -18,7 +18,7 @@ final class ProgressSbpViewController: BaseViewController {
     private let presenter: ProgressSbpPresenter
     weak var delegate: ProgressSbpPresenterProtocol?
     private var contentView: ProgressSbpView = ProgressSbpView()
-    
+    private let loaderView = LoaderView()
     private var closedConstraint: NSLayoutConstraint!
     private var tableViewHeightConstraint: NSLayoutConstraint!
     
@@ -31,6 +31,12 @@ final class ProgressSbpViewController: BaseViewController {
     override var isKeyboardShowing: Bool {
         didSet {
             tapGestureRecognizer.cancelsTouchesInView = isKeyboardShowing
+        }
+    }
+    
+    var loading: Bool = false {
+        didSet {
+            loaderView.isHidden = !loading
         }
     }
     
@@ -52,8 +58,8 @@ final class ProgressSbpViewController: BaseViewController {
     
     //MARK: - Present flow on standart form
     
-    public class func present(with configuration: PaymentConfiguration, from: UIViewController, payResponse: QrPayResponse) {
-        let presenter = ProgressSbpPresenter(configuration: configuration, payResponse: payResponse)
+    public class func present(with configuration: PaymentConfiguration, from: UIViewController) {
+        let presenter = ProgressSbpPresenter(configuration: configuration)
         let controller = ProgressSbpViewController(presenter: presenter)
         presenter.view = controller
         controller.modalPresentationStyle = .overFullScreen
@@ -67,6 +73,12 @@ final class ProgressSbpViewController: BaseViewController {
     override func loadView() {
         super.loadView()
         setupConstraintsAndView()
+        
+        view.addSubview(loaderView)
+        loaderView.frame = view.bounds
+        loaderView.layoutSubviews()
+        
+        loaderView.startAnimated(LoaderType.loadingBanks.toString())
     }
     
     override func viewDidLoad() {
@@ -213,7 +225,10 @@ extension ProgressSbpViewController: CustomSbpViewDelegate {
 //MARK: - ProgressSbpViewControllerProtocol
 
 extension ProgressSbpViewController: ProgressSbpViewControllerProtocol {
-    
+    func showAlert(message: String?, title: String?) {
+        showAlert(title: title, message: message)
+    }
+  
     func presentError(_ error: String? = nil) {
         
         if let delegate = delegate {
