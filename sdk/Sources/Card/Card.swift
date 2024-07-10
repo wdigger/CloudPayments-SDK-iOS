@@ -253,7 +253,7 @@ public struct Card {
             .replacingOccurrences(of: "\n", with: "")
             .replacingOccurrences(of: "\r", with: "")
         
-        guard let version = PublicKeyData.getValue?.version else { return nil }
+        guard let version = PublicKeyResponse.getValue?.version else { return nil }
         
         let first = String(cleanCardNumber.prefix(6))
         let last = String(cleanCardNumber.suffix(4))
@@ -357,7 +357,7 @@ public struct Card {
     }
     
     private static func dynamicPublicKey() -> String? {
-        return PublicKeyData.getValue?.Pem
+        return PublicKeyResponse.getValue?.Pem
     }
     
     private static func oldPublicKey() -> String? {

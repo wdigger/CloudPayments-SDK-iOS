@@ -2,14 +2,14 @@
 import CloudpaymentsNetworking
 
 public struct ButtonConfiguration {
-    public let isOnTinkoffButton: Bool
+    public let isOnTPayButton: Bool
     public let isOnSbpButton: Bool
     public let isOnSberPayButton: Bool
     public let successRedirectUrl: String?
     public let failRedirectUrl: String?
     
-    init(isOnTinkoffButton: Bool, isOnSbpButton: Bool, isOnSberPayButton: Bool, successRedirectUrl: String? = nil, failRedirectUrl: String? = nil) {
-        self.isOnTinkoffButton = isOnTinkoffButton
+    init(isOnTPayButton: Bool, isOnSbpButton: Bool, isOnSberPayButton: Bool, successRedirectUrl: String? = nil, failRedirectUrl: String? = nil) {
+        self.isOnTPayButton = isOnTPayButton
         self.isOnSbpButton = isOnSbpButton
         self.isOnSberPayButton = isOnSberPayButton
         self.successRedirectUrl = successRedirectUrl
@@ -175,7 +175,7 @@ public class CloudpaymentsApi {
                                            apiUrl: configuration.apiUrl)
         
         request.execute { result in
-            var isOnTinkoff = false
+            var isOnTPay = false
             var isOnSbp = false
             var isOnSberPay = false
             
@@ -183,13 +183,13 @@ public class CloudpaymentsApi {
                 guard let rawValue = element.type, let value = CaseOfBank(rawValue: rawValue) else { continue }
                 
                 switch value {
-                case .tinkoff: isOnTinkoff = element.enabled
+                case .tPay: isOnTPay = element.enabled
                 case .sbp: isOnSbp = element.enabled
                 case .sberPay: isOnSberPay = element.enabled
                 }
             }
             
-            let value = ButtonConfiguration(isOnTinkoffButton: isOnTinkoff,
+            let value = ButtonConfiguration(isOnTPayButton: isOnTPay,
                                                 isOnSbpButton: isOnSbp,
                                                 isOnSberPayButton: isOnSberPay,
                                                 successRedirectUrl: result.model.terminalFullUrl,
@@ -199,12 +199,12 @@ public class CloudpaymentsApi {
             
         } onError: { error in
             print(error.localizedDescription)
-            return completion(.init(isOnTinkoffButton: false, isOnSbpButton: false, isOnSberPayButton: false))
+            return completion(.init(isOnTPayButton: false, isOnSbpButton: false, isOnSberPayButton: false))
         }
     }
     
     public class func getSbpLink(with configuration: PaymentConfiguration, 
-                                 completion handler: @escaping (QrPayResponse?) -> Void) {
+                                 completion handler: @escaping (AltPayTransactionResponse?) -> Void) {
         
         let publicId = configuration.publicId
         let amount = configuration.paymentData.amount
@@ -252,8 +252,8 @@ public class CloudpaymentsApi {
         }
     }
     
-    public class func getTinkoffPayLink(with configuration: PaymentConfiguration,
-                                        completion handler: @escaping (QrPayResponse?) -> Void) {
+    public class func getTPayLink(with configuration: PaymentConfiguration,
+                                        completion handler: @escaping (AltPayTransactionResponse?) -> Void) {
                 
         let publicId = configuration.publicId
         let amount = configuration.paymentData.amount
@@ -293,7 +293,7 @@ public class CloudpaymentsApi {
             params["SaveCard"] = saveCard
         }
         
-        let request = TinkoffPayRequest(params: params,
+        let request = TPayLinkRequest(params: params,
                                         apiUrl: apiUrl)
         
         request.execute { result in
@@ -305,7 +305,7 @@ public class CloudpaymentsApi {
     }
     
     public class func getSberPayLink(with configuration: PaymentConfiguration,
-                                     completion handler: @escaping (QrPayResponse?) -> Void) {
+                                     completion handler: @escaping (AltPayTransactionResponse?) -> Void) {
                 
         let publicId = configuration.publicId
         let amount = configuration.paymentData.amount
@@ -356,7 +356,7 @@ public class CloudpaymentsApi {
         }
     }
     
-    public class func waitStatus(_ configuration: PaymentConfiguration,
+    public class func getWaitStatus(_ configuration: PaymentConfiguration,
                                  _ transactionId: Int64,
                                  _ publicId: String) {
         

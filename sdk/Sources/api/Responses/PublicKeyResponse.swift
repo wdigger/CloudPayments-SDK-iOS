@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PublicKeyData: Codable {
+struct PublicKeyResponse: Codable {
     let Pem: String?
     let Version: Int?
     
@@ -36,12 +36,12 @@ struct PublicKeyData: Codable {
         }
     }
     
-    public static var getValue: PublicKeyData? {
-        guard let data = UserDefaults.standard.data(forKey: PublicKeyData.publicKey) else {
-            Network.updatePublicCryptoKey()
+    public static var getValue: PublicKeyResponse? {
+        guard let data = UserDefaults.standard.data(forKey: PublicKeyResponse.publicKey) else {
+            PublicKeyRequest.updatePublicCryptoKey()
             return nil
         }
-        guard let value = try? JSONDecoder().decode(PublicKeyData.self, from: data) else {
+        guard let value = try? JSONDecoder().decode(PublicKeyResponse.self, from: data) else {
             return nil
         }
         
@@ -50,11 +50,11 @@ struct PublicKeyData: Codable {
     
     public func save() {
         let data = try? JSONEncoder().encode(self)
-        UserDefaults.standard.set(data, forKey: PublicKeyData.publicKey)
+        UserDefaults.standard.set(data, forKey: PublicKeyResponse.publicKey)
         UserDefaults.standard.synchronize()
     }
     
     public static func updateData() {
-        Network.updatePublicCryptoKey()
+        PublicKeyRequest.updatePublicCryptoKey()
     }
 }

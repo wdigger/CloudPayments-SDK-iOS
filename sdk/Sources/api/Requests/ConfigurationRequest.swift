@@ -1,18 +1,18 @@
 //
-//  BinInfoRequest.swift
+//  ConfigurationRequest.swift
 //  sdk
 //
-//  Created by i.belkin on 05.02.2024.
-//  Copyright © 2024 Cloudpayments. All rights reserved.
+//  Created by Cloudpayments on 15.11.2023.
+//  Copyright © 2023 Cloudpayments. All rights reserved.
 //
 
 import Foundation
 import CloudpaymentsNetworking
 
-final class BinInfoRequest: BaseRequest, CloudpaymentsRequestType {
-    typealias ResponseType = BankInfoResponse
+final class ConfigurationRequest: BaseRequest, CloudpaymentsRequestType {
+    typealias ResponseType = MerchantConfigurationResponse
     var data: CloudpaymentsRequest {
-        let path = CloudpaymentsHTTPResource.binInfo.asUrl(apiUrl: apiUrl)
+        let path = CloudpaymentsHTTPResource.configuration.asUrl(apiUrl: apiUrl)
        
         guard var component = URLComponents(string: path) else { return CloudpaymentsRequest(path: path, headers: headers) }
        

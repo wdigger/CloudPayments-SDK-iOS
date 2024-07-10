@@ -15,7 +15,7 @@ public protocol PaymentSbpDelegate: AnyObject {
 
 //MARK: - PaymentSbpView
 
-public class PaymentSbpView: UIView {
+public final class PaymentSbpView: UIView {
     
     //MARK: - Private & Public properties
     

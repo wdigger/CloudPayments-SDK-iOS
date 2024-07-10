@@ -17,6 +17,18 @@ extension UIColor {
         }
     }
     
+    public class var tpayButtonColor: UIColor! {
+        return color(named: "color_tpay_button")
+    }
+    
+    public class var sbpButtonColor: UIColor! {
+        return color(named: "color_background_sbp")
+    }
+    
+    public class var sberPayButtonColor: UIColor! {
+        return color(named: "color_sber_pay_button")
+    }
+    
     public class var mainText: UIColor! {
         return color(named: "color_text_main")
     }

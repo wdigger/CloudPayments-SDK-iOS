@@ -48,7 +48,7 @@ extension UIView {
         }
     }
     
-    func fullConstraint(top:CGFloat! = 0, bottom:CGFloat! = 0, leading:CGFloat! = 0, trailing:CGFloat! = 0) {
+    public func fullConstraint(top:CGFloat! = 0, bottom:CGFloat! = 0, leading:CGFloat! = 0, trailing:CGFloat! = 0) {
             guard let view = self.superview else { return }
             self.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([

@@ -8,8 +8,10 @@
 
 import UIKit
 
-public class PaymentCardForm: PaymentForm {
+public final class PaymentCardForm: PaymentForm {
+    
     // MARK: - Private properties
+    
     @IBOutlet private weak var cardNumberTextField: TextField!
     @IBOutlet private weak var cardExpDateTextField: TextField!
     @IBOutlet private weak var cardCvvTextField: TextField!
@@ -38,7 +40,7 @@ public class PaymentCardForm: PaymentForm {
     
     var onPayClicked: ((_ cryptogram: String, _ email: String?) -> ())?
     var cardNumberTimer: Timer?
-
+    
     @discardableResult
     public class func present(with configuration: PaymentConfiguration, from: UIViewController, completion: (() -> ())?) -> PaymentForm? {
         let storyboard = UIStoryboard.init(name: "PaymentForm", bundle: Bundle.mainSdk)
@@ -75,7 +77,7 @@ public class PaymentCardForm: PaymentForm {
     
     private func showCvv() {
         guard let isCvvRequired = configuration.paymentData.isCvvRequired else { return }
-    
+        
         if isCvvRequired {
             cvvView.isHidden = false
         } else {
@@ -102,7 +104,7 @@ public class PaymentCardForm: PaymentForm {
         containerHeightConstraint.constant = mainCardStackView.frame.height
         showCvv()
         cardNumberTextField.delegate = self
-
+        
         let paymentData = self.configuration.paymentData
         
         self.payButton.setTitle("Оплатить \(paymentData.amount) \(Currency.getCurrencySign(code: paymentData.currency))", for: .normal)
@@ -111,12 +113,13 @@ public class PaymentCardForm: PaymentForm {
             guard let self = self else {
                 return
             }
+            
             guard self.isValid(), let cryptogram = Card.makeCardCryptogramPacket(self.cardNumberTextField.text!, expDate: self.cardExpDateTextField.cardExpText!, cvv: self.cardCvvTextField.text!, merchantPublicID: self.configuration.publicId)
             else {
                 self.showAlert(title: .errorWord, message: String.errorCreatingCryptoPacket)
                 return
             }
-
+            
             DispatchQueue.main.async {
                 self.dismiss(animated: true) { [weak self] in
                     guard let self = self else {
@@ -268,7 +271,7 @@ public class PaymentCardForm: PaymentForm {
             self.view.layoutIfNeeded()
         }
     }
-
+    
     func setInputFieldValues(fieldType: InputFieldType, placeholderColor: UIColor, placeholderText: String, borderViewColor: UIColor, textFieldColor: UIColor? = .mainText ) {
         switch fieldType {
         case .card:
@@ -290,7 +293,6 @@ public class PaymentCardForm: PaymentForm {
     }
     
     private func configureTextFields() {
-        
         [cardNumberTextField, cardExpDateTextField, cardCvvTextField].forEach { textField in
             textField?.addTarget(self, action: #selector(didChange(_:)), for: .editingChanged)
             textField?.addTarget(self, action: #selector(didBeginEditing(_:)), for: .editingDidBegin)
@@ -302,7 +304,7 @@ public class PaymentCardForm: PaymentForm {
     private func isValid() -> Bool {
         let cardNumberIsValid = Card.isCardNumberValid(self.cardNumberTextField.text?.formattedCardNumber())
         let cardExpIsValid = Card.isExpDateValid(self.cardExpDateTextField.cardExpText?.formattedCardExp())
-
+        
         let cardCvvIsValid = Card.isValidCvv(cvv: self.cardCvvTextField.text?.formattedCardCVV(), isCvvRequired: !cvvView.isHidden)
         
         self.validateAndErrorCardNumber()
@@ -367,6 +369,7 @@ public class PaymentCardForm: PaymentForm {
 }
 
 //MARK: - Delegates for TextField
+
 extension PaymentCardForm: UITextFieldDelegate {
     
     public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -381,7 +384,7 @@ extension PaymentCardForm: UITextFieldDelegate {
         }
         cardNumberTimer?.invalidate()
         cardNumberTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.sendRequest), userInfo: nil, repeats: false)
-
+        
         return true
     }
     
@@ -570,7 +573,7 @@ extension PaymentCardForm {
         case cardCvvTextField:
             if let cardCvv = cardCvvTextField.text?.formattedCardCVV() {
                 cardCvvTextField.text = cardCvv
-                                
+                
                 if !Card.isValidCvv(cvv: cardCvv, isCvvRequired: !cvvView.isHidden) {
                     setInputFieldValues(fieldType: .cvv, placeholderColor: ValidState.error.color, placeholderText: PlaceholderType.incorrectCvv.toString(), borderViewColor: ValidState.error.color)
                     
@@ -588,37 +591,37 @@ extension PaymentCardForm {
         default: break
         }
     }
-
+    
     /// Should Return
-        /// - Parameter textField:
-        @objc private func shouldReturn(_ textField: UITextField) {
-
-            switch textField {
-
-            case cardNumberTextField:
-
-                if let cardNumber = self.cardNumberTextField.text?.formattedCardNumber() {
-                    self.cardNumberTextField.resignFirstResponder()
-                    if Card.isCardNumberValid(cardNumber) {
-                        self.cardExpDateTextField.becomeFirstResponder()
-                    }
+    /// - Parameter textField:
+    @objc private func shouldReturn(_ textField: UITextField) {
+        
+        switch textField {
+            
+        case cardNumberTextField:
+            
+            if let cardNumber = self.cardNumberTextField.text?.formattedCardNumber() {
+                self.cardNumberTextField.resignFirstResponder()
+                if Card.isCardNumberValid(cardNumber) {
+                    self.cardExpDateTextField.becomeFirstResponder()
                 }
-            case cardExpDateTextField:
-
-                if let cardExp = self.cardExpDateTextField.text?.formattedCardExp() {
-                    if cardExp.count == 5 {
-                        self.cardCvvTextField.becomeFirstResponder()
-                    }
-                }
-
-            case cardCvvTextField:
-
-                if let text = self.cardCvvTextField.text?.formattedCardCVV() {
-                    if text.count == 3 || text.count == 4 {
-                        self.cardCvvTextField.resignFirstResponder()
-                    }
-                }
-            default: break
             }
+        case cardExpDateTextField:
+            
+            if let cardExp = self.cardExpDateTextField.text?.formattedCardExp() {
+                if cardExp.count == 5 {
+                    self.cardCvvTextField.becomeFirstResponder()
+                }
+            }
+            
+        case cardCvvTextField:
+            
+            if let text = self.cardCvvTextField.text?.formattedCardCVV() {
+                if text.count == 3 || text.count == 4 {
+                    self.cardCvvTextField.resignFirstResponder()
+                }
+            }
+        default: break
         }
+    }
 }

@@ -13,7 +13,9 @@ import WebKit
 typealias PaymentCallback = (_ status: Bool, _ canceled: Bool, _ trasaction: Transaction?, _ errorMessage: String?) -> ()
 
 public class PaymentForm: BaseViewController {
+    
     // MARK: - Public Properties
+    
     @IBOutlet weak var containerView: UIView!
     @IBOutlet weak var containerBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var threeDsCloseButton: Button?
@@ -33,9 +35,10 @@ public class PaymentForm: BaseViewController {
     private var transaction: Transaction?
     
     // MARK: - Public Methods
+    
     @discardableResult
     public class func present(with configuration: PaymentConfiguration, from: UIViewController) -> PaymentForm? {
-        PublicKeyData.apiURL = configuration.apiUrl
+        PublicKeyResponse.apiURL = configuration.apiUrl
         
         let completion = {
             configuration.paymentUIDelegate.paymentFormDidDisplay()
@@ -58,6 +61,7 @@ public class PaymentForm: BaseViewController {
     }
     
     // MARK: - Private methods
+    
     @discardableResult
     private class func showCardForm(with configuration: PaymentConfiguration, from: UIViewController, completion: (() -> ())?) -> PaymentForm {
         let controller = PaymentCardForm.present(with: configuration, from: from, completion: completion) as! PaymentCardForm
@@ -68,6 +72,7 @@ public class PaymentForm: BaseViewController {
         return controller
     }
     // MARK: - Internal methods
+    
     internal func show(inViewController controller: UIViewController, completion: (() -> ())?) {
         self.transitioningDelegate = customTransitionDelegateInstance
         self.modalPresentationStyle = .custom

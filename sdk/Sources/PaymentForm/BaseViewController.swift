@@ -9,11 +9,14 @@
 import UIKit
 
 public class BaseViewController: UIViewController {
+    
     // MARK: - Public Properties
+    
     var isKeyboardShowing: Bool = false
     var keyboardFrame: CGRect = .zero
     
     // MARK: - Public methods
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -26,6 +29,7 @@ public class BaseViewController: UIViewController {
     }
     
     // MARK: - Internal methods
+    
     @objc internal func onKeyboardWillShow(_ notification: Notification) {
         self.isKeyboardShowing = true
         self.keyboardFrame = (notification.userInfo?[UITextField.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue ?? .zero

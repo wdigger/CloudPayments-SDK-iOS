@@ -13,9 +13,9 @@ enum CloudpaymentsHTTPResource: String {
     case auth = "payments/cards/auth"
     case post3ds = "payments/ThreeDSCallback"
     case configuration = "merchant/configuration"
-    case qrLinkTinkoffPay = "payments/qr/tinkoffpay/link"
-    case qrLinkSberPay = "payments/qr/sberpay/link"
-    case qrLinkSbp = "payments/qr/sbp/link"
+    case tpay = "payments/qr/tinkoffpay/link"
+    case sberPay = "payments/qr/sberpay/link"
+    case sbp = "payments/qr/sbp/link"
     case waitStatus = "payments/qr/status/wait"
     case binInfo = "bins/info"
     

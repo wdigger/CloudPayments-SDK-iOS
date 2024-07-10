@@ -16,54 +16,6 @@ protocol CustomTPayViewDelegate: AnyObject {
 final class ProgressTPayView: UIView {
     
     weak var delegate: CustomTPayViewDelegate?
-    
-    //MARK: - Constants
-    
-    private enum Constants {
-        enum ContentView {
-            static let leadingAnchor: CGFloat = 40
-            static let trailingAnchor: CGFloat = -40
-        }
-        
-        enum AlertImageView {
-            static let topAnchor: CGFloat = 40
-            static let leadingAnchor: CGFloat = 20
-            static let trailingAnchor: CGFloat = -20
-            static let heightAnchor: CGFloat = 180
-        }
-        
-        enum CenterStackView {
-            static let topAnchor: CGFloat = 12
-            static let leadingAnchor: CGFloat = 20
-            static let trailingAnchor: CGFloat = -20
-        }
-        
-        enum FooterStackView {
-            static let leadingAnchor: CGFloat = 20
-            static let trailingAnchor: CGFloat = -20
-            static let bottomAnchor: CGFloat = -12
-        }
-        
-        enum Button {
-            static let topAnchor: CGFloat = 20
-            static let heightAnchor: CGFloat = 56
-        }
-        
-        enum LogoImageView {
-            static let topAnchor: CGFloat = 12
-            static let heightAnchor: CGFloat = 18
-        }
-        
-        enum Font {
-            static let bold: CGFloat = 22
-            static let regular: CGFloat = 15
-        }
-        
-        enum Radius {
-            static let medium: CGFloat = 14
-        }
-        
-    }
 
     //MARK: - Private Properties
     
@@ -222,5 +174,55 @@ private extension ProgressTPayView {
     @objc private func closeController() {
         delegate?.closePaymentButton()
     }
+}
+
+extension ProgressTPayView {
     
+    //MARK: - Constants
+    
+    private enum Constants {
+        enum ContentView {
+            static let leadingAnchor: CGFloat = 40
+            static let trailingAnchor: CGFloat = -40
+        }
+        
+        enum AlertImageView {
+            static let topAnchor: CGFloat = 40
+            static let leadingAnchor: CGFloat = 20
+            static let trailingAnchor: CGFloat = -20
+            static let heightAnchor: CGFloat = 180
+        }
+        
+        enum CenterStackView {
+            static let topAnchor: CGFloat = 12
+            static let leadingAnchor: CGFloat = 20
+            static let trailingAnchor: CGFloat = -20
+        }
+        
+        enum FooterStackView {
+            static let leadingAnchor: CGFloat = 20
+            static let trailingAnchor: CGFloat = -20
+            static let bottomAnchor: CGFloat = -12
+        }
+        
+        enum Button {
+            static let topAnchor: CGFloat = 20
+            static let heightAnchor: CGFloat = 56
+        }
+        
+        enum LogoImageView {
+            static let topAnchor: CGFloat = 12
+            static let heightAnchor: CGFloat = 18
+        }
+        
+        enum Font {
+            static let bold: CGFloat = 22
+            static let regular: CGFloat = 15
+        }
+        
+        enum Radius {
+            static let medium: CGFloat = 14
+        }
+        
+    }
 }

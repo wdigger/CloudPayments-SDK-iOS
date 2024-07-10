@@ -1,5 +1,5 @@
 //
-//  WaitStatusRequest.swift
+//  TPayLinkRequest.swift
 //  sdk
 //
 //  Created by Cloudpayments on 15.11.2023.
@@ -9,10 +9,10 @@
 import Foundation
 import CloudpaymentsNetworking
 
-final class WaitStatusRequest: BaseRequest, CloudpaymentsRequestType {
-    typealias ResponseType = ResponseTransactionModel
+final class TPayLinkRequest: BaseRequest, CloudpaymentsRequestType {
+    typealias ResponseType = AltPayDataResponse
     var data: CloudpaymentsRequest {
-        let path = CloudpaymentsHTTPResource.waitStatus.asUrl(apiUrl: apiUrl)
+        let path = CloudpaymentsHTTPResource.tpay.asUrl(apiUrl: apiUrl)
        
         guard var component = URLComponents(string: path) else { return CloudpaymentsRequest(path: path, method: .post, params: params, headers: headers) }
        

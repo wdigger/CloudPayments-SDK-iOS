@@ -8,11 +8,11 @@
 
 import Foundation
 
-enum LoaderType: String {
+public enum LoaderType: String {
     case loaderText = "Загружаем способы оплаты"
     case loadingBanks = "Загружаем список банков"
     
-    func toString() -> String {
+    public func toString() -> String {
         return self.rawValue
     }
 }

@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-public class SbpAssembly {
+final class SbpAssembly {
     class func createSbpVC(configuration: PaymentConfiguration, from: UIViewController) -> ProgressSbpViewController {
         let presenter = ProgressSbpPresenter(configuration: configuration)
         let view = ProgressSbpViewController(presenter: presenter)

@@ -8,18 +8,17 @@
 import Foundation
 import CloudpaymentsNetworking
 
-final class Network: BaseRequest, CloudpaymentsRequestType {
+final class PublicKeyRequest: BaseRequest, CloudpaymentsRequestType {
     var data: CloudpaymentsNetworking.CloudpaymentsRequest
-    typealias ResponseType = PublicKeyData
+    typealias ResponseType = PublicKeyResponse
     
-    private init() {data = .init(path: PublicKeyData.apiURL + "payments/publickey")}
+    private init() { data = .init(path: PublicKeyResponse.apiURL + "payments/publickey") }
     
     public static func updatePublicCryptoKey() {
-        Network().execute { value in
+        PublicKeyRequest().execute { value in
             value.save()
         } onError: { string in
             print(string.localizedDescription)
         }
     }
 }
-

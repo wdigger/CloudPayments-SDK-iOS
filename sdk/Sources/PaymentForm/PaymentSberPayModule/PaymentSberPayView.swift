@@ -14,7 +14,7 @@ public protocol PaymentSberPayDelegate: AnyObject {
 
 //MARK: - PaymentSberPayView
 
-public class PaymentSberPayView: UIView {
+public final class PaymentSberPayView: UIView {
     public weak var delegate: PaymentSberPayDelegate?
     private var buttonResult: ButtonConfiguration?
     public var configuration: PaymentConfiguration! = nil

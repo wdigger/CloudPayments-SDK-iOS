@@ -79,7 +79,7 @@ final class ProgressSbpCell: UITableViewCell {
         ])
     }
     
-    func configureCell(model: SbpQRDataModel) {
+    func configureCell(model: SbpData) {
         customLabel.text = model.bankName
         guard let logoUrl = model.logoURL else { return }
         loadImage(url: logoUrl) { [weak self] image in

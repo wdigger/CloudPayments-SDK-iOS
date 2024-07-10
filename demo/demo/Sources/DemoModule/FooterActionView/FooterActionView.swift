@@ -40,7 +40,7 @@ class FooterActionView: UIView {
         switch type {
         case .demo:
             demoActionButton.addTarget(target, action: action, for: .touchUpInside)
-        case .singPay:
+        case .single:
             singlePaymentMethodsButtonAction.addTarget(target, action: action, for: .touchUpInside)
         }
     }
@@ -49,6 +49,6 @@ class FooterActionView: UIView {
 extension FooterActionView {
     enum ButtonType {
         case demo
-        case singPay
+        case single
     }
 }

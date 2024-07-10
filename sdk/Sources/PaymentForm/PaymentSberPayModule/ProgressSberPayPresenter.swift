@@ -41,7 +41,7 @@ final class ProgressSberPayPresenter {
         
         NotificationCenter.default.addObserver(self, selector: #selector(observerStatus(_:)),
                                                name: ObserverKeys.generalObserver.key, object: nil)
-        CloudpaymentsApi.waitStatus(configuration, transactionId, publicId)
+        CloudpaymentsApi.getWaitStatus(configuration, transactionId, publicId)
     }
 
     fileprivate func statusCodeNotification(_ status: StatusPay, _ notification: NSNotification) {
@@ -67,7 +67,7 @@ final class ProgressSberPayPresenter {
     
     @objc private func observerStatus(_ notification: NSNotification) {
         
-        guard let result = notification.object as? ResponseTransactionModel else {
+        guard let transactionStatus = notification.object as? TransactionStatusResponse else {
             
             if let error = notification.object as? Error {
                 let code = error._code < 0 ? -error._code : error._code
@@ -83,11 +83,11 @@ final class ProgressSberPayPresenter {
             
         }
         
-        guard let rawValue = result.model?.status,
+        guard let rawValue = transactionStatus.model?.status,
               let status = StatusPay(rawValue: rawValue)
         else {
             
-            if let statusCode = result.model?.statusCode, let statusPay = StatusPay(rawValue: statusCode) {
+            if let statusCode = transactionStatus.model?.statusCode, let statusPay = StatusPay(rawValue: statusCode) {
                 statusCodeNotification(statusPay, notification)
                 return
             }

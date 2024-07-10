@@ -76,6 +76,7 @@ final class ProgressSbpViewController: BaseViewController {
         
         view.addSubview(loaderView)
         loaderView.frame = view.bounds
+        loaderView.fullConstraint()
         loaderView.layoutSubviews()
         
         loaderView.startAnimated(LoaderType.loadingBanks.toString())
@@ -100,6 +101,7 @@ final class ProgressSbpViewController: BaseViewController {
     //MARK: - Private methods
     
     private func setupConstraintsAndView() {
+        
         view.addSubviews(contentView)
         
         NSLayoutConstraint.activate([
@@ -131,6 +133,7 @@ final class ProgressSbpViewController: BaseViewController {
     // MARK: Pan gesture handler
     
     @objc func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        
         let y = gesture.translation(in: view).y
         let newHeight = currentContainerHeight - y
         
@@ -181,6 +184,7 @@ final class ProgressSbpViewController: BaseViewController {
     }
     
     private func presentesionView(_ isPresent: Bool, completion: @escaping () -> Void) {
+    
         if isCloused { return }
         isCloused = !isPresent
         let alpha = isPresent ? 0.6 : 0
@@ -194,11 +198,13 @@ final class ProgressSbpViewController: BaseViewController {
             completion()
         }
     }
+    
 }
 
 //MARK: - CustomSbpViewDelegate
 
 extension ProgressSbpViewController: CustomSbpViewDelegate {
+    
     func numberOfRow(_ progressSbpView: ProgressSbpView, didChange text: String) {
         let trimmedSearchText = text.trimmingCharacters(in: .whitespaces)
         presenter.editingSearchBar(trimmedSearchText)
@@ -217,7 +223,7 @@ extension ProgressSbpViewController: CustomSbpViewDelegate {
         presenter.didSelectRow(row)
     }
     
-    func progressSbpView(_ progressSbpView: ProgressSbpView, cellFor row: Int) -> SbpQRDataModel {
+    func progressSbpView(_ progressSbpView: ProgressSbpView, cellFor row: Int) -> SbpData {
         return presenter.filteredBanks[row]
     }
 }
@@ -225,10 +231,11 @@ extension ProgressSbpViewController: CustomSbpViewDelegate {
 //MARK: - ProgressSbpViewControllerProtocol
 
 extension ProgressSbpViewController: ProgressSbpViewControllerProtocol {
+    
     func showAlert(message: String?, title: String?) {
         showAlert(title: title, message: message)
     }
-  
+    
     func presentError(_ error: String? = nil) {
         
         if let delegate = delegate {
@@ -246,45 +253,62 @@ extension ProgressSbpViewController: ProgressSbpViewControllerProtocol {
     }
     
     func openSafariViewController(_ url: URL) {
+        
         let safariViewController = SafariViewController(url: url)
         
         if let viewController = UIApplication.topViewController() {
             viewController.present(safariViewController, animated: true)
         }
+        
     }
     
     func openBanksApp(_ url: URL) {
+        
         UIApplication.shared.open(url) { success in
             if success {
                 self.presenter.checkSbpTransactionId()
             } else {
-                self.showAlert(title: .errorWord, message: .noBankApps)
+                self.showAlert(title: nil, message: .noBankApps)
+            }
+        }
+        
+    }
+    
+    func resultPayment(result: PaymentSbpView.PaymentAction, error: String?, transactionId: Transaction?) {
+        
+        guard let parent = self.presentingViewController else { return }
+        
+        if let delegate = delegate {
+            
+            if presenter.configuration.showResultScreen {
+                self.dismiss(animated: false) {
+                    self.openResultScreens(result, error, transactionId, parent)
+                }
+            }
+            
+            delegate.resultPayment(result, error: error, transactionId: transactionId?.transactionId)
+            return
+        }
+        
+        presentesionView(false) {
+            self.dismiss(animated: false) {
+                self.openResultScreens(result, error, transactionId, parent)
             }
         }
     }
     
-    func resultPayment(result: PaymentSbpView.PaymentAction, error: String?, transaction: Transaction?) {
+    func openResultScreens(_ result: PaymentSbpView.PaymentAction,  _ error: String?,  _ transactionId: Transaction?, _ parent: UIViewController) {
         
-        if let delegate = delegate {
-            delegate.resultPayment(result, error: error, transactionId: transaction?.transactionId)
-            return
+        switch result {
+        case .success:
+            guard let transactionId = transactionId else { return }
+            PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .succeeded(transactionId),from: parent)
+        case .error:
+            PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .failed(nil),from: parent)
+        case .close:
+            PaymentOptionsForm.present(with: self.presenter.configuration, from: parent)
         }
         
-        guard let parent = self.presentingViewController else {return}
-        
-        presentesionView(false) {
-            self.dismiss(animated: false) {
-                switch result {
-                case .success:
-                    guard let transaction = transaction else { return }
-                    PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .succeeded(transaction),from: parent)
-                case .error:
-                    PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .failed(nil),from: parent)
-                case .close:
-                    PaymentForm.present(with: self.presenter.configuration, from: parent)
-                }
-            }
-        }
     }
     
     func tableViewReloadData() {

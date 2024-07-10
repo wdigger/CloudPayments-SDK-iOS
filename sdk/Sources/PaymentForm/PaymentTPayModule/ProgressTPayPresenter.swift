@@ -41,20 +41,20 @@ final class ProgressTPayPresenter {
         
         NotificationCenter.default.addObserver(self, selector: #selector(observerStatus(_:)),
                                                name: ObserverKeys.generalObserver.key, object: nil)
-        CloudpaymentsApi.waitStatus(configuration, transactionId, publicId)
+        CloudpaymentsApi.getWaitStatus(configuration, transactionId, publicId)
     }
 
     @objc private func observerStatus(_ notification: NSNotification) {
         
-        guard let result = notification.object as? ResponseTransactionModel,
-              let rawValue = result.model?.status,
+        guard let transactionStatus = notification.object as? TransactionStatusResponse,
+              let rawValue = transactionStatus.model?.status,
               let status = StatusPay(rawValue: rawValue)
         else {
             if let error = notification.object as? Error {
                 let code = error._code < 0 ? -error._code : error._code
                 if code > 1000 {checkTransactionId(); return }
-                let string = String(code)
-                let description = ApiError.getFullErrorDescription(code: string)
+                let errorString = String(code)
+                let description = ApiError.getFullErrorDescription(code: errorString)
                 view?.resultPayment(result: .error, error: description, transactionId: nil)
                 return
             }
@@ -77,8 +77,8 @@ final class ProgressTPayPresenter {
             transactionId = nil
             let error = notification.object as? Error
             let code = error?._code
-            let string = code == nil ? "" : String(code!)
-            let descriptionError = ApiError.getFullErrorDescription(code: string)
+            let errorString = code == nil ? "" : String(code!)
+            let descriptionError = ApiError.getFullErrorDescription(code: errorString)
             view?.resultPayment(result: .error, error: descriptionError, transactionId: nil)
         }
     }
@@ -88,7 +88,7 @@ final class ProgressTPayPresenter {
 
 extension ProgressTPayPresenter {
     func getLink() {
-        CloudpaymentsApi.getTinkoffPayLink(with: configuration) { [weak self] result in
+        CloudpaymentsApi.getTPayLink(with: configuration) { [weak self] result in
             guard let self = self, let transactionId = result?.transactionId, let qrURL = result?.qrURL, let url = URL(string: qrURL) else {
                 self?.view?.resultPayment(result: .error, error: result?.message, transactionId: nil)
                 return

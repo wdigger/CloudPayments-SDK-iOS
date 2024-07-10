@@ -9,7 +9,7 @@
 import Foundation
 
 protocol ProgressSbpViewControllerProtocol: AnyObject {
-    func resultPayment(result: PaymentSbpView.PaymentAction, error: String?, transaction: Transaction?)
+    func resultPayment(result: PaymentSbpView.PaymentAction, error: String?, transactionId: Transaction?)
     func tableViewReloadData()
     func openBanksApp(_ url: URL)
     func openSafariViewController(_ url: URL)
@@ -22,10 +22,10 @@ final class ProgressSbpPresenter {
     
     //MARK: - Properties
     
-    let configuration: PaymentConfiguration
-    private (set) var payResponse: QrPayResponse?
-    private var sbpBanks: [SbpQRDataModel] { payResponse?.banks?.dictionary ?? [] }
-    private (set) var filteredBanks: [SbpQRDataModel] = []
+    private (set) var configuration: PaymentConfiguration
+    private (set) var altPayTransactionResponse: AltPayTransactionResponse?
+    private var sbpBanks: [SbpData] { altPayTransactionResponse?.banks?.dictionary ?? [] }
+    private (set) var filteredBanks: [SbpData] = []
     weak var view: ProgressSbpViewControllerProtocol?
     
     //MARK: - Init
@@ -44,22 +44,22 @@ final class ProgressSbpPresenter {
             
             guard let result = result else {
                 self.view?.loading = false
-                view?.showAlert(message: "Ошибка", title: "Данные отсутствуют")
+                view?.showAlert(message: .errorWord, title: .anotherPaymentMethod)
                 return
             }
             
-            payResponse = result
+            altPayTransactionResponse = result
             filteredBanks = sbpBanks
             view?.loading = false
             view?.tableViewReloadData()
         }
     }
-
-    private func setupLinkForBank(value: SbpQRDataModel) {
-        guard let qrURL = payResponse?.qrURL else { return }
+    
+    private func setupLinkForBank(value: SbpData) {
+        guard let qrURL = altPayTransactionResponse?.qrURL else { return }
         var stringUri = qrURL
         
-        if let _ = value.isWebClientActive, let webClientURL = value.webClientURL, let providerQrId = payResponse?.providerQrId {
+        if let _ = value.isWebClientActive, let webClientURL = value.webClientURL, let providerQrId = altPayTransactionResponse?.providerQrId {
             stringUri = "\(webClientURL)/\(providerQrId)"
             openSafariViewController(stringUri)
         } else {
@@ -91,14 +91,14 @@ final class ProgressSbpPresenter {
     
     @objc private func observerPayStatus(_ notification: NSNotification) {
         
-        guard let result = notification.object as? ResponseTransactionModel else {
+        guard let transactionStatus = notification.object as? TransactionStatusResponse else {
             _ = checkNotificationError(notification)
             return
         }
         
-        guard let rawValue = result.model?.status, let status = StatusPay(rawValue: rawValue) else {
+        guard let rawValue = transactionStatus.model?.status, let status = StatusPay(rawValue: rawValue) else {
             
-            if result.success ?? false {
+            if transactionStatus.success ?? false {
                 checkSbpTransactionId()
             } else {
                 if checkNotificationError(notification) { return }
@@ -115,9 +115,8 @@ final class ProgressSbpPresenter {
             
         case .authorized, .completed, .cancelled:
             removePayObserver()
-            let transaction = Transaction(transactionId: payResponse?.transactionId)
-            
-            view?.resultPayment(result: .success, error: nil, transaction: transaction)
+            let transactionId = Transaction(transactionId: altPayTransactionResponse?.transactionId)
+            view?.resultPayment(result: .success, error: nil, transactionId: transactionId)
             
         case .declined:
             removePayObserver()
@@ -148,6 +147,7 @@ extension ProgressSbpPresenter {
     }
     
     func editingSearchBar(_ text: String) {
+        
         if text.isEmpty {
             filteredBanks = sbpBanks
         } else {
@@ -161,12 +161,12 @@ extension ProgressSbpPresenter {
     }
     
     func checkSbpTransactionId() {
-        guard let transactionId = payResponse?.transactionId else { return }
+        guard let transactionId = altPayTransactionResponse?.transactionId else { return }
         removePayObserver()
         
         let publicId = configuration.publicId
         NotificationCenter.default.addObserver(self, selector: #selector(observerPayStatus(_:)),
                                                name: ObserverKeys.generalObserver.key, object: nil)
-        CloudpaymentsApi.waitStatus(configuration, transactionId, publicId)
+        CloudpaymentsApi.getWaitStatus(configuration, transactionId, publicId)
     }
 }

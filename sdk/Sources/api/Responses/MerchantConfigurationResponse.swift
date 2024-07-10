@@ -1,5 +1,5 @@
 //
-//  GatewayConfiguration.swift
+//  MerchantConfigurationResponse.swift
 //  Cloudpayments
 //
 //  Created by Cloudpayments on 16.06.2023.
@@ -7,15 +7,8 @@
 
 import Foundation
 
-enum CaseOfBank: Int {
-    case sbp = 5
-    case tinkoff = 6
-    case sberPay = 12
-}
-
-// MARK: - GatewayConfiguration
-public struct GatewayConfiguration: Codable {
-    let model: GatewayPaymentModel
+public struct MerchantConfigurationResponse: Codable {
+    let model: MerchantConfiguration
     let success: Bool
     let message: String?
     
@@ -26,8 +19,7 @@ public struct GatewayConfiguration: Codable {
     }
 }
 
-// MARK: - GatewayPaymentModel
-struct GatewayPaymentModel: Codable {
+struct MerchantConfiguration: Codable {
     let logoURL: String?
     let terminalURL: String?
     let terminalFullUrl: String?
@@ -55,35 +47,5 @@ struct GatewayPaymentModel: Codable {
         case externalPaymentMethods = "ExternalPaymentMethods"
         case features = "Features"
         case supportedCards = "SupportedCards"
-    }
-}
-
-// MARK: - ExternalPaymentMethod
-struct ExternalPaymentMethod: Codable {
-    let type: CaseOfBank.RawValue?
-    let enabled: Bool
-    let appleMerchantID: String?
-    let allowedPaymentMethods: [String]?
-    let shopID, showCaseID: String?
-
-    enum CodingKeys: String, CodingKey {
-        case type = "Type"
-        case enabled = "Enabled"
-        case appleMerchantID = "AppleMerchantId"
-        case allowedPaymentMethods = "AllowedPaymentMethods"
-        case shopID = "ShopId"
-        case showCaseID = "ShowCaseId"
-    }
-}
-
-// MARK: - Features
-struct Features: Codable {
-    let isAllowedNotSanctionedCards, isQiwi: Bool
-    let isSaveCard: Int
-
-    enum CodingKeys: String, CodingKey {
-        case isAllowedNotSanctionedCards = "IsAllowedNotSanctionedCards"
-        case isQiwi = "IsQiwi"
-        case isSaveCard = "IsSaveCard"
     }
 }

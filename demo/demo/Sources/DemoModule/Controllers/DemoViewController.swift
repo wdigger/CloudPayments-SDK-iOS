@@ -56,7 +56,7 @@ final class DemoViewController: BaseViewController {
         
         footer.frame = CGRect(x: Constants.position.toCGFloat(), y: Constants.position.toCGFloat(), width: Constants.footerWidth.toCGFloat(), height: Constants.footerHeight.toCGFloat())
         footer.addTarget(target: self, action: #selector(run(_:)), .demo)
-        footer.addTarget(target: self, action: #selector(singlePaymentMethodsButtonRun(_:)), .singPay)
+        footer.addTarget(target: self, action: #selector(singlePaymentMethodsButtonRun(_:)), .single)
         tableView.tableFooterView = footer
     }
     
@@ -123,16 +123,15 @@ final class DemoViewController: BaseViewController {
             paymentData: paymentData,
             useDualMessagePayment: footer.demoActionSwitch.isOn,
             apiUrl: apiUrl,
-            saverCardMode: false
+            saveCardSinglePaymentMode: false,
+            showResultScreen: true
         )
         
-        if let _ = self.navigationController {
-            self.dismiss(animated: true) { [weak self] in
-                let testController = TestSinglePaymentMethodsController()
-                testController.configuration = configuration
-                testController.modalPresentationStyle = .formSheet
-                self?.present(testController, animated: true)
-            }
+        self.dismiss(animated: true) { [weak self] in
+            let testController = TestSinglePaymentMethodsController()
+            testController.configuration = configuration
+            testController.modalPresentationStyle = .formSheet
+            self?.present(testController, animated: true)
         }
     }
     

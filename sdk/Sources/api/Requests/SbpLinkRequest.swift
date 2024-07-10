@@ -1,18 +1,18 @@
 //
-//  SberPayLinkRequest.swift
+//  SbpLinkRequest.swift
 //  sdk
 //
-//  Created by i.belkin on 21.05.2024.
+//  Created by Cloudpayments on 02.07.2024.
 //  Copyright © 2024 Cloudpayments. All rights reserved.
 //
 
 import Foundation
 import CloudpaymentsNetworking
 
-final class SberPayLinkRequest: BaseRequest, CloudpaymentsRequestType {
-    typealias ResponseType = TinkoffResultPayData
+final class SbpLinkRequest: BaseRequest, CloudpaymentsRequestType {
+    typealias ResponseType = SbpDataResponse
     var data: CloudpaymentsRequest {
-        let path = CloudpaymentsHTTPResource.qrLinkSberPay.asUrl(apiUrl: apiUrl)
+        let path = CloudpaymentsHTTPResource.sbp.asUrl(apiUrl: apiUrl)
        
         guard var component = URLComponents(string: path) else { return CloudpaymentsRequest(path: path, method: .post, params: params, headers: headers) }
        

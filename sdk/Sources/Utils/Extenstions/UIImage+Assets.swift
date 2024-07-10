@@ -19,6 +19,18 @@ extension UIImage {
         return UIImage()
     }
     
+    public class var iconTPay: UIImage {
+        return self.named("ic_tpay")
+    }
+    
+    public class var iconSberPay: UIImage {
+        return self.named("icon_sber_pay_button")
+    }
+    
+    public class var iconSbp: UIImage {
+        return self.named("icon_sbp_button_new")
+    }
+    
     public class var iconProgress: UIImage {
         return self.named("ic_progress")
     }

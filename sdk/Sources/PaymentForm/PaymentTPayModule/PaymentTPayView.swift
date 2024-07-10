@@ -14,7 +14,8 @@ public protocol PaymentTPayDelegate: AnyObject {
 
 //MARK: - PaymentTPayView
 
-public class PaymentTPayView: UIView {
+public final class PaymentTPayView: UIView {
+    
     public weak var delegate: PaymentTPayDelegate?
     private var buttonResult: ButtonConfiguration?
     public var configuration: PaymentConfiguration! = nil

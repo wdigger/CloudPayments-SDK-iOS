@@ -14,7 +14,7 @@ protocol CustomSbpViewDelegate: AnyObject {
     func searchBarCancelButtonClicked(_ progressSbpView: ProgressSbpView)
     
     func numberOfRow(_ progressSbpView: ProgressSbpView) -> Int
-    func progressSbpView(_ progressSbpView: ProgressSbpView, cellFor row: Int) -> SbpQRDataModel
+    func progressSbpView(_ progressSbpView: ProgressSbpView, cellFor row: Int) -> SbpData
     func progressSbpView(_ progressSbpView: ProgressSbpView, didSelect row: Int)
 }
 
@@ -35,7 +35,7 @@ final class ProgressSbpView: UIView {
         return tableView
     }()
     
-    private var notFoundBanksLabel = UILabel(text: "Ничего не найдено", textColor: .black, fontSize: 18)
+    private var notFoundBanksLabel = UILabel(text: .notFound, textColor: .black, fontSize: 18)
     private var searchBar = UISearchBar()
     private var sbpImageView = UIImageView()
     private var defaultBorderColor: CGColor?
@@ -105,7 +105,7 @@ final class ProgressSbpView: UIView {
         
         searchBar.barTintColor = UIColor.white
         searchBar.backgroundColor = UIColor.white
-        searchBar.placeholder = "Поиск банка"
+        searchBar.placeholder = .searchBankApp
         notFoundBanksLabel.textColor = UIColor(red: 0.55, green: 0.58, blue: 0.62, alpha: 1)
         
         if let textfield = searchBar.value(forKey: "searchField") as? UITextField {
@@ -125,7 +125,7 @@ final class ProgressSbpView: UIView {
         let rightView = UIView()
         let headerStackView = UIStackView(.horizontal, .fill, .fill, 24, [leftView, rightView])
         let stackView = UIStackView(.vertical, .equalSpacing, .fill, 12, [headerStackView, searchBar])
-        let label = UILabel(text: "Выберите банк для подтверждения оплаты", textColor: .black, fontSize: 17)
+        let label = UILabel(text: .chooseBank, textColor: .black, fontSize: 17)
         label.textAlignment = .left
         label.textColor = UIColor(red: 0.27, green: 0.3, blue: 0.36, alpha: 1)
         

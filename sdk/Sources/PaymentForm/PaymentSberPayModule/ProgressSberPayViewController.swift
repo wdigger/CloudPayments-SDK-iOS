@@ -15,7 +15,7 @@ final class ProgressSberPayViewController: UIViewController {
     private let defaultOpen: Bool
     
     //MARK: - Init
-        
+    
     init(presenter: ProgressSberPayPresenter, _ defaultOpen: Bool = false) {
         self.presenter = presenter
         self.defaultOpen = defaultOpen
@@ -76,10 +76,11 @@ extension ProgressSberPayViewController: CustomSberPayViewDelegate {
 extension ProgressSberPayViewController: ProgressSberPayViewControllerProtocol {
     
     func openLinkURL(url: URL) {
+        
         let supportedSchemes = ["http", "https"]
         
         guard supportedSchemes.contains(url.scheme?.lowercased() ?? "") else {
-            showAlert(title: "Ошибка", message: "Не удалось открыть приложение банка")
+            showAlert(title: nil, message: .banksAppNotOpen)
             return
         }
         
@@ -94,22 +95,35 @@ extension ProgressSberPayViewController: ProgressSberPayViewControllerProtocol {
 
     func resultPayment(result: PaymentSberPayView.PaymentAction, error: String?, transactionId: Transaction?) {
         
+        guard let parent = self.presentingViewController else { return }
+        
         if let delegate = delegate {
+            
+            if presenter.configuration.showResultScreen {
+                self.dismiss(animated: false) {
+                    self.openResultScreens(result, error, transactionId, parent)
+                }
+            }
+            
             delegate.resultPayment(result: result, error: error, transactionId: transactionId?.transactionId)
             return
         }
         
-        guard let parent = self.presentingViewController else { return }
-        
         self.dismiss(animated: false) {
-            switch result {
-            case .success:
-                PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .succeeded(transactionId), from: parent)
-            case .error:
-                PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .failed(error), from: parent)
-            case .close:
-                PaymentOptionsForm.present(with: self.presenter.configuration, from: parent)
-            }
+            self.openResultScreens(result, error, transactionId, parent)
         }
+    }
+    
+    func openResultScreens(_ result: PaymentSberPayView.PaymentAction,  _ error: String?, _ transactionId: Transaction?, _ parent: UIViewController) {
+        
+        switch result {
+        case .success:
+            PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .succeeded(transactionId), from: parent)
+        case .error:
+            PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .failed(error), from: parent)
+        case .close:
+            PaymentOptionsForm.present(with: self.presenter.configuration, from: parent)
+        }
+        
     }
 }

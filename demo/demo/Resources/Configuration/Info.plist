@@ -28,9 +28,9 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>tinkoffbank</string>
 		<string>sberpay</string>
 		<string>mailto</string>
-		<string>tinkoffbank</string>
 		<string>tel</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>

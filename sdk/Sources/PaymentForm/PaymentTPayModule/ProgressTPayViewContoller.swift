@@ -9,6 +9,7 @@
 import UIKit
 
 final class ProgressTPayViewController: UIViewController {
+    
     weak var delegate: ProgressTPayProtocol?
     private let customView = ProgressTPayView()
     private let presenter: ProgressTPayPresenter
@@ -29,7 +30,7 @@ final class ProgressTPayViewController: UIViewController {
     
     public class func present(with configuration: PaymentConfiguration, from: UIViewController, defaultOpen: Bool = false) {
         let presenter = ProgressTPayPresenter(configuration: configuration)
-        let controller = ProgressTPayViewController(presenter: presenter)
+        let controller = ProgressTPayViewController(presenter: presenter, defaultOpen)
         presenter.view = controller
         controller.modalPresentationStyle = .overFullScreen
         controller.modalTransitionStyle = .crossDissolve
@@ -58,7 +59,7 @@ final class ProgressTPayViewController: UIViewController {
 //MARK: - Progress TPay View Controller
 
 extension ProgressTPayViewController: CustomTPayViewDelegate {
-
+    
     func closePaymentButton() {
         
         if defaultOpen {
@@ -75,7 +76,15 @@ extension ProgressTPayViewController: CustomTPayViewDelegate {
 //MARK: Presenter Delegate
 
 extension ProgressTPayViewController: ProgressTPayViewControllerProtocol {
+    
     func openLinkURL(url: URL) {
+        
+        let supportedSchemes = ["http", "https"]
+        
+        guard supportedSchemes.contains(url.scheme?.lowercased() ?? "") else {
+            showAlert(title: nil, message: .banksAppNotOpen)
+            return
+        }
         
         guard UIApplication.shared.canOpenURL(url) else {
             let vc = SafariViewController(url: url)
@@ -88,21 +97,35 @@ extension ProgressTPayViewController: ProgressTPayViewControllerProtocol {
     
     func resultPayment(result: PaymentTPayView.PaymentAction, error: String?, transactionId: Transaction?) {
         
-        dismiss(animated: true) {
-            self.delegate?.resultPayment(result: result, error: error, transactionId: transactionId?.transactionId)
-        }
-        
         guard let parent = self.presentingViewController else { return }
         
-        self.dismiss(animated: false) {
-            switch result {
-            case .success:
-                PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .succeeded(transactionId), from: parent)
-            case .error:
-                PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .failed(error), from: parent)
-            case .close:
-                PaymentOptionsForm.present(with: self.presenter.configuration, from: parent)
+        if let delegate = delegate {
+            
+            if presenter.configuration.showResultScreen {
+                self.dismiss(animated: false) {
+                    self.openResultScreens(result, error, transactionId, parent)
+                }
             }
+            
+            delegate.resultPayment(result: result, error: error, transactionId: transactionId?.transactionId)
+            return
         }
+        
+        self.dismiss(animated: false) {
+            self.openResultScreens(result, error, transactionId, parent)
+        }
+    }
+    
+    func openResultScreens(_ result: PaymentTPayView.PaymentAction,  _ error: String?, _ transactionId: Transaction?, _ parent: UIViewController) {
+        
+        switch result {
+        case .success:
+            PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .succeeded(transactionId), from: parent)
+        case .error:
+            PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .failed(error), from: parent)
+        case .close:
+            PaymentOptionsForm.present(with: self.presenter.configuration, from: parent)
+        }
+        
     }
 }

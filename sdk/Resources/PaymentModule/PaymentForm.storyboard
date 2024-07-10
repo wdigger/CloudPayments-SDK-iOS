@@ -13,7 +13,7 @@
         <!--Payment Card Form-->
         <scene sceneID="Ekd-cN-VVV">
             <objects>
-                <viewController storyboardIdentifier="PaymentForm" modalPresentationStyle="overCurrentContext" id="yYc-tm-1ad" customClass="PaymentCardForm" customModule="CloudpaymentsSDK" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PaymentForm" modalPresentationStyle="overCurrentContext" id="yYc-tm-1ad" customClass="PaymentCardForm" customModule="sdk" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="bBd-gv-a5O">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -55,7 +55,7 @@
                                                     <constraint firstItem="ySl-co-gaI" firstAttribute="top" secondItem="ano-D3-Ubo" secondAttribute="bottom" constant="23" id="nRU-WX-Auc"/>
                                                 </constraints>
                                             </view>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="h4y-G1-6qY" customClass="View" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="h4y-G1-6qY" customClass="View" customModule="sdk" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="108" width="353" height="56"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Номер карты" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KA9-vx-nN5">
@@ -64,7 +64,7 @@
                                                         <color key="textColor" name="color_text_button"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="jQn-IO-Zsi" customClass="TextField" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="jQn-IO-Zsi" customClass="TextField" customModule="sdk" customModuleProvider="target">
                                                         <rect key="frame" x="16" y="26" width="243" height="22"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="22" id="evG-77-Oeh"/>
@@ -132,10 +132,10 @@
                                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="tfx-fU-6Mk">
                                                 <rect key="frame" x="0.0" y="180" width="353" height="56"/>
                                                 <subviews>
-                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8z6-s9-M8m" userLabel="Expdate view" customClass="View" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8z6-s9-M8m" userLabel="Expdate view" customClass="View" customModule="sdk" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="0.0" width="168.66666666666666" height="56"/>
                                                         <subviews>
-                                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="u1g-7O-WBg" customClass="TextField" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="u1g-7O-WBg" customClass="TextField" customModule="sdk" customModuleProvider="target">
                                                                 <rect key="frame" x="16" y="26" width="136.66666666666666" height="22"/>
                                                                 <constraints>
                                                                     <constraint firstAttribute="height" constant="22" id="8SA-qY-tbm"/>
@@ -189,10 +189,10 @@
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                     </view>
-                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="17Q-q2-SrP" userLabel="Cvv view" customClass="View" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="17Q-q2-SrP" userLabel="Cvv view" customClass="View" customModule="sdk" customModuleProvider="target">
                                                         <rect key="frame" x="184.66666666666663" y="0.0" width="168.33333333333337" height="56"/>
                                                         <subviews>
-                                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="H7z-3W-BC2" customClass="TextField" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="H7z-3W-BC2" customClass="TextField" customModule="sdk" customModuleProvider="target">
                                                                 <rect key="frame" x="14.999999999999993" y="26" width="98.333333333333314" height="22"/>
                                                                 <constraints>
                                                                     <constraint firstAttribute="height" constant="22" id="FB0-rR-L78"/>
@@ -271,7 +271,7 @@
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ej6-Eu-2fF">
                                                 <rect key="frame" x="0.0" y="252" width="353" height="72"/>
                                                 <subviews>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oJC-RS-URc" customClass="Button" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oJC-RS-URc" customClass="Button" customModule="sdk" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="16" width="353" height="56"/>
                                                         <color key="backgroundColor" name="color_blue"/>
                                                         <constraints>
@@ -375,7 +375,7 @@
         <!--Payment Process Form-->
         <scene sceneID="Z90-g9-bOz">
             <objects>
-                <viewController storyboardIdentifier="PaymentProcessForm" id="xmx-Pt-dkp" customClass="PaymentProcessForm" customModule="CloudpaymentsSDK" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PaymentProcessForm" id="xmx-Pt-dkp" customClass="PaymentProcessForm" customModule="sdk" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Gpt-uD-nOq">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -385,10 +385,10 @@
                                 <state key="normal" title="Button"/>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="67G-IT-evc">
-                                <rect key="frame" x="40" y="121.33333333333331" width="313" height="634.66666666666674"/>
+                                <rect key="frame" x="40" y="146.33333333333331" width="313" height="584.66666666666674"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="g1D-4H-IPH">
-                                        <rect key="frame" x="0.0" y="0.0" width="313" height="634.66666666666663"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="313" height="584.66666666666663"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nvo-4Q-Hc6">
                                                 <rect key="frame" x="0.0" y="0.0" width="313" height="252.33333333333334"/>
@@ -406,7 +406,7 @@
                                                 </constraints>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="y8Q-vb-h03" userLabel="Progress View">
-                                                <rect key="frame" x="0.0" y="252.3333333333334" width="313" height="66.333333333333343"/>
+                                                <rect key="frame" x="0.0" y="252.33333333333334" width="313" height="66.333333333333343"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Оплата в процессе" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vao-cc-YkU">
                                                         <rect key="frame" x="20" y="0.0" width="273" height="66.333333333333329"/>
@@ -424,7 +424,7 @@
                                                 </constraints>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vd0-d3-EFh" userLabel="Error View">
-                                                <rect key="frame" x="0.0" y="318.66666666666669" width="313" height="50"/>
+                                                <rect key="frame" x="0.0" y="318.66666666666663" width="313" height="50"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Описание ошибки" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pig-SP-brj" userLabel="secondDescriptionLabel">
                                                         <rect key="frame" x="20" y="12" width="273" height="38"/>
@@ -441,28 +441,10 @@
                                                     <constraint firstItem="Pig-SP-brj" firstAttribute="top" secondItem="vd0-d3-EFh" secondAttribute="top" constant="12" id="xHR-Jp-LAM"/>
                                                 </constraints>
                                             </view>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hPr-7w-M8n">
-                                                <rect key="frame" x="0.0" y="368.66666666666669" width="313" height="50"/>
-                                                <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xcz-HV-ecl">
-                                                        <rect key="frame" x="20" y="12" width="273" height="38"/>
-                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                </subviews>
-                                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="bottom" secondItem="Xcz-HV-ecl" secondAttribute="bottom" id="3qc-v7-oEN"/>
-                                                    <constraint firstItem="Xcz-HV-ecl" firstAttribute="leading" secondItem="hPr-7w-M8n" secondAttribute="leading" constant="20" id="CT5-0Z-eIl"/>
-                                                    <constraint firstItem="Xcz-HV-ecl" firstAttribute="top" secondItem="hPr-7w-M8n" secondAttribute="top" constant="12" id="QTR-MD-DuP"/>
-                                                    <constraint firstAttribute="trailing" secondItem="Xcz-HV-ecl" secondAttribute="trailing" constant="20" id="YQ0-1N-oSY"/>
-                                                </constraints>
-                                            </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qWv-ZM-rPY" userLabel="Button VIew">
-                                                <rect key="frame" x="0.0" y="418.66666666666669" width="313" height="76"/>
+                                                <rect key="frame" x="0.0" y="368.66666666666663" width="313" height="76"/>
                                                 <subviews>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bvh-hz-knE" customClass="Button" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bvh-hz-knE" customClass="Button" customModule="sdk" customModuleProvider="target">
                                                         <rect key="frame" x="20" y="20" width="273" height="56"/>
                                                         <color key="backgroundColor" name="color_blue"/>
                                                         <constraints>
@@ -486,7 +468,7 @@
                                                 </constraints>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uCs-AP-siD">
-                                                <rect key="frame" x="0.0" y="494.66666666666674" width="313" height="68"/>
+                                                <rect key="frame" x="0.0" y="444.66666666666663" width="313" height="68"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gHW-ix-nkJ" customClass="Button" customModule="Cloudpayments">
                                                         <rect key="frame" x="20" y="12" width="273" height="56"/>
@@ -518,7 +500,7 @@
                                                 </constraints>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Sqi-VT-CJw" userLabel="Logo View">
-                                                <rect key="frame" x="0.0" y="562.66666666666663" width="313" height="72"/>
+                                                <rect key="frame" x="0.0" y="512.66666666666663" width="313" height="72"/>
                                                 <subviews>
                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_secured_by_cp" translatesAutoresizingMaskIntoConstraints="NO" id="Rhh-FU-3ut">
                                                         <rect key="frame" x="29.666666666666686" y="28" width="254" height="16"/>
@@ -565,7 +547,7 @@
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HQI-Lk-0gA">
                                                 <rect key="frame" x="0.0" y="59" width="393" height="44"/>
                                                 <subviews>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HWd-EI-zm7" customClass="Button" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HWd-EI-zm7" customClass="Button" customModule="sdk" customModuleProvider="target">
                                                         <rect key="frame" x="345" y="0.0" width="48" height="44"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="48" id="e3k-Nw-MEf"/>
@@ -638,8 +620,6 @@
                         <outlet property="threeDsCloseButton" destination="HWd-EI-zm7" id="yeL-t4-5oC"/>
                         <outlet property="threeDsContainerView" destination="WOb-Tm-khS" id="WMV-zm-n3i"/>
                         <outlet property="threeDsFormView" destination="Mre-EE-jnd" id="eUH-gE-xkP"/>
-                        <outlet property="tinkoffDescription" destination="Xcz-HV-ecl" id="H9s-Hm-7dn"/>
-                        <outlet property="tinkoffView" destination="hPr-7w-M8n" id="ZDc-og-Jzb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Deh-Hc-0Qm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -664,7 +644,7 @@
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HGh-3C-ngX">
                                 <rect key="frame" x="0.0" y="842" width="393" height="266"/>
                                 <subviews>
-                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yDU-pE-2eL" userLabel="TopElementView" customClass="View" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yDU-pE-2eL" userLabel="TopElementView" customClass="View" customModule="sdk" customModuleProvider="target">
                                         <rect key="frame" x="129" y="21" width="135" height="5"/>
                                         <color key="backgroundColor" name="color_black"/>
                                         <constraints>
@@ -708,7 +688,7 @@
                                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dn4-zG-GBf" userLabel="Main card view">
                                                                 <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
                                                                 <subviews>
-                                                                    <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ds8-4r-6Pa" customClass="Button" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                                    <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ds8-4r-6Pa" customClass="Button" customModule="sdk" customModuleProvider="target">
                                                                         <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
                                                                         <color key="backgroundColor" name="color_blue"/>
                                                                         <constraints>
@@ -742,25 +722,25 @@
                                                                     <constraint firstAttribute="bottom" secondItem="Ds8-4r-6Pa" secondAttribute="bottom" id="nUa-yS-ScG"/>
                                                                 </constraints>
                                                             </view>
-                                                            <view hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vfX-2B-FR1" userLabel="Main tinkoff view">
+                                                            <view hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vfX-2B-FR1" userLabel="Main tpay view">
                                                                 <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
                                                                 <subviews>
                                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ogz-S0-gAM" customClass="Button" customModule="Cloudpayments">
                                                                         <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
-                                                                        <color key="backgroundColor" name="color_black"/>
+                                                                        <color key="backgroundColor" name="color_tpay_button"/>
                                                                         <constraints>
                                                                             <constraint firstAttribute="height" constant="56" id="h6Q-UF-z2l"/>
                                                                         </constraints>
                                                                         <color key="tintColor" name="color_text_white"/>
                                                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                                        <state key="normal" title="Tinkoff" image="ic_tpay"/>
-                                                                        <buttonConfiguration key="configuration" style="plain" image="ic_tpay" title="Tinkoff"/>
+                                                                        <state key="normal" title="" image="ic_tpay"/>
+                                                                        <buttonConfiguration key="configuration" style="plain" image="ic_tpay"/>
                                                                         <userDefinedRuntimeAttributes>
                                                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                                 <real key="value" value="8"/>
                                                                             </userDefinedRuntimeAttribute>
                                                                             <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
-                                                                                <real key="value" value="1"/>
+                                                                                <real key="value" value="0.0"/>
                                                                             </userDefinedRuntimeAttribute>
                                                                         </userDefinedRuntimeAttributes>
                                                                     </button>
@@ -803,7 +783,7 @@
                                                             <view hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lcn-U0-o7V" userLabel="SberPay View">
                                                                 <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
                                                                 <subviews>
-                                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mcD-ws-ZeM" userLabel="SberPay Button" customClass="Button" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mcD-ws-ZeM" userLabel="SberPay Button" customClass="Button" customModule="sdk" customModuleProvider="target">
                                                                         <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
                                                                         <color key="backgroundColor" name="color_sber_pay_button"/>
                                                                         <constraints>
@@ -830,7 +810,7 @@
                                                             <view hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NVM-nf-zTd" userLabel="Sbp">
                                                                 <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
                                                                 <subviews>
-                                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tsl-aQ-bDt" customClass="Button" customModule="CloudpaymentsSDK" customModuleProvider="target">
+                                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tsl-aQ-bDt" customClass="Button" customModule="sdk" customModuleProvider="target">
                                                                         <rect key="frame" x="0.0" y="0.0" width="361" height="56"/>
                                                                         <color key="backgroundColor" name="color_background_sbp"/>
                                                                         <constraints>
@@ -838,7 +818,7 @@
                                                                         </constraints>
                                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                                        <state key="normal" title="Оплатить" image="icon_spb_button">
+                                                                        <state key="normal" title="Оплатить" image="icon_sbp_button">
                                                                             <color key="titleColor" name="color_text_white"/>
                                                                         </state>
                                                                         <userDefinedRuntimeAttributes>
@@ -981,14 +961,14 @@
                         <outlet property="footer" destination="wyU-2h-F6Y" id="21k-wc-1GL"/>
                         <outlet property="heightConstraint" destination="5bA-qa-4zz" id="Iqo-Zi-Js0"/>
                         <outlet property="loaderSBPView" destination="DRI-aR-DDQ" id="22f-aq-Ns5"/>
-                        <outlet property="loaderTinkoffView" destination="SN2-Lb-zrN" id="kpV-24-Z7D"/>
+                        <outlet property="loaderTPayView" destination="SN2-Lb-zrN" id="kpV-24-Z7D"/>
                         <outlet property="mainAppleView" destination="vpt-9r-s2q" id="9w5-31-JYg"/>
-                        <outlet property="mainTinkoffView" destination="vfX-2B-FR1" id="Fbo-8c-ERE"/>
+                        <outlet property="mainTPayView" destination="vfX-2B-FR1" id="Fbo-8c-ERE"/>
                         <outlet property="payWithCardButton" destination="Ds8-4r-6Pa" id="DN2-cU-CVW"/>
                         <outlet property="paymentLabel" destination="8Gs-ry-pVK" id="lby-Af-LQQ"/>
                         <outlet property="sberPayButton" destination="mcD-ws-ZeM" id="rK8-d1-1dP"/>
                         <outlet property="sbpButton" destination="tsl-aQ-bDt" id="1Gh-Ea-mnM"/>
-                        <outlet property="tinkoffButton" destination="ogz-S0-gAM" id="ZAO-fW-bmB"/>
+                        <outlet property="tPayButton" destination="ogz-S0-gAM" id="ZAO-fW-bmB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uLp-Mv-jOF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1003,11 +983,11 @@
         <image name="ic_progress" width="180" height="180"/>
         <image name="ic_scan" width="13.333333015441895" height="13.333333015441895"/>
         <image name="ic_secured_by_cp" width="56.333332061767578" height="5.6666665077209473"/>
-        <image name="ic_tpay" width="66" height="30"/>
+        <image name="ic_tpay" width="50" height="22"/>
         <image name="icn_cvv" width="30" height="22"/>
         <image name="icn_eye_closed" width="14" height="13"/>
         <image name="icon_sber_pay_button" width="69" height="24"/>
-        <image name="icon_spb_button" width="60" height="34"/>
+        <image name="icon_sbp_button" width="60" height="34"/>
         <namedColor name="card_color_border">
             <color red="0.88599997758865356" green="0.9100000262260437" blue="0.93699997663497925" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
@@ -1037,6 +1017,9 @@
         </namedColor>
         <namedColor name="color_text_white">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="color_tpay_button">
+            <color red="1" green="0.8666666666666667" blue="0.17647058823529413" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

@@ -7,7 +7,7 @@
 
 import CloudpaymentsNetworking
 
-class BankInfoRequest: BaseRequest, CloudpaymentsRequestType {
+final class BankInfoRequest: BaseRequest, CloudpaymentsRequestType {
     private let firstSix: String
     init(firstSix: String) {
         self.firstSix = firstSix

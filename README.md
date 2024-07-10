@@ -75,20 +75,20 @@ let configuration = PaymentConfiguration.init(
     requireEmail: true, // Обязательный email, (по умолчанию false)
     useDualMessagePayment: true, // Использовать двухстадийную схему проведения платежа, (по умолчанию используется одностадийная схема)
     disableApplePay: false, // Выключить Apple Pay, (по умолчанию Apple Pay включен)
-    successRedirectUrl: "" // Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
+    successRedirectUrl: "", // Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
     failRedirectUrl: "" //  Ваш deeplink для редиректа из приложения банка после неуспешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
 ```
-2.1. Для передачи deeplink при использовании CБП и TinkoffPay нужно использовать Universal Links:
+2.1. Для передачи deeplink при использовании CБП и TPay нужно использовать Universal Links:
 
 2.2. Документация от Apple: [Universal Links](https://developer.apple.com/documentation/xcode/supporting-universal-links-in-your-app)
 
 2.3. В вашем приложении реализуйте метод application(_:continue:restorationHandler:) в классе вашего AppDelegate для обработки Universal Links
 
-### Использование TinkoffPay в стандартной платёжной форме:
+### Использование TPay в стандартной платёжной форме:
 
-1. Включить TinkoffPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
+1. Включить TPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
 
-2. Для определения наличия мобильного приложения Тинькофф на устройстве пользователя, добавьте значение **tinkoffbank** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
+2. Для определения наличия мобильного приложения Т-банк на устройстве пользователя, добавьте значение **tinkoffbank** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
 
 ```
 <key>LSApplicationQueriesSchemes</key>
@@ -96,13 +96,13 @@ let configuration = PaymentConfiguration.init(
   <string>tinkoffbank</string>
 </array>
 ```
-Благодаря этому SDK сможет корректно определить наличие приложения Тинькофф на устройстве пользователя.
+Благодаря этому SDK сможет корректно определить наличие приложения T-банк на устройстве пользователя.
 
-### Использование отдельной кнопки TinkoffPay:
+### Использование отдельной кнопки TPay:
 
-1. Включить TinkoffPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
+1. Включить TPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
 
-2. Для определения наличия мобильного приложения Тинькофф на устройстве пользователя, добавьте значение **tinkoffbank** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
+2. Для определения наличия мобильного приложения T-банк на устройстве пользователя, добавьте значение **tinkoffbank** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
 
 ```
 <key>LSApplicationQueriesSchemes</key>
@@ -114,34 +114,25 @@ let configuration = PaymentConfiguration.init(
 3.Создайте объект PaymentTPayView и разместите его
 
    ``` 
-    private lazy var tinkoffView = PaymentTPayView() 
-    private lazy var tinkoffLabel = UILabel()
+    private lazy var tPayView = PaymentTPayView() 
     
     private func setupViews() {
     
     // делегат
-    tinkoffView.delegate = self 
+    tPayView.delegate = self 
 
-    view.addSubview(tinkoffView)
-    tinkoffView.addSubview(tinkoffLabel)
+    view.addSubview(tPayView)
 
-    tinkoffView.backgroundColor = .black
-    tinkoffView.layer.cornerRadius = 8
+    tPayView.backgroundColor = .black
+    tPayView.layer.cornerRadius = 8
 
-    tinkoffLabel.text = "Тинькофф Pay"
-    tinkoffLabel.textColor = .white
-
-    tinkoffView.translatesAutoresizingMaskIntoConstraints = false
-    tinkoffLabel.translatesAutoresizingMaskIntoConstraints = false
+    tPayView.translatesAutoresizingMaskIntoConstraints = false
 
     NSLayoutConstraint.activate([
-    tinkoffView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-    tinkoffView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-    tinkoffView.heightAnchor.constraint(equalToConstant: 50),
-    tinkoffView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-
-    tinkoffLabel.centerXAnchor.constraint(equalTo: tinkoffView.centerXAnchor),
-    tinkoffLabel.centerYAnchor.constraint(equalTo: tinkoffView.centerYAnchor)
+    tPayView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+    tPayView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+    tPayView.heightAnchor.constraint(equalToConstant: 50),
+    tPayView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
     ])
     }
    ```
@@ -184,18 +175,19 @@ let configuration = PaymentConfiguration.init(
     successRedirectUrl: "" // Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
     failRedirectUrl: "" // Ваш deeplink для редиректа из приложения банка после неуспешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
     useDualMessagePayment: true, // Использовать двухстадийную схему проведения платежа, (по умолчанию используется одностадийная схема)
-    saveCardMode: false) // Передача сохранения карты (только для отдельной кнопки)
+    saveCardMode: false, // Передача сохранения карты (только для отдельной кнопки)
+    showResultScreen: true)// Для включения экранов успеха и неуспеха для отдельных кнопок (по умолчанию false)
 
-    tinkoffView.configuration = configuration // передайте конфигурацию в объект PaymentTPayView
+    tPayView.configuration = configuration // передайте конфигурацию в объект PaymentTPayView
     }
     
-5.Создайте метод для проверки доступности TinkoffPay  
+5.Создайте метод для проверки доступности TPay  
     
     private func checkButtons() {
-    tinkoffView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
+    tPayView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
     guard let self = self, let result = result else { return }
-    // проверка доступности TinkoffPay и её отображение 
-    self.tinkoffView.isHidden = !result.isOnTinkoffButton
+    // проверка доступности TPay и её отображение 
+    self.tPayView.isHidden = !result.isOnTPayButton
         }
     }
 
@@ -209,7 +201,7 @@ let configuration = PaymentConfiguration.init(
         case .error:
             print("Операция отклонена")
         case .close:
-            print("Пользователь закрыл платёжную форму TinkoffPay")
+            print("Пользователь закрыл платёжную форму TPay")
         }
     } }
     
@@ -221,7 +213,6 @@ let configuration = PaymentConfiguration.init(
 
    ``` 
     private lazy var sbpView = PaymentSbpView()
-    private lazy var sbpLabel = UILabel()
     
     private func setupViews() {
     
@@ -229,26 +220,18 @@ let configuration = PaymentConfiguration.init(
     sbpView.delegate = self 
 
     view.addSubview(sbpView)
-    tinkoffView.addSubview(sbpLabel)
 
-    sbpView.backgroundColor = .systemPink
+    sbpView.backgroundColor = .blue
     sbpView.layer.cornerRadius = 8
 
-    sbpLabel.text = "СБП"
-    sbpLabel.textColor = .white
-
     sbpView.translatesAutoresizingMaskIntoConstraints = false
-    sbpLabel.translatesAutoresizingMaskIntoConstraints = false
 
     NSLayoutConstraint.activate([
-    sbpView.topAnchor.constraint(equalTo: tinkoffView.bottomAnchor, constant: 20),
+    sbpView.topAnchor.constraint(equalTo: tPayView.bottomAnchor, constant: 20),
     sbpView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
     sbpView.heightAnchor.constraint(equalToConstant: 50),
     sbpView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
     sbpView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-
-    sbpLabel.centerXAnchor.constraint(equalTo: sbpView.centerXAnchor),
-    sbpLabel.centerYAnchor.constraint(equalTo: sbpView.centerYAnchor),
     ])
     }
    ```
@@ -289,7 +272,8 @@ let configuration = PaymentConfiguration.init(
     publicId: "", // // Ваш Public_id из личного кабинета
     paymentData: paymentData, // Информация о платеже
     useDualMessagePayment: false, // Использовать двухстадийную схему проведения платежа, (Для СБП используется одностадийная схема)
-    saveCardForSinglePaymentMode: false) // Галочка для сохранения или не сохранения карты (по умолчанию nil)
+    saveCardForSinglePaymentMode: false, // Галочка для сохранения или не сохранения карты (по умолчанию nil)
+    showResultScreen: true) // Для включения экранов успеха и неуспеха для отдельных кнопок (по умолчанию false)
 
     sbpView.configuration = configuration // передайте конфигурацию в объект PaymentSbpView
     }
@@ -297,7 +281,7 @@ let configuration = PaymentConfiguration.init(
 3.Создайте метод для проверки доступности СБП  
     
     private func checkButtons() {
-    tinkoffView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
+    tpayView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
     guard let self = self, let result = result else { return }
     // проверка доступности CБП и её отображение
     self.sbpView.isHidden = !result.isOnSbpButton
@@ -333,7 +317,7 @@ let configuration = PaymentConfiguration.init(
 4. Создайте метод для проверки доступности SberPay  
     ```
     private func checkButtons() {
-    tinkoffView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
+    tPayView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
     guard let self = self, let result = result else { return }
     // проверка доступности SberPay и её отображение
     self.sberPayView.isHidden = !result.isOnSberPayButton
@@ -591,6 +575,10 @@ public protocol ThreeDsDelegate: class {
 
 ### История обновлений:
 
+#### 1.5.7
+* Обновлен дизайн TPay
+* Добавлен параметр showResultScreen
+
 #### 1.5.6
 * Добавлен режим запуска SDK SberPay
 * Добавлен Privacy Manifest
@@ -612,9 +600,9 @@ public protocol ThreeDsDelegate: class {
 * Повышена надежность
 
 #### 1.5.1
-* Добавлен режим запуска SDK TinkoffPay
+* Добавлен режим запуска SDK TPay
 
-* Добавлена возможность педедать deeplink для перехода из приложения Tinkoff после оплаты
+* Добавлена возможность педедать deeplink для перехода из приложения T-банк после оплаты
 
 * Отключен YandexPay
 
