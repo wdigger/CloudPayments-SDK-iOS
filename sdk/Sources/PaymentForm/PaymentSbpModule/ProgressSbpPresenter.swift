@@ -37,9 +37,10 @@ final class ProgressSbpPresenter {
     //MARK: - Private Methods
     
     private func getSbpLink() {
+        
         view?.loading = true
         
-        CloudpaymentsApi.getSbpLink(with: configuration) { [ weak self] result in
+        CloudpaymentsApi.getSbpLink(with: configuration) { [weak self] result in
             guard let self = self else { return }
             
             guard let result = result else {
@@ -53,10 +54,13 @@ final class ProgressSbpPresenter {
             view?.loading = false
             view?.tableViewReloadData()
         }
+        
     }
     
     private func setupLinkForBank(value: SbpData) {
+    
         guard let qrURL = altPayTransactionResponse?.qrURL else { return }
+        
         var stringUri = qrURL
         
         if let _ = value.isWebClientActive, let webClientURL = value.webClientURL, let providerQrId = altPayTransactionResponse?.providerQrId {
@@ -76,13 +80,13 @@ final class ProgressSbpPresenter {
     private func openSafariViewController(_ string: String) {
         guard let finalURL = URL(string: string) else { return }
         view?.openSafariViewController(finalURL)
-        checkSbpTransactionId()
+        checkTransactionId()
     }
     
     private func checkNotificationError(_ notification: NSNotification) -> Bool {
         guard let error = notification.object as? Error else { return false }
         let code = error._code < 0 ? -error._code : error._code
-        if code >= 1000 {checkSbpTransactionId(); return true}
+        if code >= 1000 {checkTransactionId(); return true}
         let string = String(code)
         let descriptionError = ApiError.getFullErrorDescription(code: string)
         view?.presentError(descriptionError)
@@ -99,7 +103,7 @@ final class ProgressSbpPresenter {
         guard let rawValue = transactionStatus.model?.status, let status = StatusPay(rawValue: rawValue) else {
             
             if transactionStatus.success ?? false {
-                checkSbpTransactionId()
+                checkTransactionId()
             } else {
                 if checkNotificationError(notification) { return }
                 let descriptionError = ApiError.getFullErrorDescription(code: "0")
@@ -110,8 +114,9 @@ final class ProgressSbpPresenter {
         }
         
         switch status {
+            
         case .created, .pending:
-            checkSbpTransactionId()
+            checkTransactionId()
             
         case .authorized, .completed, .cancelled:
             removePayObserver()
@@ -126,6 +131,7 @@ final class ProgressSbpPresenter {
             let descriptionError = ApiError.getFullErrorDescription(code: string)
             view?.presentError(descriptionError)
         }
+        
     }
 }
 
@@ -160,7 +166,7 @@ extension ProgressSbpPresenter {
         view?.tableViewReloadData()
     }
     
-    func checkSbpTransactionId() {
+    func checkTransactionId() {
         guard let transactionId = altPayTransactionResponse?.transactionId else { return }
         removePayObserver()
         

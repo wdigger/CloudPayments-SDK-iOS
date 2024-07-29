@@ -79,16 +79,8 @@ extension ProgressTPayViewController: ProgressTPayViewControllerProtocol {
     
     func openLinkURL(url: URL) {
         
-        let supportedSchemes = ["http", "https"]
-        
-        guard supportedSchemes.contains(url.scheme?.lowercased() ?? "") else {
-            showAlert(title: nil, message: .banksAppNotOpen)
-            return
-        }
-        
         guard UIApplication.shared.canOpenURL(url) else {
-            let vc = SafariViewController(url: url)
-            self.present(vc, animated: true)
+            showAlert(title: nil, message: .banksAppNotOpen)
             return
         }
         

@@ -103,7 +103,7 @@ final class ProgressSberPayPresenter {
 extension ProgressSberPayPresenter {
     func getLink() {
         CloudpaymentsApi.getSberPayLink(with: configuration) { [weak self] result in
-            guard let self = self, let transactionId = result?.transactionId, let string = result?.qrURL, let url = URL(string: string) else {
+            guard let self = self, let transactionId = result?.transactionId, let qrURL = result?.qrURL, let url = URL(string: qrURL) else {
                 self?.view?.resultPayment(result: .error, error: result?.message, transactionId: nil)
                 return
             }

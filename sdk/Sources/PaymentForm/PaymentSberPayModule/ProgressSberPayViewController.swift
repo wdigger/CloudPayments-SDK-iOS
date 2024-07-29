@@ -75,24 +75,66 @@ extension ProgressSberPayViewController: CustomSberPayViewDelegate {
 
 extension ProgressSberPayViewController: ProgressSberPayViewControllerProtocol {
     
-    func openLinkURL(url: URL) {
+    func openLinkURL(url path: URL) {
         
-        let supportedSchemes = ["http", "https"]
+        let sberDeeplinks = [
+            "ios-app-smartonline",
+            "btripsexpenses",
+            "sbolpay"
+        ]
         
-        guard supportedSchemes.contains(url.scheme?.lowercased() ?? "") else {
+        let urlString = path.absoluteString
+        
+        guard let urlComponents = URLComponents(string: urlString) else {
             showAlert(title: nil, message: .banksAppNotOpen)
             return
         }
         
-        guard UIApplication.shared.canOpenURL(url) else {
-            let vc = SafariViewController(url: url)
-            self.present(vc, animated: true)
-            return
+        func checkLink(link string: String?) -> Bool {
+            guard let string = string,
+                  let link = URL(string: string),
+                  UIApplication.shared.canOpenURL(link) else {
+                return false
+            }
+            return true
         }
         
-        UIApplication.shared.open(url)
+        var foundValidLink = false
+        
+        for scheme in sberDeeplinks {
+            var sberURL: URL?
+            var sberComponents = urlComponents
+            sberComponents.scheme = scheme
+            
+            if scheme == "ios-app-smartonline" || scheme == "btripsexpenses" {
+                let originalHost = sberComponents.host ?? ""
+                let originalPath = sberComponents.path
+                sberComponents.host = "sbolpay"
+                sberComponents.path = "/" + originalHost + originalPath
+            }
+            
+            guard let generatedLink = sberComponents.url?.absoluteString else { continue }
+            
+            if checkLink(link: generatedLink) {
+                sberURL = URL(string: generatedLink)
+                foundValidLink = true
+                if let validURL = sberURL {
+                    UIApplication.shared.open(validURL)
+                }
+                break
+            }
+        }
+        
+        if !foundValidLink {
+            guard UIApplication.shared.canOpenURL(path) else {
+                showAlert(title: nil, message: .banksAppNotOpen)
+                return
+            }
+            UIApplication.shared.open(path)
+        }
+        
     }
-
+    
     func resultPayment(result: PaymentSberPayView.PaymentAction, error: String?, transactionId: Transaction?) {
         
         guard let parent = self.presentingViewController else { return }

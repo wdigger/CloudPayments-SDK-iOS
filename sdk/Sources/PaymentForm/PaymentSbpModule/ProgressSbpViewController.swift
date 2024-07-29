@@ -238,12 +238,24 @@ extension ProgressSbpViewController: ProgressSbpViewControllerProtocol {
     
     func presentError(_ error: String? = nil) {
         
-        if let delegate = delegate {
-            delegate.resultPayment(.error, error: error, transactionId: nil)
-            return
+        guard let parent = self.presentingViewController else { return }
+        
+        if let safariViewController = UIApplication.topViewController() as? SafariViewController {
+            safariViewController.dismiss(animated: false)
         }
         
-        guard let parent = self.presentingViewController else {return}
+        if let delegate = delegate {
+            
+            if presenter.configuration.showResultScreen {
+                self.dismiss(animated: false) {
+                    PaymentProcessForm.present(with: self.presenter.configuration, cryptogram: nil, email: nil, state: .failed(nil), from: parent)
+                }
+            }
+            
+            delegate.resultPayment(.error, error: error, transactionId: nil)
+            
+            return
+        }
         
         presentesionView(false) {
             self.dismiss(animated: false) {
@@ -266,7 +278,7 @@ extension ProgressSbpViewController: ProgressSbpViewControllerProtocol {
         
         UIApplication.shared.open(url) { success in
             if success {
-                self.presenter.checkSbpTransactionId()
+                self.presenter.checkTransactionId()
             } else {
                 self.showAlert(title: nil, message: .noBankApps)
             }
@@ -277,6 +289,10 @@ extension ProgressSbpViewController: ProgressSbpViewControllerProtocol {
     func resultPayment(result: PaymentSbpView.PaymentAction, error: String?, transactionId: Transaction?) {
         
         guard let parent = self.presentingViewController else { return }
+        
+        if let safariViewController = UIApplication.topViewController() as? SafariViewController {
+            safariViewController.dismiss(animated: false)
+        }
         
         if let delegate = delegate {
             

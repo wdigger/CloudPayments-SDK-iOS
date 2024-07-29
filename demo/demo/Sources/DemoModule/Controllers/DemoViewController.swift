@@ -124,7 +124,7 @@ final class DemoViewController: BaseViewController {
             useDualMessagePayment: footer.demoActionSwitch.isOn,
             apiUrl: apiUrl,
             saveCardSinglePaymentMode: false,
-            showResultScreen: true
+            showResultScreen: false
         )
         
         self.dismiss(animated: true) { [weak self] in

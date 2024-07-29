@@ -88,7 +88,7 @@ let configuration = PaymentConfiguration.init(
 
 1. Включить TPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
 
-2. Для определения наличия мобильного приложения Т-банк на устройстве пользователя, добавьте значение **tinkoffbank** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
+2. Для определения наличия мобильного приложения Т-банк на устройстве пользователя, добавьте значение **tinkoffbank** и **bank100000000004** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
 
 ```
 <key>LSApplicationQueriesSchemes</key>
@@ -102,7 +102,7 @@ let configuration = PaymentConfiguration.init(
 
 1. Включить TPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
 
-2. Для определения наличия мобильного приложения T-банк на устройстве пользователя, добавьте значение **tinkoffbank** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
+2. Для определения наличия мобильного приложения T-банк на устройстве пользователя, добавьте значение **tinkoffbank** и **bank100000000004** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
 
 ```
 <key>LSApplicationQueriesSchemes</key>
@@ -310,7 +310,7 @@ let configuration = PaymentConfiguration.init(
 
 1. Включить SberPay через вашего курирующего менеджера.
 
-2. Для определения наличия мобильного приложения Cбербанка на устройстве пользователя, добавьте значение **sberpay** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
+2. Для определения наличия мобильного приложения Cбера на устройстве, добавьте значения **sberpay**, **btripsexpenses**, **sbolpay**, **ios-app-smartonline** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
 
 3. Создайте объект PaymentSberPayView и разместите его
 
@@ -574,6 +574,9 @@ public protocol ThreeDsDelegate: class {
 ```
 
 ### История обновлений:
+
+#### 1.5.8
+* Исправлена проблема при оплате по Tpay и SberPay
 
 #### 1.5.7
 * Обновлен дизайн TPay

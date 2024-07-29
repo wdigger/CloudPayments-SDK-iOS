@@ -106,7 +106,7 @@ extension ProgressTPayPresenter {
             case .created, .pending:
                 self.checkTransactionId()
             default:
-                return
+                self.checkTransactionId()
             }
             
             self.view?.openLinkURL(url: url)
