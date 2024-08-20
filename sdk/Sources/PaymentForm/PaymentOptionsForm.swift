@@ -177,11 +177,12 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
             
             MerchantConfigurationRequest.getMerchantConfiguration(baseURL: baseUrl, terminalPublicId: terminalPublicId) { [weak self] response in
                 
-                if let successRedirectUrl = response?.successRedirectUrl {
+                if (configuration.successRedirectUrl?.isEmpty ?? true),
+                   let successRedirectUrl = response?.successRedirectUrl {
                     configuration.successRedirectUrl = successRedirectUrl
                 }
                 
-                if let failRedirectUrl = response?.failRedirectUrl {
+                if (configuration.failRedirectUrl?.isEmpty ?? true), let failRedirectUrl = response?.failRedirectUrl {
                     configuration.failRedirectUrl = failRedirectUrl
                 }
                 

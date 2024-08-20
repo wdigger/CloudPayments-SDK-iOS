@@ -196,7 +196,7 @@ final class DemoViewController: BaseViewController {
             scanner: nil,
             requireEmail: false,
             useDualMessagePayment: footer.demoActionSwitch.isOn,
-            disableApplePay: true,
+            disableApplePay: false,
             apiUrl: apiUrl
         )
         

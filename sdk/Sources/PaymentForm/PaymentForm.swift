@@ -47,9 +47,9 @@ public class PaymentForm: BaseViewController {
 
         if PKPaymentAuthorizationViewController.canMakePayments() {
             let controller = PaymentOptionsForm.present(with: configuration, from: from, completion: completion) as! PaymentOptionsForm
-            controller.onCardOptionSelected = { isSaveCard in
+            controller.onCardOptionSelected = { saveCard in
                 
-                 configuration.paymentData.saveCard = isSaveCard
+                 configuration.paymentData.saveCard = saveCard
                 
                 self.showCardForm(with: configuration, from: from, completion: nil)
             }

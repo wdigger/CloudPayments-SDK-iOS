@@ -16,8 +16,8 @@ public class PaymentConfiguration {
     let useDualMessagePayment: Bool
     let disableApplePay: Bool
     let apiUrl: String
-    var successRedirectUrl: String?
-    var failRedirectUrl: String?
+    public var successRedirectUrl: String?
+    public var failRedirectUrl: String?
     var saveCardSinglePaymentMode: Bool?
     var showResultScreen: Bool
    

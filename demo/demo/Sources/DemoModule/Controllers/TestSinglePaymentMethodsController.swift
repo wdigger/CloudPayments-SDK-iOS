@@ -104,6 +104,16 @@ final class TestSinglePaymentMethodsController: UIViewController {
         loaderView.startAnimated(LoaderType.loaderText.toString())
         self.tPayView.getMerchantConfiguration { [weak self] result in
             guard let self = self, let result = result else { return }
+            
+            if (configuration?.successRedirectUrl?.isEmpty ?? true),
+               let successRedirectUrl = result.successRedirectUrl {
+                configuration?.successRedirectUrl = successRedirectUrl
+            }
+            
+            if (configuration?.failRedirectUrl?.isEmpty ?? true), let failRedirectUrl = result.failRedirectUrl {
+                configuration?.failRedirectUrl = failRedirectUrl
+            }
+            
             self.tPayView.isHidden = !result.isOnTPayButton
             self.sbpView.isHidden = !result.isOnSbpButton
             self.sberPayView.isHidden = !result.isOnSberPayButton
