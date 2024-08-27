@@ -78,13 +78,11 @@ extension ProgressTPayViewController: CustomTPayViewDelegate {
 extension ProgressTPayViewController: ProgressTPayViewControllerProtocol {
     
     func openLinkURL(url: URL) {
-        
-        guard UIApplication.shared.canOpenURL(url) else {
-            showAlert(title: nil, message: .banksAppNotOpen)
-            return
+        UIApplication.shared.open(url) { success in
+            if !success {
+                self.showAlert(title: nil, message: .banksAppNotOpen)
+            }
         }
-        
-        UIApplication.shared.open(url)
     }
     
     func resultPayment(result: PaymentTPayView.PaymentAction, error: String?, transactionId: Transaction?) {

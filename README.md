@@ -88,30 +88,11 @@ let configuration = PaymentConfiguration.init(
 
 1. Включить TPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
 
-2. Для определения наличия мобильного приложения Т-банк на устройстве пользователя, добавьте значение **tinkoffbank** и **bank100000000004** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
-
-```
-<key>LSApplicationQueriesSchemes</key>
-<array>
-  <string>tinkoffbank</string>
-</array>
-```
-Благодаря этому SDK сможет корректно определить наличие приложения T-банк на устройстве пользователя.
-
 ### Использование отдельной кнопки TPay:
 
 1. Включить TPay в [личном кабинете Cloudpayments](https://merchant.cloudpayments.ru/).
 
-2. Для определения наличия мобильного приложения T-банк на устройстве пользователя, добавьте значение **tinkoffbank** и **bank100000000004** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
-
-```
-<key>LSApplicationQueriesSchemes</key>
-<array>
-  <string>tinkoffbank</string>
-</array>
-```
-
-3.Создайте объект PaymentTPayView и разместите его
+2.Создайте объект PaymentTPayView и разместите его
 
    ``` 
     private lazy var tPayView = PaymentTPayView() 
@@ -136,7 +117,7 @@ let configuration = PaymentConfiguration.init(
     ])
     }
    ```
-4.Создайте метод с конфигурацией  
+3.Создайте метод с конфигурацией  
 
     private func addConfiguration() {
 
@@ -181,7 +162,7 @@ let configuration = PaymentConfiguration.init(
     tPayView.configuration = configuration // передайте конфигурацию в объект PaymentTPayView
     }
     
-5.Создайте метод для проверки доступности TPay  
+4.Создайте метод для проверки доступности TPay  
     
     private func checkButtons() {
     tPayView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
@@ -191,7 +172,7 @@ let configuration = PaymentConfiguration.init(
         }
     }
 
-6.Подпишитесь на протокол PaymentTPayDelegate и обработайте результаты
+5.Подпишитесь на протокол PaymentTPayDelegate и обработайте результаты
 
     extension TestSinglePaymentMethodsController: PaymentTPayDelegate {
     func resultPayment(_ tPay: Cloudpayments.PaymentTPayView, result: Cloudpayments.PaymentTPayView.PaymentAction, error: String?, transactionId: Int64?) {
@@ -574,6 +555,12 @@ public protocol ThreeDsDelegate: class {
 ```
 
 ### История обновлений:
+
+#### 1.5.10
+* Исправлена проблема при оплате по Tpay и открытие приложения Т-банк
+
+#### 1.5.9
+* Исправлена проблема при оплате по СБП
 
 #### 1.5.8
 * Исправлена проблема при оплате по Tpay и SberPay

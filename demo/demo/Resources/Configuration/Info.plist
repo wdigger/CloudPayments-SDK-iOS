@@ -5,9 +5,9 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict/>
-        <string>btripsexpenses</string>
-        <string>ios-app-smartonline</string>
-        <string>sbolpay</string>
+		<string>btripsexpenses</string>
+		<string>ios-app-smartonline</string>
+		<string>sbolpay</string>
 		<string>sberpay</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
@@ -32,14 +32,12 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-        <string>ios-app-smartonline</string>
-          <string>btripsexpenses</string>
-          <string>sbolpay</string>
-          <string>sberpay</string>
-          <string>tinkoffbank</string>
-          <string>bank100000000004</string>
-          <string>mailto</string>
-          <string>tel</string>
+		<string>ios-app-smartonline</string>
+		<string>btripsexpenses</string>
+		<string>sbolpay</string>
+		<string>sberpay</string>
+		<string>mailto</string>
+		<string>tel</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
