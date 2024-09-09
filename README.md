@@ -56,7 +56,6 @@ let paymentData = PaymentData()
     .setApplePayMerchantId("") // Apple pay merchant id (Необходимо получить у Apple)
     .setDescription("Корзина цветов") // Описание оплаты в свободной форме
     .setAccountId("111") // Обязательный идентификатор пользователя для создания подписки и получения токена
-    .setIpAddress("98.21.123.32") // IP-адрес плательщика
     .setInvoiceId("123") // Номер счета или заказа
     .setEmail("test@cp.ru") // E-mail плательщика, на который будет отправлена квитанция об оплате
     .setPayer(payer) // Информация о плательщике
@@ -555,6 +554,9 @@ public protocol ThreeDsDelegate: class {
 ```
 
 ### История обновлений:
+
+#### 1.5.11
+* Удален параметр ipAddress
 
 #### 1.5.10
 * Исправлена проблема при оплате по Tpay и открытие приложения Т-банк

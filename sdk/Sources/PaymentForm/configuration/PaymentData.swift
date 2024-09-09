@@ -64,7 +64,6 @@ public class PaymentData {
     private (set) var description: String?
     private (set) var accountId: String?
     private (set) var invoiceId: String?
-    private (set) var ipAddress: String? = "98.21.123.32"
     private (set) var cultureName: String?
     private (set) var jsonData: String?
     
@@ -115,11 +114,6 @@ public class PaymentData {
     
     public func setInvoiceId(_ invoiceId: String?) -> PaymentData {
         self.invoiceId = invoiceId
-        return self
-    }
-    
-    public func setIpAddress(_ ipAddress: String?) -> PaymentData {
-        self.ipAddress = ipAddress
         return self
     }
     

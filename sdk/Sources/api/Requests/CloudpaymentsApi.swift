@@ -215,7 +215,6 @@ public class CloudpaymentsApi {
         let email = configuration.paymentData.email
         let jsonData = configuration.paymentData.jsonData
         let successRedirectUrl = configuration.successRedirectUrl
-        let ipAddress = configuration.paymentData.ipAddress
         let apiUrl = configuration.apiUrl
         
         var params = [
@@ -227,7 +226,6 @@ public class CloudpaymentsApi {
             "Device" : "MobileApp",
             "Description" : description,
             "Email" : email,
-            "IpAddress": ipAddress,
             "TtlMinutes" : 30,
             "Scenario": "7",
             "JsonData": jsonData,
@@ -278,7 +276,6 @@ public class CloudpaymentsApi {
             "Device" : "MobileApp",
             "Description" : description,
             "Email" : email,
-            "IpAddress": "123.123.123.123",
             "Os" : "iOS",
             "Scheme" : sсheme.rawValue,
             "TtlMinutes" : 30,
@@ -330,7 +327,6 @@ public class CloudpaymentsApi {
             "Device" : "MobileApp",
             "Description" : description,
             "Email" : email,
-            "IpAddress": "123.123.123.123",
             "Os" : "iOS",
             "Scheme" : sсheme.rawValue,
             "TtlMinutes" : 30,
@@ -443,7 +439,6 @@ public class CloudpaymentsApi {
         var parameters: [String: Any] = [
             "Amount" : paymentData.amount, // Сумма платежа (Обязательный)
             "Currency" : paymentData.currency, // Валюта (Обязательный)
-            "IpAddress" : paymentData.ipAddress ?? "",
             "Name" : paymentData.cardholderName ?? defaultCardHolderName, // Имя держателя карты в латинице (Обязательный для всех платежей кроме Apple Pay и Google Pay)
             "CardCryptogramPacket" : cardCryptogramPacket, // Криптограмма платежных данных (Обязательный)
             "Email" : email ?? "", // E-mail, на который будет отправлена квитанция об оплате
