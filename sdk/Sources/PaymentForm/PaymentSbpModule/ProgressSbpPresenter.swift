@@ -58,7 +58,7 @@ final class ProgressSbpPresenter {
     }
     
     private func setupLinkForBank(value: SbpData) {
-    
+        
         guard let qrURL = altPayTransactionResponse?.qrURL else { return }
         
         var stringUri = qrURL

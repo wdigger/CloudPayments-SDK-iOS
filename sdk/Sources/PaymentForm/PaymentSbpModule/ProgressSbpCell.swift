@@ -89,14 +89,10 @@ final class ProgressSbpCell: UITableViewCell {
         }
     }
     
-    fileprivate func loadImage(url string: String, completion: @escaping (UIImage?) -> Void) {
-        guard let url = URL(string: string) else { return completion(nil) }
-        
-        let task = URLSession.shared.dataTask(with: .init(url: url)) { [weak self] data, _, _ in
+    fileprivate func loadImage(url string: String, completion handler: @escaping (UIImage?) -> Void) {
+        CloudpaymentsApi.loadImage(url: string) { [weak self] result in
             guard let _ = self else { return }
-            guard let data = data, let image = UIImage(data: data) else { return completion(nil)}
-            completion(image)
+            handler(result)
         }
-        task.resume()
     }
 }

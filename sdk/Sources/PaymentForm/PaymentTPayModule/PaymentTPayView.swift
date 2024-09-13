@@ -83,7 +83,7 @@ extension PaymentTPayView: ProgressTPayProtocol {
 
 public extension PaymentTPayView {
     func getMerchantConfiguration(completion: @escaping (ButtonConfiguration?) -> Void) {
-        CloudpaymentsApi.getMerchantConfiguration(configuration: configuration) { [weak self ] result in
+        CloudpaymentsApi.getMerchantConfiguration(configuration: configuration) { [weak self] result in
             guard let self = self else { return }
             self.buttonResult = result
             completion(result)

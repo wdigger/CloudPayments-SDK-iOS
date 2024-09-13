@@ -473,6 +473,18 @@ public class CloudpaymentsApi {
         headers["MobileSDKSource"] = self.source.rawValue
         return headers
     }
+    
+    class func loadImage(url string: String, completion: @escaping (UIImage?) -> Void) {
+        
+        guard let url = URL(string: string) else { return completion(nil) }
+        
+        let task = URLSession.shared.dataTask(with: .init(url: url)) { data, _, _ in
+            guard let data = data, let image = UIImage(data: data) else { return completion(nil) }
+            completion(image)
+        }
+        
+        task.resume()
+    }
 }
 
 public typealias CloudpaymentsRequestCompletion<T> = (_ response: T?, _ error: Error?) -> Void

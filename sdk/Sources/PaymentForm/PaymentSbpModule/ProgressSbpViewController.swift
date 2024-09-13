@@ -184,7 +184,7 @@ final class ProgressSbpViewController: BaseViewController {
     }
     
     private func presentesionView(_ isPresent: Bool, completion: @escaping () -> Void) {
-    
+        
         if isCloused { return }
         isCloused = !isPresent
         let alpha = isPresent ? 0.6 : 0
