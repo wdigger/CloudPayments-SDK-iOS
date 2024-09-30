@@ -77,7 +77,7 @@ let configuration = PaymentConfiguration.init(
     successRedirectUrl: "", // Ваш deeplink для редиректа из приложения банка после успешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
     failRedirectUrl: "" //  Ваш deeplink для редиректа из приложения банка после неуспешной оплаты, (если ничего не передано, по умолчанию используется URL адрес вашего сайта)
 ```
-2.1. Для передачи deeplink при использовании CБП и TPay нужно использовать Universal Links:
+2.1. Для передачи deeplink при использовании CБП,TPay,SberPay нужно использовать Universal Links:
 
 2.2. Документация от Apple: [Universal Links](https://developer.apple.com/documentation/xcode/supporting-universal-links-in-your-app)
 
@@ -290,11 +290,9 @@ let configuration = PaymentConfiguration.init(
 
 1. Включить SberPay через вашего курирующего менеджера.
 
-2. Для определения наличия мобильного приложения Cбера на устройстве, добавьте значения **sberpay**, **btripsexpenses**, **sbolpay**, **ios-app-smartonline** в массив по ключу **LSApplicationQueriesSchemes** в файл **Info.plist** вашего приложения:
+2. Создайте объект PaymentSberPayView и разместите его
 
-3. Создайте объект PaymentSberPayView и разместите его
-
-4. Создайте метод для проверки доступности SberPay  
+3. Создайте метод для проверки доступности SberPay  
     ```
     private func checkButtons() {
     tPayView.getMerchantConfiguration(publicId: merchantPublicId) { [ weak self ] result in
@@ -305,12 +303,11 @@ let configuration = PaymentConfiguration.init(
     }
     ```
 
-5. Подпишитесь на протокол PaymentSberPayDelegate и обработайте результаты
+4. Подпишитесь на протокол PaymentSberPayDelegate и обработайте результаты
 
 ### Использование SberPay в стандартной платёжной форме: 
 
 Включить SberPay через вашего курирующего менеджера.
-
 
 3. Вызовите форму оплаты внутри своего контроллера (Для стандартной формы)
 
@@ -554,6 +551,12 @@ public protocol ThreeDsDelegate: class {
 ```
 
 ### История обновлений:
+
+#### 1.5.13
+* Выполнена доработка для SberPay
+
+#### 1.5.12
+* Повышена надежность
 
 #### 1.5.11
 * Удален параметр ipAddress
