@@ -351,18 +351,16 @@ final class PaymentOptionsForm: PaymentForm, PKPaymentAuthorizationViewControlle
     
     private func setupButton() {
         emailTextField.text = configuration.paymentData.email?.trimmingCharacters(in: .whitespaces)
-        addConfiguration(tPayButton, .tpayButtonColor, .blackColor)
+        addConfiguration(tPayButton, nil, .whiteColor)
         
-        tPayButton.semanticContentAttribute = .forceRightToLeft
         tPayButton.addTarget(self, action: #selector(tPayButtonAction(_:)), for: .touchUpInside)
+        tPayButton.setImage(.iconTPay, for: .normal)
+    
         isReceiptButtonEnabled(configuration.requireEmail)
         
         sbpButton.semanticContentAttribute = .forceRightToLeft
         sbpButton.addTarget(self, action: #selector(sbpButtonAction(_:)), for: .touchUpInside)
         addConfiguration(sbpButton, nil, .whiteColor)
-        
-        tPayButton.semanticContentAttribute = .forceRightToLeft
-        tPayButton.addTarget(self, action: #selector(tPayButtonAction(_:)), for: .touchUpInside)
         
         sberPayButton.addTarget(self, action: #selector(sberPayButtonAction(_:)), for: .touchUpInside)
         
